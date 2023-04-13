@@ -11,7 +11,7 @@ from scipy.spatial.transform import Rotation as R
 from skimage.transform import ProjectiveTransform, estimate_transform, warp
 from tqdm.auto import tqdm
 
-from ..utils.landmarksInfo import LandmarksInfo
+from ..utils.landmarks_info import LandmarksInfo
 
 
 def _arg_type_normalizer(*args) -> Union[List[float], Tuple[float, float]]:

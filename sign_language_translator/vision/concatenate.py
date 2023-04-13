@@ -12,7 +12,7 @@ import numpy as np
 import torch
 from scipy.signal import find_peaks
 
-from ..utils.landmarksInfo import LandmarksInfo
+from ..utils.landmarks_info import LandmarksInfo
 from . import transforms as T
 
 

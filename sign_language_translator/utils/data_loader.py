@@ -7,7 +7,7 @@ import moviepy.editor as mpy
 import numpy as np
 import pandas as pd
 
-from .signDataAttributes import SignDataAttributes
+from .sign_data_attributes import SignDataAttributes
 
 
 class DataLoader:
