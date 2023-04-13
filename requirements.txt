@@ -8,3 +8,4 @@ Pillow
 scipy
 torch
 skimage
+pytest

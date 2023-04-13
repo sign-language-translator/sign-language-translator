@@ -8,7 +8,6 @@ from typing import Dict, List, Set, Union
 
 from sign_language_translator import (
     DATASET_ROOT_DIRECTORY,
-    SIGN_RECORDINGS_DATASET_DIRECTORY,
     Country,
     Organization,
     SignCollection,
@@ -17,7 +16,8 @@ from sign_language_translator import (
 
 with open(
     os.path.join(
-        SIGN_RECORDINGS_DATASET_DIRECTORY,
+        DATASET_ROOT_DIRECTORY,
+        "sign_recordings",
         "collection_to_label_to_language_to_words.json",
     ),
     "r",
@@ -26,7 +26,8 @@ with open(
 
 with open(
     os.path.join(
-        SIGN_RECORDINGS_DATASET_DIRECTORY,
+        DATASET_ROOT_DIRECTORY,
+        "sign_recordings",
         "organization_to_language_to_constructable_words.json",
     ),
     "r",

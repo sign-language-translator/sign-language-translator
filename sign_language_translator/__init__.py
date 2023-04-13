@@ -4,17 +4,11 @@
 import enum
 import os
 
-DATASET_ROOT_DIRECTORY = "/"
 
 def set_dataset_dir(path: str) -> None:
     assert os.path.isdir(path)
     global DATASET_ROOT_DIRECTORY
     DATASET_ROOT_DIRECTORY = path
-
-SIGN_RECORDINGS_DATASET_DIRECTORY = os.path.join(
-    DATASET_ROOT_DIRECTORY, "sign_recordings"
-)
-TEXT_CORPORA_DATASET_DIRECTORY = os.path.join(DATASET_ROOT_DIRECTORY, "text_corpora")
 
 
 class Country(enum.Enum):

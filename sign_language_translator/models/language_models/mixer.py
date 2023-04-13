@@ -49,6 +49,9 @@ class Mixer(LanguageModel):
 
         return self.unknown_token, 0.0
 
+    def next_all(self, context: Iterable) -> Tuple[Iterable[Any], Iterable[float]]:
+        return [], []
+
     def load(self, model_path: str) -> None:
         # folder
         pass

@@ -12,6 +12,9 @@ url = "https://github.com/mdsrqbl"
 repository = "https://github.com/sign-language-translator/sign-language-translator"
 keywords = ["sign", "translation", "pose", "pakistan"]
 
+[tool.poetry.dependencies]
+pytest = "^7.0.0"
+
 [tool.pytest.ini_options]
 addopts = "-v "
 filterwarnings = [
