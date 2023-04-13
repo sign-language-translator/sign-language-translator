@@ -1,0 +1,10 @@
+ipython
+matplotlib
+mediapipe
+moviepy
+numpy
+pandas
+Pillow
+scipy
+torch
+skimage

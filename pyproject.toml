@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling>=1.10.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sign_language_translator"
+version = "0.3.0"
+readme = "README.md"
+description = "Translate between text and sign language using AI"
+authors = [{author = "Mudassar Iqbal", email = "mdsriqb@gmail.com"}]
+url = "https://github.com/mdsrqbl"
+repository = "https://github.com/sign-language-translator/sign-language-translator"
+keywords = ["sign", "translation", "pose", "pakistan"]
+
+[tool.pytest.ini_options]
+addopts = "-v "
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.isort]
+profile = "black"
