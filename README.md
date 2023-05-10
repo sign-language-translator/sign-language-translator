@@ -95,47 +95,66 @@ sign_language_sentence.video().ipython_display()
 ## Directory Tree
     sign-language-translator
     ├── README.md
-    ├── roadmap.md
     ├── pyproject.toml
     ├── requirements.txt
+    ├── roadmap.md
+    ├── sign_language_translator
+    │   ├── config
+    │   │   ├── enums.py
+    │   │   ├── helpers.py
+    │   │   └── settings.py
+    │   │
+    │   ├── data_collection
+    │   │   ├── completeness.py
+    │   │   ├── scraping.py
+    │   │   └── synonyms.py
+    │   │
+    │   ├── languages
+    │   │   ├── sign_collection.py
+    │   │   ├── vocab.py
+    │   │   ├── sign
+    │   │   │   ├── pakistan_sign_language.py
+    │   │   │   └── sign_language.py
+    │   │   │
+    │   │   └── text
+    │   │       ├── text_language.py
+    │   │       ├── english.py
+    │   │       └── urdu.py
+    │   │
+    │   ├── models
+    │   │   ├── language_models
+    │   │   │   ├── abstract_language_model.py
+    │   │   │   ├── beam_sampling.py
+    │   │   │   ├── mixer.py
+    │   │   │   ├── simple_language_model.py
+    │   │   │   └── transformer_language_model.py
+    │   │   │
+    │   │   ├── sign_to_text
+    │   │   └── text_to_sign
+    │   │       ├── concatenative_synthesis.py
+    │   │       └── t2s_model.py
+    │   │
+    │   ├── text
+    │   │   ├── metrics.py
+    │   │   ├── preprocess.py
+    │   │   ├── subtitles.py
+    │   │   ├── tokens.py
+    │   │   └── utils.py
+    │   │
+    │   ├── utils
+    │   │   ├── data_loader.py
+    │   │   ├── landmarks_info.py
+    │   │   ├── sign_data_attributes.py
+    │   │   └── tree.py
+    │   │
+    │   └── vision
+    │       ├── concatenate.py
+    │       ├── embed.py
+    │       ├── transforms.py
+    │       └── visualization.py
     │
-    └── sign_language_translator
-        │
-        ├── data_collection
-        │   ├── completeness.py
-        │   ├── scraping.py
-        │   └── synonyms.py
-        │
-        ├── models
-        │   ├── language_models
-        │   │   ├── abstract_language_model.py
-        │   │   ├── beam_sampling.py
-        │   │   ├── mixer.py
-        │   │   ├── simple_language_model.py
-        │   │   └── transformer_language_model.py
-        │   │
-        │   ├── sign_to_text
-        │   └── text_to_sign
-        │
-        ├── text
-        │   ├── metrics.py
-        │   ├── preprocess.py
-        │   ├── subtitles.py
-        │   ├── tokens.py
-        │   ├── utils.py
-        │   └── vocab.py
-        │
-        ├── utils
-        │   ├── data_loader.py
-        │   ├── landmarks_info.py
-        │   ├── sign_data_attributes.py
-        │   └── tree.py
-        │
-        └── vision
-            ├── concatenate.py
-            ├── embed.py
-            ├── transforms.py
-            └── visualization.py
+    │
+    └── tests
 
 ## Research Paper
 Stay Tuned!
