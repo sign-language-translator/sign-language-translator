@@ -11,8 +11,8 @@ class BeamSampling:
         self,
         model: LanguageModel,
         beam_width: int = 3,
-        start_of_sequence_token="[",  # ["<s>"],
-        end_of_sequence_token="]",  # ["</s>"],
+        start_of_sequence_token=["["],  # ["<s>"],
+        end_of_sequence_token=["]"],  # ["</s>"],
         max_length=33,
         scoring_function=lambda seq, log_prob: 10.0 + log_prob / len(seq),
         return_log_probability=True,
@@ -51,6 +51,7 @@ class BeamSampling:
             branches_ = []
             for context_, score_ in branches:
                 if (
+                    # ended
                     context_[-1] == self.end_of_sequence_token
                     or len(context_) >= self.max_length
                 ):

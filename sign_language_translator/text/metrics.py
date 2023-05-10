@@ -45,7 +45,7 @@ def f1_score(reference, candidate):
     return 2 * bleu_score * rogue_score / ((bleu_score + rogue_score) or 1)
 
 
-class NovelityScoring:
+class NoveltyScore:
     def __init__(
         self,
         n_to_ngram_to_frequency: Dict[int, Dict[Tuple[Any], int]],

@@ -7,7 +7,7 @@ import numpy
 
 
 def find_similar_available_words(
-    candidate: str, vocab, threshold=0.5, n_words=8
+    candidate: str, supported_words, threshold=0.5, n_words=8
 ) -> List[str]:
     return [candidate]
 
