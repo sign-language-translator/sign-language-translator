@@ -4,6 +4,18 @@ import re
 import enum
 
 
+class Tags(enum.Enum):
+    WORD = "WORD"
+    DATE = "DATE"
+    NAME = "NAME"
+    SPACE = "SPACE"
+    NUMBER = "NUMBER"
+    ACRONYM = "ACRONYM"
+    PUNCTUATION = "PUNCTUATION"
+    DEFAULT = ""
+    # CONTEXT = "(something)"
+
+
 class Rule:
     def __init__(self, matcher: Callable[[str], bool], tag: str, priority: int):
         self.matcher = matcher
@@ -19,7 +31,8 @@ class Rule:
     def get_priority(self):
         return self.priority
 
-    def from_pattern(self, pattern: str, tag: str, priority: int):
+    @staticmethod
+    def from_pattern(pattern: str, tag: str, priority: int):
         def match(text: str):
             return bool(re.match(pattern, text))
 
@@ -27,7 +40,7 @@ class Rule:
 
 
 class Tagger:
-    def __init__(self, rules: List[Rule], default=""):
+    def __init__(self, rules: List[Rule], default=Tags.DEFAULT):
         self.rules = rules
         self.default = default
 
@@ -50,14 +63,3 @@ class Tagger:
                     priority = rule.get_priority()
 
         return tag
-
-
-class Tags(enum.Enum):
-    WORD = "WORD"
-    DATE = "DATE"
-    NAME = "NAME"
-    SPACE = "SPACE"
-    NUMBER = "NUMBER"
-    ACRONYM = "ACRONYM"
-    PUNCTUATION = "PUNCTUATION"
-    # CONTEXT = "(something)"
