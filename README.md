@@ -7,6 +7,11 @@ The goal is to provide a user friendly API to novel Sign Language Translation so
 
 A bigger hurdle is the lack of datasets and frameworks that deep learning engineers and software developers can use to build useful products for the target community. That is what this project aims to deliver.
 
+#### Solution
+We've have built an extensible rule-based text-to-sign translation system that can be used to train Deep Learning based models.
+
+Just inherit the TextLanguage and SignLanguage classes to build a rule-based translation system for your regional language. Later you can use that model to fine-tune our AI models.
+
 #### Major Components and Goals ####
 1. `Sign language to Text`
     - In speech to text translation, features such as mel-spectrograms are extracted from audio and fed into neural networks which then output text tokens corresponding to what was said in the audio.
@@ -138,7 +143,8 @@ sign_language_sentence.video().ipython_display()
     │   │   ├── metrics.py
     │   │   ├── preprocess.py
     │   │   ├── subtitles.py
-    │   │   ├── tokens.py
+    │   │   ├── tagger.py
+    │   │   ├── tokenizer.py
     │   │   └── utils.py
     │   │
     │   ├── utils
@@ -159,7 +165,7 @@ sign_language_sentence.video().ipython_display()
 Stay Tuned!
 
 ## Credits and Gratitude
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor at PUCIT. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-04-20.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor at PUCIT. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-05-25.
 
 Immense gratitude towards:
 - [Mudassar Iqbal](https://github.com/mdsrqbl) for leading and coding the project so far.
