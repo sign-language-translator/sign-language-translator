@@ -122,8 +122,8 @@ sign_language_sentence.video().ipython_display()
     │   │   │   └── sign_language.py
     │   │   │
     │   │   └── text
-    │   │       ├── text_language.py
     │   │       ├── english.py
+    │   │       ├── text_language.py
     │   │       └── urdu.py
     │   │
     │   ├── models
@@ -175,7 +175,7 @@ Immense gratitude towards:
 - Hamza Foundation (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing for collaboration and providing the reference clips, hearing-impaired performers for data creation, and creating the text2gloss dataset.
 
 ## Bonus
-count total number of lines of code (currently 5389 total):
+count total number of lines of code (currently 5721 total):
 ```
 git ls-files | grep '\.py' | xargs wc -l
 ```
