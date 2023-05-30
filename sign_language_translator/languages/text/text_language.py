@@ -15,19 +15,32 @@ class TextLanguage(ABC):
     def allowed_characters() -> Set[str]:
         pass
 
-    @abstractstaticmethod
-    def delete_unallowed_characters(str) -> str:
-        pass
+    # @abstractstaticmethod
+    # def delete_unallowed_characters(str) -> str:
+    #     pass
 
     @abstractmethod
     def preprocess(self, text: str) -> str:
         pass
 
     @abstractmethod
-    def is_word_supported(self, word: str) -> bool:
+    def tokenize(self, text: str) -> str:
         pass
 
     @abstractmethod
-    def get_word_contexts(self, word: str) -> List[str]:
+    def sentence_tokenize(self, text: str) -> str:
         pass
 
+    @abstractmethod
+    def detokenize(self, text: str) -> str:
+        pass
+
+    @abstractmethod
+    def tag(self, word: str) -> bool:
+        pass
+
+    @abstractmethod
+    def get_tags(self, word: str) -> bool:
+        pass
+
+    # embed/similar

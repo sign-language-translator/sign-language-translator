@@ -10,3 +10,6 @@ class Settings:
     DATASET_ROOT_DIRECTORY: str = join(
         dirname(dirname(__file__)), "sign-language-datasets"
     )
+
+    FILENAME_SEPARATOR = "_"
+    FILENAME_CONNECTOR = "-"

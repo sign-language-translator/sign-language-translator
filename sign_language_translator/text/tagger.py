@@ -14,6 +14,12 @@ class Tags(enum.Enum):
     PUNCTUATION = "PUNCTUATION"
     DEFAULT = ""
     # CONTEXT = "(something)"
+    # PERSON = {
+    #     'id': 'PERSON',
+    #     'name': 'Person',
+    #     'description': 'Represents a person',
+    #     'example': 'John Doe',
+    # }
 
 
 class Rule:

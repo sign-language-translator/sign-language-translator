@@ -4,7 +4,7 @@
 import json
 import os
 import re
-from typing import Dict, List, Set, Union, Tuple
+from typing import Dict, List, Set, Union, Tuple, Any
 
 from ..config.settings import Settings
 
@@ -15,17 +15,25 @@ class Vocab:
     def __init__(
         self,
         language: str,
-        sign_collections: List[str],
+        sign_collections: List[str] | None = None,
+        data_root_dir: str = Settings.DATASET_ROOT_DIRECTORY,
     ) -> None:
+        # save arguments
         self.language = language
         self.sign_collections = sign_collections
-        self.sign_labels = self._load_sign_labels()
+        self.data_root_dir = data_root_dir
+        # :TODO: regex matching of sign_collections e.g. pk-*-*
+
+        # read files
+        self.sign_labels = self._load_sign_labels(sign_collections)
         self.preprocessing_map = self._load_preprocessing(self.language)
         self.label_to_words = self._load_label_to_words(language, sign_collections)
         self.label_sequence_to_words = self._load_constructable_words(
-            self.language, self.sign_collections
+            language, sign_collections
         )
-        self.context_regex = r"\([^\(\)]*\)"  # delete all occurrences of everything wrapped in a pair of parenthesis
+
+        # create vocab
+        self.context_regex = r"\([^\(\)]*\)"  # all occurrences of everything wrapped in a pair of parenthesis
         self.supported_words_with_context = self._make_supported_words()
         self.supported_words = {
             self.remove_context(word) for word in self.supported_words_with_context
@@ -34,33 +42,33 @@ class Vocab:
             self.supported_words_with_context
         )
 
-        self.NON_SENTENCE_END_TOKENS = {
-            w
-            for wc in self.supported_words_with_context
-            for w in [self.remove_context(wc)]
-            if (("double-handed-letter)" in wc) and (not w.isascii()))
-            or (len(w) == 1 and w.isalnum())
-        }
+    def get_context(self, word: str) -> str:
+        context = re.match(self.context_regex, word)
+        context = context.group() if context else ""
 
-    def remove_context(self, word: str):
+        return context
+
+    def remove_context(self, word: str) -> str:
         without_context = re.sub(self.context_regex, "", word)
         return without_context
 
     def _load_label_to_words(
-        self, language: str, sign_collections: str
+        self, language: str, sign_collections: List[str]
     ) -> Dict[str, List[str]]:
         with open(
             os.path.join(
-                Settings.DATASET_ROOT_DIRECTORY,
+                self.data_root_dir,
                 "sign_recordings",
                 "collection_to_label_to_language_to_words.json",
             ),
             "r",
         ) as f:
+            raw_data: Dict[str, Dict[str, Dict[str, List[str]]]] = json.load(f)
             label_2_words = {
-                f"{sc}_{label}": v[language]
-                for sc in sign_collections
-                for label, v in json.load(f)[sc].items()
+                f"{sc}{Settings.FILENAME_SEPARATOR}{label}": lang_to_word_list[language]
+                for sc in sign_collections or raw_data.keys()
+                for label, lang_to_word_list in raw_data.get(sc, {}).items()
+                if language in lang_to_word_list
             }
 
         return label_2_words
@@ -70,58 +78,92 @@ class Vocab:
     ) -> Dict[Tuple[str], List[str]]:
         with open(
             os.path.join(
-                Settings.DATASET_ROOT_DIRECTORY,
+                self.data_root_dir,
                 "sign_recordings",
                 "collection_to_label_to_language_to_words.json",
             ),
             "r",
         ) as f:
-            collection_to_label_to_language_to_words = json.load(f)
+            collection_to_label_to_language_to_words: Dict[
+                str, Dict[str, Dict[str, List[str]]]
+            ] = json.load(f)
 
         with open(
             os.path.join(
-                Settings.DATASET_ROOT_DIRECTORY,
+                self.data_root_dir,
                 "sign_recordings",
                 "organization_to_language_to_constructable_words.json",
             ),
             "r",
         ) as f:
+            raw_data: Dict[str, Dict[str, List[str]]] = json.load(f)
             label_sequence_2_words = {
-                tuple(d["components"]): d[language]
-                for sc in sign_collections
-                for d in json.load(f)["-".join(sc.split("-")[:2])]
+                tuple(sign_dict["components"]): sign_dict[language]
+                for sc in sign_collections or raw_data.keys()
+                for sign_dict in raw_data.get(
+                    Settings.FILENAME_CONNECTOR.join(
+                        sc.split(Settings.FILENAME_CONNECTOR)[:2]
+                    ),
+                    [],
+                )
                 + [
                     v
                     for sc in sign_collections
-                    for label, v in collection_to_label_to_language_to_words[sc].items()
+                    or collection_to_label_to_language_to_words.keys()
+                    for label, v in collection_to_label_to_language_to_words.get(
+                        sc, {}
+                    ).items()
                     if "components" in v
                 ]
+                if language in sign_dict
+                and (
+                    all(
+                        [
+                            comp.split(Settings.FILENAME_SEPARATOR)[0] in sc
+                            for comp in sign_dict["components"]
+                        ]
+                    )
+                    if sign_collections
+                    else True
+                )
             }
 
         return label_sequence_2_words
 
-    def _load_preprocessing(self, language: str) -> Dict:
+    def _load_preprocessing(self, language: str) -> Dict[str, Any]:
         with open(
             os.path.join(
-                Settings.DATASET_ROOT_DIRECTORY,
+                self.data_root_dir,
                 "text_preprocessing.json",
             ),
             "r",
         ) as f:
-            preprocessing_map = {k: v[language] for k, v in json.load(f).items()}
+            raw_data: Dict[str, Dict[str, Any]] = json.load(f)
+            preprocessing_map: Dict[str, Any] = {
+                k: v.get(language, type(list(v.values())[0])())
+                for k, v in raw_data.items()
+            }
 
         return preprocessing_map
 
-    def _load_sign_labels(self) -> Dict[str, List[str]]:
+    def _load_sign_labels(
+        self, sign_collections: List[str] | None = None
+    ) -> Dict[str, List[str]]:
         with open(
             os.path.join(
-                Settings.DATASET_ROOT_DIRECTORY,
+                self.data_root_dir,
                 "sign_recordings",
                 "recordings_labels.json",
             ),
             "r",
         ) as f:
-            sign_labels = json.load(f)
+            sign_labels: Dict[str, List[str]] = json.load(f)
+            sign_labels = [
+                f"{sign_collection}{Settings.FILENAME_SEPARATOR}{label}"
+                for sign_collection, label_list in sign_labels.items()
+                for label in label_list
+                if sign_collection in (sign_collections or sign_labels.keys())
+            ]
 
         return sign_labels
 
@@ -131,12 +173,12 @@ class Vocab:
         vocab |= {w for words in self.label_to_words.values() for w in words}
 
         # self.preprocessing_map["joint_word_to_split_words"],
-        vocab |= set(self.preprocessing_map["person_names"])
+        vocab |= set(self.preprocessing_map.get("person_names", {}))
         # self.preprocessing_map["named_entities"],
         vocab |= {
             w
-            for w, n in self.preprocessing_map["words_to_numbers"].items()
-            # Should be in TextLanguage. figure something out! delete from json?
+            for w, n in self.preprocessing_map.get("words_to_numbers", {}).items()
+            # :TODO: Should be in TextLanguage. figure something out! delete from json?
             if "0" not in str(n)
         }
         # self.preprocessing_map["number_suffixes_to_zeros"],
@@ -155,9 +197,9 @@ class Vocab:
 
     # load sign video/features
 
+
 BAD_CHARACTERS_REGEX = r"|".join(
     {"\ufeff", "\u200b", "\u2005", "\u2009", "\u200b", "\u200c"}
     | {"\u0601", "\u2002", "\u2061", "\u202c", "\u3000", "\u200d"}
     | {"\u2003", "\u0602", "\xad", " ", "‎", "\u200f"}
 )
-

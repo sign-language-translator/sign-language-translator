@@ -11,7 +11,7 @@ def get_tagger():
         Rule.from_pattern(r"^\d{4}-\d{2}-\d{2}$", Tags.DATE, 5),
         Rule(lambda token: token.lower() in ["mudassar", "iqbal"], Tags.NAME, 3),
     ]
-    tagger = Tagger(rules=rules, default="")
+    tagger = Tagger(rules=rules, default=Tags.DEFAULT)
 
     return tagger
 

@@ -1,0 +1,34 @@
+{
+    "abc-xyz-1": {
+        "sign-1": {
+            "english": [
+                "word-0",
+                "word-1"
+            ]
+        },
+        "sign-2": {
+            "english": [
+                "word-2",
+                "word-3(context)"
+            ]
+        }
+    },
+    "abc-xyz-2": {
+        "sign-3": {
+            "english": [
+                "word-4",
+                "word-5"
+            ],
+            "components": [
+                "abc-xyz-1_sign-1",
+                "abc-xyz-2_sign-1"
+            ]
+        },
+        "sign-1": {
+            "english": [
+                "word-6",
+                "word-0"
+            ]
+        }
+    }
+}

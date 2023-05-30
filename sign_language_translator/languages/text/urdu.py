@@ -19,16 +19,23 @@ class Urdu(TextLanguage):
     def allowed_characters(cls) -> Set[str]:
         return cls.ALLOWED_CHARACTERS
 
-    @classmethod
-    def delete_unallowed_characters(cls, text: str) -> str:
-        text = re.sub(cls.UNALLOWED_CHARACTERS_REGEX, " ", text)
+    def delete_unallowed_characters(self, text: str) -> str:
+        text = re.sub(self.UNALLOWED_CHARACTERS_REGEX, " ", text)
         text = re.sub(r"\s+", " ", text)
         text = text.strip()
 
         return text
 
     def __init__(self) -> None:
-        self.VOCAB = Vocab(Urdu.name(), ["pk-hfad-1"])
+        self.VOCAB = Vocab(Urdu.name())
+
+        self.NON_SENTENCE_END_TOKENS = {
+            w
+            for wc in self.VOCAB.supported_words_with_context
+            for w in [self.VOCAB.remove_context(wc)]
+            if (("double-handed-letter)" in wc) and (not w.isascii()))
+            or (len(w) == 1 and w.isalnum())
+        }
 
     def preprocess(self, text: str) -> str:
         text = Urdu.character_normalize(text)
