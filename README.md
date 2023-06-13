@@ -8,9 +8,9 @@ The goal is to provide a user friendly API to novel Sign Language Translation so
 A bigger hurdle is the lack of datasets and frameworks that deep learning engineers and software developers can use to build useful products for the target community. That is what this project aims to deliver.
 
 #### Solution
-We've have built an extensible rule-based text-to-sign translation system that can be used to train Deep Learning based models.
+We've have built an *extensible rule-based* text-to-sign translation system that can be used to *train Deep Learning* models.
 
-Just inherit the TextLanguage and SignLanguage classes to build a rule-based translation system for your regional language. Later you can use that model to fine-tune our AI models.
+Just inherit the TextLanguage and SignLanguage classes to build a rule-based translation system for your regional language. Later you can use that system to fine-tune our AI models.
 
 #### Major Components and Goals ####
 1. `Sign language to Text`
@@ -73,29 +73,65 @@ The text data includes:
 [See the *sign-language-datasets* repo and its *release files* for the actual data & details](https://github.com/sign-language-translator/sign-language-datasets)
 
 ## Usage
-[see notebooks repo for detailed use](https://github.com/sign-language-translator/notebooks)
+see the *test cases* or [the *notebooks* repo](https://github.com/sign-language-translator/notebooks) for detailed use
 
+###### basic translation
 ```python
 import sign_language_translator as slt
 
 # download dataset
 # slt.download_data("path/to")
-slt.set_dataset_dir("path/to/sign-language-datasets")
+# slt.set_dataset_dir("path/to/sign-language-datasets")
+# by default, dataset is downloaded within the install directory
 
-# download translation models
-# model = slt.download_model("...")
+# Load text-to-sign model
+# deep_t2s_model = slt.get_model("generative_t2s_base-01") # pytorch
+# rule-based model (concatenates clips of each word)
 t2s_model = slt.get_model(
-    task= "text-to-sign",
-    approach = "concatenative", # "generative"
-    text_language = "Urdu",
-    sign_language = "PakistanSignLanguage",
+    text_language = "English", # or object of any child of slt.languages.text.text_language.TextLanguage class
+    sign_language = "PakistanSignLanguage", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
     sign_feature_model = "mediapipe_pose_v2_hand_v1",
 )
 
-sign_language_sentence = t2s_model.translate("hello world!")
+text = "hello world!"
+sign_language_sentence = t2s_model(text)
 
-sign_language_sentence.video().ipython_display()
+moviepy_video_object = sign_language_sentence.video()
+# moviepy_video_object.ipython_display()
+# moviepy_video_object.write_videofile(f"sentences/{text}.mp4")
 
+
+
+# Load sign-to-text model
+deep_s2t_model = slt.get_model("gesture_mp_base-01") # pytorch
+
+# load sign
+video = slt.read_video("video.mp4")
+features = slt.extract_features(video, "mediapipe_pose_v2_hand_v1")
+
+# translate
+text = deep_s2t_model(features)
+print(text)
+```
+###### text language processor
+```python
+
+from sign_language_translator.languages.text.urdu import Urdu
+ur_nlp = Urdu()
+
+text = "hello جاؤں COVID-19."
+normalized_text = ur_nlp.preprocess(text)
+tokens = ur_nlp.tokenize(normalized_text)
+# tagged = ur_nlp.tag(tokens)
+tags = ur_nlp.get_tags(tokens)
+# ur_nlp.get_word_senses("میں") # = [["میں(i)", "میں(in)"]]
+
+print(f"{text = }\n{normalized_text = }\n{tokens = }\n{tags = }")
+# text = 'hello جاؤں COVID-19.'
+# normalized_text = 'جاؤں COVID-19.'
+# tokens = ['جاؤں', ' ', 'COVID', '-', '19', '.']
+# # tagged = [('جاؤں', <Tags.SUPPORTED_WORD: 'SUPPORTED_WORD'>), ...]
+# tags = [<Tags.SUPPORTED_WORD: 'SUPPORTED_WORD'>, ...]
 ```
 ## Directory Tree
     sign-language-translator
@@ -165,17 +201,18 @@ sign_language_sentence.video().ipython_display()
 Stay Tuned!
 
 ## Credits and Gratitude
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor at PUCIT. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-05-25.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor at PUCIT. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-06-14.
 
 Immense gratitude towards:
 - [Mudassar Iqbal](https://github.com/mdsrqbl) for leading and coding the project so far.
-- Rabbia Arshad for help in web development and initial R&D.
+- Rabbia Arshad for help in initial R&D and web development.
 - Waqas Bin Abbas for assistance in video data collection process.
 - Dr Kamran Malik for teaching us AI, setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
 - Hamza Foundation (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing for collaboration and providing the reference clips, hearing-impaired performers for data creation, and creating the text2gloss dataset.
+- [UrduHack](https://github.com/urduhack/urduhack) (espacially Ikram Ali) for their work on Urdu character normalization.
 
 ## Bonus
-count total number of lines of code (currently 5721 total):
+count total number of lines of code (currently 6045 total):
 ```
 git ls-files | grep '\.py' | xargs wc -l
 ```

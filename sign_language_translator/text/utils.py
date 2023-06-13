@@ -1,7 +1,7 @@
 """other functions
 """
 
-from typing import Iterable, List
+from typing import Iterable, List, Set, Any
 
 import numpy
 
@@ -31,7 +31,30 @@ def make_ngrams(sequence: Iterable, n: int) -> List[Iterable]:
     )
     return ngrams
 
-def normpdf(x:float, mean:float, std:float):
+
+def extract_supported_subsequence(
+    sequence: Iterable[Any],
+    tags: Iterable[Any],
+    supported_tags: Set[Any],
+    skipped_items: Set[Any],
+) -> List[List[Any]]:
+    subsequences = []
+    subseq = []
+    for token, tag in zip(sequence, tags):
+        if (tag in supported_tags) and (token not in skipped_items):
+            subseq.append(token)
+        else:
+            if subseq:
+                subsequences.append(subseq)
+                subseq = []
+
+    if subseq:
+        subsequences.append(subseq)
+
+    return subsequences
+
+
+def normpdf(x: float, mean: float, std: float):
     denominator = std * ((2.0 * numpy.pi) ** 0.5)
     numerator = numpy.exp(-0.5 * ((x - mean) / std) ** 2)
     return numerator / denominator

@@ -1,19 +1,22 @@
-from typing import Callable, List, Tuple
-import re
-
 import enum
+import re
+from typing import Any, Callable, List, Tuple
 
 
 class Tags(enum.Enum):
     WORD = "WORD"
     DATE = "DATE"
+    TIME = "TIME"
     NAME = "NAME"
     SPACE = "SPACE"
     NUMBER = "NUMBER"
     ACRONYM = "ACRONYM"
     PUNCTUATION = "PUNCTUATION"
+    SUPPORTED_WORD = "SUPPORTED_WORD"
     DEFAULT = ""
-    # CONTEXT = "(something)"
+    END_OF_SEQUENCE = "EOS"
+    START_OF_SEQUENCE = "SOS"
+    # WORD_SENSE = "(anything)"
     # PERSON = {
     #     'id': 'PERSON',
     #     'name': 'Person',
@@ -50,12 +53,12 @@ class Tagger:
         self.rules = rules
         self.default = default
 
-    def tag(self, tokens: List[str]) -> List[Tuple[str, str]]:
+    def tag(self, tokens: List[str]) -> List[Tuple[str, Any]]:
         tagged_tokens = list(zip(tokens, self.get_tags(tokens)))
 
         return tagged_tokens
 
-    def get_tags(self, tokens: List[str]) -> List[str]:
+    def get_tags(self, tokens: List[str]) -> List[Any]:
         return [self._apply_rules(token) for token in tokens]
 
     def _apply_rules(self, token: str) -> str:

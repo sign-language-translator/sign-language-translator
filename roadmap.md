@@ -79,7 +79,7 @@
     - [ ] T5 (summarizer) on text2text dataset
     - [ ] pose generation (text 2 audio, (parametric synthesis tts))
         - [ ] evaluation (classifier for machine-generated and human-produced speech, WER on stt model)
-    - [ ] motion transfer (.../stable diffusion)
+    - [ ] motion transfer (.../stable diffusion(predict CLIP model embedding of frame from pose vector))
     - [ ] pose to image (GAN/stable diffusion)
 - [ ] Deployment
     - [ ] API / MLOps / model & video persistance in memory

@@ -20,13 +20,14 @@ def replace_words(text: str, word_map: Dict[str, str], word_regex: str = r"\w+")
     return text
 
 
-def remove_space_before_punctuation(text: str, punctuation_regex=r"\s+[\.,\?!]"):
+def remove_space_before_punctuation(text: str, punctuation={".", ",", "?", "!"}):
+    regex = r"\s+[" + "".join([re.escape(punc) for punc in punctuation]) + r"]"
     def get_replacement(match: re.Match) -> str:
         matched_string: str = match.group(0)
         replacement_string = matched_string.lstrip()
 
         return replacement_string
 
-    fixed_text = re.sub(punctuation_regex, get_replacement, text)
+    fixed_text = re.sub(regex, get_replacement, text)
 
     return fixed_text

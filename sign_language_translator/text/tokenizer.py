@@ -15,7 +15,9 @@ class SignTokenizer:
 
         self._first_subword_to_full = self._make_compound_word_map(compound_words)
 
-        self.end_of_sentence_tokens = end_of_sentence_tokens
+        self.end_of_sentence_tokens = list(
+            set(end_of_sentence_tokens) | set(full_stops)
+        )
         self.non_sentence_end_words = non_sentence_end_words
         self.full_stops = full_stops
 
@@ -38,10 +40,14 @@ class SignTokenizer:
         broken = [
             text[split_indexes[i] : split_indexes[i + 1]]
             for i in range(len(split_indexes) - 1)
+            if split_indexes[i] != split_indexes[i + 1]
         ]
 
         if join_compound_words:
             broken = self._join_subwords(broken)
+
+        # if join_word_sense:
+        #     broken = self._join_word_sense(broken)
 
         return broken
 
@@ -91,7 +97,7 @@ class SignTokenizer:
 
         return mapper
 
-    def _join_subwords(self, tokens: List[str]):
+    def _join_subwords(self, tokens: List[str]) -> List[str]:
         new_tokens = []
         i = 0
         while i < len(tokens):
@@ -110,3 +116,7 @@ class SignTokenizer:
             i += 1
 
         return new_tokens
+
+    def _join_word_sense(self, tokens: List[str]):
+        # :TODO: handle ["word", "word", "(", "word", "-", "sense", ")"] --> ["word", "word(word-sense)"] in tokenization
+        return tokens

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod, abstractstaticmethod
-from typing import Set, List
+from typing import Any, Iterable, List, Set, Tuple, Union
 
 
 class TextLanguage(ABC):
@@ -15,32 +15,33 @@ class TextLanguage(ABC):
     def allowed_characters() -> Set[str]:
         pass
 
-    # @abstractstaticmethod
-    # def delete_unallowed_characters(str) -> str:
-    #     pass
-
     @abstractmethod
     def preprocess(self, text: str) -> str:
         pass
 
     @abstractmethod
-    def tokenize(self, text: str) -> str:
+    def tokenize(self, text: str) -> List[str]:
         pass
 
     @abstractmethod
-    def sentence_tokenize(self, text: str) -> str:
+    def sentence_tokenize(self, text: str) -> List[str]:
         pass
 
     @abstractmethod
-    def detokenize(self, text: str) -> str:
+    def detokenize(self, tokens: Iterable[str]) -> str:
         pass
 
     @abstractmethod
-    def tag(self, word: str) -> bool:
+    def tag(self, tokens: Union[str, Iterable[str]]) -> List[Tuple[str, Any]]:
         pass
 
     @abstractmethod
-    def get_tags(self, word: str) -> bool:
+    def get_tags(self, tokens: Union[str, Iterable[str]]) -> List[Any]:
+        pass
+
+    @abstractmethod
+    def get_word_senses(self, tokens: Union[str, Iterable[str]]) -> List[List[str]]:
         pass
 
     # embed/similar
+    # all_tags

@@ -190,5 +190,9 @@ def test_ambiguous_words():
     pass
 
 
+def test_word_senses():
+    pass
+
+
 def test_test_data():
     pass

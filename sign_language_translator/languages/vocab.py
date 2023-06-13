@@ -4,9 +4,9 @@
 import json
 import os
 import re
-from typing import Dict, List, Set, Union, Tuple, Any
+from typing import Any, Dict, List, Set, Tuple, Union
 
-from ..config.settings import Settings
+from sign_language_translator.config.settings import Settings
 
 
 class Vocab:
@@ -33,24 +33,26 @@ class Vocab:
         )
 
         # create vocab
-        self.context_regex = r"\([^\(\)]*\)"  # all occurrences of everything wrapped in a pair of parenthesis
-        self.supported_words_with_context = self._make_supported_words()
+        self.WORD_SENSE_REGEX = r"\([^\(\)]*\)"  # all occurrences of everything wrapped in a pair of parenthesis
+        self.supported_words_with_word_sense = self._make_supported_words()
         self.supported_words = {
-            self.remove_context(word) for word in self.supported_words_with_context
+            self.remove_word_sense(word) for word in self.supported_words_with_word_sense
         }
-        self.ambiguous_to_context = self._make_ambiguous_map(
-            self.supported_words_with_context
+        self.ambiguous_to_unambiguous = self._make_disambiguation_map(
+            self.supported_words_with_word_sense
         )
+        self.person_names = self.preprocessing_map.get('person_names',[])
+        self.words_to_numbers = self.preprocessing_map.get('words_to_numbers', {})
 
-    def get_context(self, word: str) -> str:
-        context = re.match(self.context_regex, word)
-        context = context.group() if context else ""
+    def get_word_sense(self, word: str) -> str:
+        word_sense = re.match(self.WORD_SENSE_REGEX, word)
+        word_sense = word_sense.group() if word_sense else ""
 
-        return context
+        return word_sense
 
-    def remove_context(self, word: str) -> str:
-        without_context = re.sub(self.context_regex, "", word)
-        return without_context
+    def remove_word_sense(self, word: str) -> str:
+        without_word_sense = re.sub(self.WORD_SENSE_REGEX, "", word)
+        return without_word_sense
 
     def _load_label_to_words(
         self, language: str, sign_collections: List[str]
@@ -184,16 +186,16 @@ class Vocab:
         # self.preprocessing_map["number_suffixes_to_zeros"],
         return vocab
 
-    def _make_ambiguous_map(self, words: List[str]) -> Dict[str, List[str]]:
-        ambiguous_2_context = dict()
+    def _make_disambiguation_map(self, words: List[str]) -> Dict[str, List[str]]:
+        ambiguous_2_unambiguous = dict()
         for word in words:
-            without_context = self.remove_context(word)
-            if without_context != word:
-                if without_context not in ambiguous_2_context:
-                    ambiguous_2_context[without_context] = []
-                ambiguous_2_context[without_context].append(word)
+            without_word_sense = self.remove_word_sense(word)
+            if without_word_sense != word:
+                if without_word_sense not in ambiguous_2_unambiguous:
+                    ambiguous_2_unambiguous[without_word_sense] = []
+                ambiguous_2_unambiguous[without_word_sense].append(word)
 
-        return ambiguous_2_context
+        return ambiguous_2_unambiguous
 
     # load sign video/features
 

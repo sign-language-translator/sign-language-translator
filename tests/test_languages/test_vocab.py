@@ -22,7 +22,7 @@ def test_vocab_single_sign_collection():
         "word-2",
         "word-3",
     }
-    assert vocab.ambiguous_to_context == {"word-3": ["word-3(context)"]}
+    assert vocab.ambiguous_to_unambiguous == {"word-3": ["word-3(context)"]}
 
 
 def test_vocab_all_sign_collections():
@@ -46,7 +46,7 @@ def test_vocab_all_sign_collections():
         ("abc-xyz-2_sign-1", "abc-xyz-1_sign-2"): ["word-7", "word-8"],
         ("abc-xyz-1_sign-1", "abc-xyz-2_sign-1"): ["word-4", "word-5"],
     }
-    assert vocab.supported_words_with_context == {
+    assert vocab.supported_words_with_word_sense == {
         "alice",
         "bob",
         "word-0",
@@ -59,7 +59,7 @@ def test_vocab_all_sign_collections():
         "word-7",
         "word-8",
     }
-    assert vocab.ambiguous_to_context == {"word-3": ["word-3(context)"]}
+    assert vocab.ambiguous_to_unambiguous == {"word-3": ["word-3(context)"]}
 
 
 # def test_sign_collection_regex_matching():
