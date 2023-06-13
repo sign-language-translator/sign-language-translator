@@ -13,7 +13,7 @@ def tree(
     cur_path: str = ".",
     directory_only=True,
     extra_line=True,
-    ignore=["__pycache__", "temp"],
+    ignore=["__pycache__", "temp", "__init__.py"],
     regex=True,
 ) -> None:
     """prints out directory hierarchy

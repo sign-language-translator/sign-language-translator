@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache
 pytestdebug.log
+.coverage
 
 # Other
 .DS_Store

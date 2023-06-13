@@ -1,45 +1,45 @@
-"""Main __init__ file. Defines global variables & constants.
+"""# sign_language_translator
+
+## Usage
+```python
+import sign_language_translator as slt
+
+# download dataset
+# slt.download_data("path/to")
+slt.set_dataset_dir("path/to/sign-language-datasets")
+
+# download translation models
+# model = slt.download_model("...")
+t2s_model = slt.get_model(
+    task = "text-to-sign",
+    approach = "concatenative", # for rule-based synthesis. "generative" for Deep Learning based synthesis.
+    text_language = "Urdu",
+    sign_language = "PakistanSignLanguage",
+    sign_feature_model = "mediapipe_pose_v2_hand_v1",
+)
+
+sign_language_sentence = t2s_model.translate("hello world!")
+
+# video = sign_language_sentence.video() # moviepy
+# frame = sign_language_sentence.get_frame(index=10) # PIL Image
+# slice = sign_language_sentence[10:11]
+# features = sign_language_sentence.numpy()
+# features = sign_language_sentence.torch()
+sign_language_sentence.show()
+```
 """
 
-import enum
-import os
+from .config.helpers import set_dataset_dir
+from .config.settings import Settings
+from . import vision, text, data_collection, models, utils, config
 
-
-def set_dataset_dir(path: str) -> None:
-    assert os.path.isdir(path)
-    global DATASET_ROOT_DIRECTORY
-    DATASET_ROOT_DIRECTORY = path
-
-
-class Country(enum.Enum):
-    PAKISTAN = "pk"
-
-
-class Organization(enum.Enum):
-    HFAD = "hfad"
-    # NICE = "nice"
-    # FESF = "fesf"
-
-
-class TextualLanguage(enum.Enum):
-    ENGLISH = "english"
-    URDU = "urdu"
-
-
-class SignCollection(enum.Enum):
-    PK_HFAD_1 = "pk-hfad-1"
-
-
-# INTERNATIONAL_LANGUAGE = TextualLanguage.ENGLISH
-# NATIVE_LANGUAGE = TextualLanguage.URDU
-
-
-# def set_native_language(language: TextualLanguage):
-#     """the regional spoken/textual language to be used throughout the project."""
-#     global NATIVE_LANGUAGE
-#     NATIVE_LANGUAGE = language
-
-# def set_international_language(language: TextualLanguage):
-#     """the international spoken/textual language to be used throughout the project."""
-#     global INTERNATIONAL_LANGUAGE
-#     INTERNATIONAL_LANGUAGE = language
+__all__ = [
+    "set_dataset_dir",
+    "Settings",
+    "vision",
+    "text",
+    "data_collection",
+    "models",
+    "utils",
+    "config",
+]

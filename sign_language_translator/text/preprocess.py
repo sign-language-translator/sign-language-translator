@@ -4,15 +4,10 @@
 import re
 from typing import Dict
 
-from urduhack.normalization import normalize_characters, normalize_combine_characters
-
-from .vocab import (
-    BAD_CHARACTERS_REGEX,
-    REKHTA_MISSPELLED_TO_CORRECT,
-    URDU_WORD_REGEX,
-    TextualLanguage,
-    preprocessing_map,
-)
+__all__ = [
+    "replace_words",
+    "remove_space_before_punctuation",
+]
 
 
 def replace_words(text: str, word_map: Dict[str, str], word_regex: str = r"\w+") -> str:
@@ -25,44 +20,14 @@ def replace_words(text: str, word_map: Dict[str, str], word_regex: str = r"\w+")
     return text
 
 
-def urdu_text_normalization(text: str):
-    text = normalize_characters(text)
-    text = normalize_combine_characters(text)
-    text = replace_words(
-        text,
-        word_map=preprocessing_map["misspelled_to_correct"][TextualLanguage.URDU.value],
-        word_regex=URDU_WORD_REGEX,
-    )
-    text = re.sub(BAD_CHARACTERS_REGEX, " ", text)
-    text = re.sub(r"[۔\.][۔\. ]+[\.۔]", "۔۔۔", text)
+def remove_space_before_punctuation(text: str, punctuation={".", ",", "?", "!"}):
+    regex = r"\s+[" + "".join([re.escape(punc) for punc in punctuation]) + r"]"
+    def get_replacement(match: re.Match) -> str:
+        matched_string: str = match.group(0)
+        replacement_string = matched_string.lstrip()
 
-    return text
+        return replacement_string
 
+    fixed_text = re.sub(regex, get_replacement, text)
 
-def urdu_poetry_preprocessor(text: str) -> str:
-    text = ("؛ ").join(
-        [
-            line.strip("() '\"\t")
-            for line in text.splitlines()
-            if len(re.findall(URDU_WORD_REGEX, line)) > 1
-        ]
-    )
-    text = replace_words(
-        text,
-        word_map=REKHTA_MISSPELLED_TO_CORRECT,
-        word_regex=URDU_WORD_REGEX,
-    )
-
-    return text
-
-
-def urdu_passage_preprocessor(text: str) -> str:
-    text = re.sub(r"\s+", " ", text)
-    text = text.strip()
-
-    return text
-
-
-def urdu_wikipedia_preprocessor(text: str) -> str:
-    text = text.strip(". !\"'\n\t")
-    return text
+    return fixed_text

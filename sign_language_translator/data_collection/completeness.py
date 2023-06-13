@@ -8,6 +8,7 @@ from typing import Dict
 from tqdm.auto import tqdm
 
 from sign_language_translator.utils.tree import tree
+from sign_language_translator import Settings
 
 
 class DataCompletenessChecker:
@@ -21,7 +22,7 @@ class DataCompletenessChecker:
             f"person{n}"
             for n in [101, 151, 201, 202, 203, 204, 205, 251, 252, 253, 254, 255]
         ],
-        sep="_",
+        sep=Settings.FILENAME_SEPARATOR,
         extension=".mp4",
         find_filepaths=False,
         load_filepaths=False,
