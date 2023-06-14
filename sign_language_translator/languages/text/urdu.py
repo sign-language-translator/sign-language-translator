@@ -345,4 +345,4 @@ class Urdu(TextLanguage):
     )
 
 
-__all__ = ["Urdu", "Tags"]
+__all__ = ["Urdu"]

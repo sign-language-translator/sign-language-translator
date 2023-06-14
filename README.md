@@ -102,12 +102,13 @@ moviepy_video_object = sign_language_sentence.video()
 
 
 
-# Load sign-to-text model
-deep_s2t_model = slt.get_model("gesture_mp_base-01") # pytorch
-
 # load sign
 video = slt.read_video("video.mp4")
-features = slt.extract_features(video, "mediapipe_pose_v2_hand_v1")
+# features = slt.extract_features(video, "mediapipe_pose_v2_hand_v1")
+
+# Load sign-to-text model
+deep_s2t_model = slt.get_model("gesture_mp_base-01") # pytorch
+features = deep_s2t_model.extract_features(video)
 
 # translate
 text = deep_s2t_model(features)
@@ -116,7 +117,7 @@ print(text)
 ###### text language processor
 ```python
 
-from sign_language_translator.languages.text.urdu import Urdu
+from sign_language_translator.languages.text import Urdu
 ur_nlp = Urdu()
 
 text = "hello جاؤں COVID-19."
@@ -208,11 +209,11 @@ Immense gratitude towards:
 - Rabbia Arshad for help in initial R&D and web development.
 - Waqas Bin Abbas for assistance in video data collection process.
 - Dr Kamran Malik for teaching us AI, setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
-- Hamza Foundation (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing for collaboration and providing the reference clips, hearing-impaired performers for data creation, and creating the text2gloss dataset.
+- [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing for collaboration and providing the reference clips, hearing-impaired performers for data creation, and creating the text2gloss dataset.
 - [UrduHack](https://github.com/urduhack/urduhack) (espacially Ikram Ali) for their work on Urdu character normalization.
 
 ## Bonus
-count total number of lines of code (currently 6045 total):
+Count total number of **lines of code** (Package: **5474** + Tests: **569**):
 ```
 git ls-files | grep '\.py' | xargs wc -l
 ```
