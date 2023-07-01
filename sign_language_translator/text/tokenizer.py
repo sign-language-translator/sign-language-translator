@@ -1,15 +1,15 @@
 import re
-from typing import Any, Dict, Iterable, List, Set, Tuple, Union
+from typing import Dict, Iterable, List
 
 
 class SignTokenizer:
     def __init__(
         self,
         word_regex: str = r"\w+",
-        compound_words: List[str] = [],
-        end_of_sentence_tokens: List[str] = [".", "?", "!"],
-        full_stops=["."],
-        non_sentence_end_words: List[str] = ["A", "B", "C"],
+        compound_words: Iterable[str] = (),
+        end_of_sentence_tokens: Iterable[str] = (".", "?", "!"),
+        full_stops=(".",),
+        non_sentence_end_words: Iterable[str] = ("A", "B", "C"),
     ):
         self.word_regex = word_regex
 
@@ -62,7 +62,7 @@ class SignTokenizer:
                 ended = True
                 if (
                     token in self.full_stops
-                    and previous_token in self.non_sentence_end_words
+                    and previous_token in self.non_sentence_end_words # type: ignore
                 ):
                     ended = False
             else:

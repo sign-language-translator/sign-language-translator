@@ -27,24 +27,32 @@ class Urdu(TextLanguage):
         return cls.ALLOWED_CHARACTERS
 
     def __init__(self) -> None:
-        self.VOCAB = Vocab(self.name(), data_root_dir=Settings.DATASET_ROOT_DIRECTORY)
+        self.vocab = Vocab(
+            language=self.name(),
+            sign_collections=[r".*"],
+            data_root_dir=Settings.DATASET_ROOT_DIRECTORY,
+            arg_is_regex=True,
+        )
 
-        self.NON_SENTENCE_END_TOKENS = {
+        self.non_sentence_end_tokens = {
+            # letters (A.B.C.) & spelled out letters (Ay, Bee, See)
             w.upper()
-            for wc in self.VOCAB.supported_words_with_word_sense
-            for w in [self.VOCAB.remove_word_sense(wc)]
+            for wc in self.vocab.supported_words_with_word_sense
+            for w in [self.vocab.remove_word_sense(wc)]
             if (("double-handed-letter)" in wc) and (not w.isascii()))
             or (len(w) == 1 and w.isalpha())
         }
 
         self.tokenizer = SignTokenizer(
             word_regex=self.word_regex(),
-            compound_words=self.VOCAB.supported_words
-            | self.VOCAB.supported_words_with_word_sense,
+            compound_words=self.vocab.supported_words
+            | self.vocab.supported_words_with_word_sense,
             end_of_sentence_tokens=self.END_OF_SENTENCE_MARKS,
             full_stops=self.FULL_STOPS,
-            non_sentence_end_words=self.NON_SENTENCE_END_TOKENS,
+            non_sentence_end_words=self.non_sentence_end_tokens,
         )
+
+        # :TODO: {<unk>: id_}, def token_to_id, tokenize(..., as_input_ids = True),
 
         self.tagging_rules = [
             # e.g. " "
@@ -64,12 +72,12 @@ class Urdu(TextLanguage):
             # e.g. 09:30:25.333
             Rule.from_pattern(r"^\d+(?::\d+)?(?::\d+(?:\.\d+)?)$", Tags.TIME, 4),
             # e.g. John, Doe
-            Rule(lambda token: token.lower() in self.VOCAB.person_names, Tags.NAME, 2),
+            Rule(lambda token: token.lower() in self.vocab.person_names, Tags.NAME, 2),
             # e.g. Cow, airplane, 1
             Rule(
                 lambda token: (
-                    token.lower() in self.VOCAB.supported_words
-                    or token.lower() in self.VOCAB.supported_words_with_word_sense
+                    token.lower() in self.vocab.supported_words
+                    or token.lower() in self.vocab.supported_words_with_word_sense
                 ),
                 Tags.SUPPORTED_WORD,
                 3,
@@ -78,7 +86,7 @@ class Urdu(TextLanguage):
             Rule(
                 lambda token: (
                     bool(re.match(r"^\d+(?:\.\d+)?$", token))
-                    or token in self.VOCAB.words_to_numbers
+                    or token in self.vocab.words_to_numbers
                 ),
                 Tags.NUMBER,
                 4,
@@ -95,7 +103,7 @@ class Urdu(TextLanguage):
         # spell fix
         text = replace_words(
             text,
-            word_map=self.VOCAB.preprocessing_map["misspelled_to_correct"],
+            word_map=self.vocab.misspelled_to_correct,  # :TODO: split joint words
             word_regex=self.word_regex(),
         )
         text = remove_space_before_punctuation(text, self.PUNCTUATION)
@@ -140,7 +148,7 @@ class Urdu(TextLanguage):
             tokens = [tokens]
 
         word_senses = [
-            self.VOCAB.ambiguous_to_unambiguous.get(token, []) for token in tokens
+            self.vocab.ambiguous_to_unambiguous.get(token, []) for token in tokens
         ]
 
         return word_senses
@@ -213,11 +221,11 @@ class Urdu(TextLanguage):
         text = text.strip(". !\"'\n\t")
         return text
 
-    if "UrduHack":
+    if True or "UrduHack":
         # Start of the code borrowed from "UrduHack/normalization/character.py"
-        """Following Dictionaries and code are copied from UrduHack package
-        Original Author: Ikram Ali (mrikram1989@gmail.com)
-        Source Repo URL: https://github.com/urduhack/urduhack"""
+        # """Following Dictionaries and code are copied from UrduHack package
+        # Original Author: Ikram Ali (mrikram1989@gmail.com)
+        # Source Repo URL: https://github.com/urduhack/urduhack"""
 
         # Maps correct Urdu characters to list of visually similar non-urdu characters
         CORRECT_URDU_CHARACTERS_TO_INCORRECT: Dict[str, List[str]] = {
