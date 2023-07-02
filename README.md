@@ -1,19 +1,18 @@
 # Sign Language Translator ⠎⠇⠞
 
-1. [Sign Language Translator ⠎⠇⠞](#sign-language-translator-)
-   1. [Overview](#overview)
-      1. [Solution](#solution)
-      2. [Major Components and Goals](#major-components-and-goals)
-   2. [How to install the package](#how-to-install-the-package)
-   3. [Datasets](#datasets)
-   4. [Usage](#usage)
-               1. [basic translation](#basic-translation)
-               2. [text language processor](#text-language-processor)
-               3. [sign language processor](#sign-language-processor)
-   5. [Directory Tree](#directory-tree)
-   6. [Research Paper](#research-paper)
-   7. [Credits and Gratitude](#credits-and-gratitude)
-   8. [Bonus](#bonus)
+1. [Overview](#overview)
+   1. [Solution](#solution)
+   2. [Major Components and Goals](#major-components-and-goals)
+2. [How to install the package](#how-to-install-the-package)
+3. [Datasets](#datasets)
+4. [Usage](#usage)
+    1. [basic translation](#basic-translation)
+    2. [text language processor](#text-language-processor)
+    3. [sign language processor](#sign-language-processor)
+5. [Directory Tree](#directory-tree)
+6. [Research Paper](#research-paper)
+7. [Credits and Gratitude](#credits-and-gratitude)
+8. [Bonus](#bonus)
 
 ## Overview
 
@@ -63,7 +62,7 @@ Just inherit the TextLanguage and SignLanguage classes to build a rule-based tra
 Production mode:
 
 ```bash
-pip install sign_language_translator
+pip install sign-language-translator
 ```
 
 Editable mode:
@@ -252,7 +251,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor at PUCIT. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-06-14.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor at PUCIT. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-07-01.
 
 Immense gratitude towards:
 
@@ -270,3 +269,62 @@ Count total number of **lines of code** (Package: **5629** + Tests: **569**):
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
 ```
+
+**Just for fun**
+
+```text
+Q: What was the deaf student's favorite course?
+A: Communication skills
+```
+
+**Publish package on PyPi**
+
+1. Install Poetry [(official docs)](https://python-poetry.org/docs/#installation) and twine:
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+```bash
+pip install twine
+```
+
+2. Initialize Poetry using the following command to create a new pyproject.toml file with the necessary project information
+
+existing project:
+
+```bash
+poetry init
+```
+
+new project:
+
+```bash
+poetry new project-name
+```
+
+3. Build Distribution Files (might wanna add "dist/" to .gitignore)
+
+```bash
+poetry build
+```
+
+4. Publish to PyPI
+
+```bash
+twine upload dist/*
+```
+
+Provide the credentials associated with your PyPI account.
+
+5. Automate the Release Process (GitHub Actions)
+
+- Set up PyPI Configuration:
+  - on Github repository page, go to "Settings" > "Secrets" and add PYPI_API_TOKEN as secret
+- Create and push .github/workflows/release.yml. Configure the workflow to:
+  - trigger on the main branch update event.
+  - check if version has updated using git diff
+  - build and test your package.
+  - publish the package to PyPI using Twine using secret credentials.
+
+With this setup, whenever there is a new version update on the main branch, the CI tool will automatically build and release the package to PyPI.
