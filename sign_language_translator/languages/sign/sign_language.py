@@ -1,32 +1,87 @@
+"""contains abstract class for sign languages which map spoken language text to signs using rules"""
+
+import enum
 from abc import ABC, abstractmethod
-from typing import Union
-import datetime
+from typing import Any, Dict, Iterable, List, Tuple
 
 
 class SignLanguage(ABC):
-    @abstractmethod
-    def _translate_number(self, number: Union[int, float]):
-        pass
+    """This abstract class defines the structure and methods required for mapping
+    spoken language text to signs in sign languages using rule-based approaches.
+
+    Attributes:
+        Keys (enum.Enum): Enumerates all keys that are used in a sign dict.
+
+    Methods:
+        tokens_to_sign_dicts: Converts tokens to signs based on rules and returns a list of sign dictionaries.
+        restructure_sentence: Restructures a sentence by adjusting grammar, dropping meaningless words, and normalizing synonyms.
+        _make_equal_weight_sign_dict: Creates a sign dictionary with equal weights for the provided signs.
+    """
+
+    class SignDictKeys(enum.Enum):
+        """Enumerates all keys that are used in a sign dict.
+
+        Attributes:
+            SIGNS (str): key for the 'signs' field in the sign dict mapping to list of sequence of video names.
+            WEIGHTS (str): key for the 'weights' field in the sign dict mapping to the usage frequency of a video sequence.
+        """
+
+        SIGNS = "signs"
+        WEIGHTS = "weights"
 
     @abstractmethod
-    def _translate_date(self, date: datetime.date):
-        pass
+    def tokens_to_sign_dicts(
+        self,
+        tokens: Iterable[str],
+        tags: Iterable[Any] | None = None,
+        contexts: Iterable[Any] | None = None,
+    ) -> List[Dict[str, List[List[str]] | List[float]]]:
+        """Converts tokens to signs based on rules and returns a list of sign dictionaries.
+
+        Args:
+            tokens (Iterable[str]): Input tokens to be converted to signs.
+            tags (Iterable[Any], optional): Additional tags associated with the tokens. Defaults to None.
+            contexts (Iterable[Any], optional): Additional contexts associated with the tokens. Defaults to None.
+
+        Returns:
+            List[Dict[str, List[List[str]] | List[float]]]: A list of sign dictionaries, where each dictionary contains
+                the 'signs' field mapping to a list of sign sequences and the 'weights' field mapping to the usage
+                frequency of each sign sequence.
+                e.g. "word" -> [{"signs": [[sign_1, sign_2], [alternate_1]], "weights": [10, 5]}, ...]
+        """
 
     @abstractmethod
-    def _translate_time(self, time: datetime.time):
-        pass
+    def restructure_sentence(
+        self,
+        sentence: Iterable[str],
+        tags: Iterable[Any] | None = None,
+        contexts: Iterable[Any] | None = None,
+    ) -> Tuple[Iterable[str], Iterable[Any], Iterable[Any]]:
+        """Restructures a sentence by changing the grammar,
+        removing stopwords, spaces & punctuation, and modifying token contents.
 
-    @abstractmethod
-    def _translate_word(self, text: str):
-        pass
+        Args:
+            sentence (Iterable[str]): Input sentence to be restructured.
+            tags (Iterable[Any], optional): Additional tags associated with the sentence. Defaults to None.
+            contexts (Iterable[Any], optional): Additional contexts associated with the sentence. Defaults to None.
 
-    @abstractmethod
-    def _restructure_sentence(self, sentence: str) -> str:
-        # adjust the grammar/word sequence
-        # drop meaningless words and punctuation
-        # normalize synonyms
-        pass
+        Returns:
+            Tuple[Iterable[str], Iterable[Any], Iterable[Any]]: The restructured sentence, associated tags, and contexts.
+        """
 
-    # text_language.supported_word : [[sign_collection.label]]
-    # priority/source_id
-    # probability(frequency)
+    def _make_equal_weight_sign_dict(
+        self, signs: List[List[str]]
+    ) -> Dict[str, List[List[str]] | List[float]]:
+        """Creates a sign dictionary with equal weights for the provided signs.
+
+        Args:
+            signs (List[List[str]]): List of sign sequences.
+
+        Returns:
+            Dict[str, List[List[str]] | List[float]]: A sign dictionary with equal weights for each sign sequence.
+        """
+
+        return {
+            self.SignDictKeys.SIGNS.value: signs,
+            self.SignDictKeys.WEIGHTS.value: [1 / len(signs) for _ in signs],
+        }

@@ -31,6 +31,8 @@ def test_vocab_single_sign_collection():
     assert vocab.person_names == ["alice", "bob"]
     assert vocab.joint_word_to_split_words == {"icecream": "ice cream"}
 
+    assert vocab.labels == {"abc-xyz-1_sign-1", "abc-xyz-1_sign-2"}
+
 
 def test_vocab_all_sign_collections():
     data_path = os.path.join(os.path.dirname(__file__), "data")

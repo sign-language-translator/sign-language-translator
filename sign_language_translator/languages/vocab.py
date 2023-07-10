@@ -74,6 +74,12 @@ class Vocab:
         self.ambiguous_to_unambiguous = self._make_disambiguation_map(
             self.supported_words_with_word_sense
         )
+        self.labels: Set[str] = {
+            label
+            for label_sequences in self.word_to_labels.values()
+            for label_sequence in label_sequences
+            for label in label_sequence
+        }
 
         preprocessing_map = self.__load_preprocessing(language)
         self.person_names: List[str] = preprocessing_map.get("person_names", [])
@@ -89,6 +95,10 @@ class Vocab:
         self.joint_word_to_split_words: Dict[str, str] = preprocessing_map.get(
             "joint_word_to_split_words", {}
         )
+        # TODO: improve coverage of key.isnumeric()
+        self.numeric_keys: Set[str] = {
+            key for key in self.word_to_labels if key.isnumeric()
+        }
 
     def remove_word_sense(self, text: str) -> str:
         """Remove the word sense or disambiguation information from given text.
@@ -199,7 +209,9 @@ class Vocab:
                 continue
             for label, language_to_words in label_to_language_to_words.items():
                 for lang, words in language_to_words.items():
-                    if not self.__check_text_in_list(lang, [language], regex=regex):
+                    if lang == "components" or not self.__check_text_in_list(
+                        lang, [language], regex=regex
+                    ):
                         continue
                     for word in words:
                         if word not in word_to_labels:
@@ -218,7 +230,9 @@ class Vocab:
                                 )
                                 for comp in language_to_words["components"]
                             ):
-                                word_to_labels[word].append(language_to_words["components"])
+                                word_to_labels[word].append(
+                                    language_to_words["components"]
+                                )
 
         # constructable words
         for (
@@ -229,7 +243,7 @@ class Vocab:
                 continue
             for language_to_words in list_of_language_to_words:
                 for lang, words in language_to_words.items():
-                    if not (
+                    if lang == "components" or not (
                         self.__check_text_in_list(lang, [language], regex=regex)
                         and "components" in language_to_words
                     ):
@@ -286,3 +300,8 @@ class Vocab:
         return ambiguous_2_unambiguous
 
     # load sign video/features
+
+
+__all__ = [
+    "Vocab",
+]

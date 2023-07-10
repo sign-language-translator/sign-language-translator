@@ -1,18 +1,21 @@
 # Sign Language Translator ⠎⠇⠞
 
 1. [Overview](#overview)
-   1. [Solution](#solution)
-   2. [Major Components and Goals](#major-components-and-goals)
+   1.1. [Solution](#solution)
+   1.2. [Major Components and Goals](#major-components-and-goals)
+   1.3. [Datasets](#datasets)
 2. [How to install the package](#how-to-install-the-package)
-3. [Datasets](#datasets)
-4. [Usage](#usage)
-    1. [basic translation](#basic-translation)
-    2. [text language processor](#text-language-processor)
-    3. [sign language processor](#sign-language-processor)
-5. [Directory Tree](#directory-tree)
-6. [Research Paper](#research-paper)
-7. [Credits and Gratitude](#credits-and-gratitude)
-8. [Bonus](#bonus)
+3. [Usage](#usage)
+    3.1. [basic translation](#basic-translation)
+    3.2. [text language processor](#text-language-processor)
+    3.3. [sign language processor](#sign-language-processor)
+4. [Directory Tree](#directory-tree)
+5. [Research Paper](#research-paper)
+6. [Credits and Gratitude](#credits-and-gratitude)
+7. [Bonus](#bonus)
+   1. number of lines of code
+   2. just for fun
+   3. publish package on PyPI
 
 ## Overview
 
@@ -31,31 +34,54 @@ Just inherit the TextLanguage and SignLanguage classes to build a rule-based tra
 ### Major Components and Goals
 
 1. `Sign language to Text`
-    - In speech to text translation, features such as mel-spectrograms are extracted from audio and fed into neural networks which then output text tokens corresponding to what was said in the audio.
-    - Similarly, features such as pose vectors (2D or 3D) are extracted from video, and to be mapped to text corresponding to the performed signs, they are fed into a neural network which is a checkpoint of a SOTA speech-to-text model fine-tuned using gradual unfreezing starting from the layers near input towards the output layers.
+
+    - Features such as pose vectors (2D or 3D) are extracted from video, and to be mapped to text corresponding to the performed signs, they are fed into a neural network which could be a checkpoint of a SOTA speech-to-text model fine-tuned using gradual unfreezing starting from the layers near input towards the output layers.
 
 2. `Text to Sign Language`
     - This is a relatively easier task as it can even be solved with HashTables. Just parse the input text and play appropriate video clip for each word.
 
     1. Motion Transfer
-        - This allows for seamless transitions between the clips. The idea is to concatenate pose vectors in the time dimension and transfer the movements onto any given image of any person.
+        - The idea is to concatenate pose vectors in the time dimension and transfer the movements onto any given image of any person. This allows for seamless transitions between the clips.
     2. Sign Feature Synthesis
         - This is similar to speech synthesis. It solves the challenge of unknown synonyms or hard to tokenize/process words/phrases.
-        - It can also be fine-tuned to make avatars move in desired ways using only text.
+        - It can be achieved by conditioning a pose sequence generating model on a pre-trained text encoder (e.g finetune the decoder of a multilingual T5 to output pose vectors instead of text tokens).
 
-3. `Preprocessing Utilities`
+1. `Preprocessing Utilities`
     1. Pose Extraction
         - Mediapipe 3D world coordinates and 2D image coordinates
         - Pose Visualization
     2. Text normalization
-        - Since the supported vocabulary is handcrafted, unknown words (or spellings) must be substituted with the supported words.
+        - Since the supported vocabulary is handcrafted, unknown words (or spellings) must be substituted with the supported words and ambiguous words must be disambiguated.
 
-4. `Data Collection and Creation`
-    Sign languages are very diverse and every small region will require their own translator. So, the product needed first is the one that can help build sign language translators. This framework is designed with the capacity to handle all the variations and even lead to sign standardization.
+2. `Data Collection and Creation`
+    Sign languages are very diverse and every small region will require their own translator. So, the product needed first is the one that can help build sign language translators. This project is designed with the capacity to handle all the variations and even lead to sign standardization.
 
    1. Clip extraction from long videos
    2. Multithreaded Web scraping
    3. Language Models to write sentences of supported words
+
+### Datasets
+
+The sign videos are categorized by:
+
+1. country
+2. source organization
+3. session number
+4. camera angle
+5. person code ((d: deaf | h: hearing)(m: male | f: female)000001)
+6. equivalent text language word
+
+The files are labeled as follows:
+`country_organization_sessionNumber_cameraAngle_personCode_word.extension`
+
+The text data includes:
+
+1. word/sentence mappings to videos
+2. spoken language sentences and phrases
+3. spoken language sentences & corresponding sign video label sequences
+4. preprocessing data such as word-to-numbers, misspellings, named-entities etc
+
+[See the *sign-language-datasets* repo and its *release files* for the actual data & details](https://github.com/sign-language-translator/sign-language-datasets)
 
 ## How to install the package
 
@@ -77,25 +103,6 @@ pip install -e .
 pip install -e git+https://github.com/sign-language-translator/sign-language-translator.git
 ```
 
-## Datasets
-
-The sign videos are categorized by:
-
-1. country
-2. source organization
-3. session (remove this)
-4. camera angle
-5. person code
-
-The text data includes:
-
-1. word/sentence mappings to videos
-2. spoken language word sequences
-3. spoken language sentences & corresponding sign video label sequences
-4. preprocessing data such as word-to-numbers, misspellings, named-entities etc
-
-[See the *sign-language-datasets* repo and its *release files* for the actual data & details](https://github.com/sign-language-translator/sign-language-datasets)
-
 ## Usage
 
 see the *test cases* or [the *notebooks* repo](https://github.com/sign-language-translator/notebooks) for detailed use
@@ -115,6 +122,7 @@ import sign_language_translator as slt
 # deep_t2s_model = slt.get_model("generative_t2s_base-01") # pytorch
 # rule-based model (concatenates clips of each word)
 t2s_model = slt.get_model(
+    approach = "ConcatenativeSynthesis", # concatenate sign video for each word in text
     text_language = "English", # or object of any child of slt.languages.text.text_language.TextLanguage class
     sign_language = "PakistanSignLanguage", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
     sign_feature_model = "mediapipe_pose_v2_hand_v1",
@@ -200,9 +208,10 @@ sign-language-translator
     │   └── synonyms.py
     │
     ├── languages
-    │   ├── sign_collection.py
+    │   ├── utils.py
     │   ├── vocab.py
     │   ├── sign
+    │   │   ├── mapping_rules.py
     │   │   ├── pakistan_sign_language.py
     │   │   └── sign_language.py
     │   │
@@ -212,6 +221,7 @@ sign-language-translator
     │       └── urdu.py
     │
     ├── models
+    │   ├── utils.py
     │   ├── language_models
     │   │   ├── abstract_language_model.py
     │   │   ├── beam_sampling.py
@@ -251,7 +261,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor at PUCIT. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-07-01.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor at PUCIT. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-07-11.
 
 Immense gratitude towards:
 
@@ -262,9 +272,11 @@ Immense gratitude towards:
 - [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing for collaboration and providing the reference clips, hearing-impaired performers for data creation, and creating the text2gloss dataset.
 - [UrduHack](https://github.com/urduhack/urduhack) (espacially Ikram Ali) for their work on Urdu character normalization.
 
+- [Telha Bilal](https://github.com/TelhaBilal) for help in designing the architecture of some modules.
+
 ## Bonus
 
-Count total number of **lines of code** (Package: **5629** + Tests: **569**):
+Count total number of **lines of code** (Package: **6580** + Tests: **780**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
@@ -277,54 +289,56 @@ Q: What was the deaf student's favorite course?
 A: Communication skills
 ```
 
-**Publish package on PyPi**
+**Publish package on `PyPI`**
 
 1. Install Poetry [(official docs)](https://python-poetry.org/docs/#installation) and twine:
 
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
-```
+    ```bash
+    curl -sSL https://install.python-poetry.org | python3 -
+    ```
 
-```bash
-pip install twine
-```
+    ```bash
+    pip install twine
+    ```
 
 2. Initialize Poetry using the following command to create a new pyproject.toml file with the necessary project information
 
-existing project:
+    existing project:
 
-```bash
-poetry init
-```
+    ```bash
+    poetry init
+    ```
 
-new project:
+    new project:
 
-```bash
-poetry new project-name
-```
+    ```bash
+    poetry new project-name
+    ```
 
 3. Build Distribution Files (might wanna add "dist/" to .gitignore)
 
-```bash
-poetry build
-```
+    ```bash
+    poetry build
+    ```
 
 4. Publish to PyPI
 
-```bash
-twine upload dist/*
-```
+    ```bash
+    twine upload dist/*
+    ```
 
-Provide the credentials associated with your PyPI account.
+    Provide the credentials associated with your PyPI account.
 
 5. Automate the Release Process (GitHub Actions)
 
-- Set up PyPI Configuration:
-  - on Github repository page, go to "Settings" > "Secrets" and add PYPI_API_TOKEN as secret
-- Create and push .github/workflows/release.yml. Configure the workflow to:
-  - trigger on the main branch update event.
-  - check if version has updated using git diff
-  - build and test your package.
-  - publish the package to PyPI using Twine using secret credentials.
+    - Set up PyPI Configuration:
+    - on Github repository page, go to "Settings" > "Secrets" and add PYPI_API_TOKEN as secret
+    - Create and push .github/workflows/release.yml. Configure the workflow to:
+    - trigger on the main branch update event.
+    - check if version has updated using git diff
+    - build and test your package.
+    - publish the package to PyPI using Twine using secret credentials.
 
-With this setup, whenever there is a new version update on the main branch, the CI tool will automatically build and release the package to PyPI.
+    - before actual publish, test your publishing process on test.pypi.org with `twine upload --repository testpypi dist/*`
+
+    With this setup, whenever there is a new version update on the main branch, the CI tool will automatically build and release the package to PyPI.

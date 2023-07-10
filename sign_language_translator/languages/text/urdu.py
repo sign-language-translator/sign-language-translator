@@ -45,11 +45,19 @@ class Urdu(TextLanguage):
 
         self.tokenizer = SignTokenizer(
             word_regex=self.word_regex(),
-            compound_words=self.vocab.supported_words
-            | self.vocab.supported_words_with_word_sense,
+            compound_words=(
+                self.vocab.supported_words
+                | self.vocab.supported_words_with_word_sense
+                | {
+                    w
+                    for word in self.vocab.words_to_numbers.keys()
+                    for w in [word, word.replace("-", " ")]
+                }
+            ),  # TODO: | one-hundred twenty-three (\d[ \d]*): ["100", "23"] --> ["123"]
             end_of_sentence_tokens=self.END_OF_SENTENCE_MARKS,
             full_stops=self.FULL_STOPS,
             non_sentence_end_words=self.non_sentence_end_tokens,
+            tokenized_word_sense_pattern=[self.URDU_WORD_REGEX, r"\(", [r"نام"], r"\)"],
         )
 
         # :TODO: {<unk>: id_}, def token_to_id, tokenize(..., as_input_ids = True),
@@ -71,8 +79,13 @@ class Urdu(TextLanguage):
             Rule.from_pattern(r"^\d{4}-\d{2}-\d{2}$", Tags.DATE, 4),
             # e.g. 09:30:25.333
             Rule.from_pattern(r"^\d+(?::\d+)?(?::\d+(?:\.\d+)?)$", Tags.TIME, 4),
-            # e.g. John, Doe
-            Rule(lambda token: token.lower() in self.vocab.person_names, Tags.NAME, 2),
+            # e.g. John, Doe(name)
+            Rule(
+                lambda token: token in self.vocab.person_names
+                or token.endswith("(نام)"),
+                Tags.NAME,
+                2,
+            ),
             # e.g. Cow, airplane, 1
             Rule(
                 lambda token: (
@@ -115,7 +128,9 @@ class Urdu(TextLanguage):
         return text
 
     def tokenize(self, text: str) -> List[str]:
-        tokens = self.tokenizer.tokenize(text, join_compound_words=True)
+        tokens = self.tokenizer.tokenize(
+            text, join_compound_words=True, join_word_sense=True
+        )
         return tokens
 
     def sentence_tokenize(self, text: str) -> List[str]:
@@ -345,6 +360,8 @@ class Urdu(TextLanguage):
         | set(URDU_DIACRITICS)
         | set(SYMBOLS)
         | set(string.ascii_uppercase)  # acronyms
+        # TODO: remove ascii_lowercase when word-senses are also urdu in dataset
+        # | set(string.ascii_lowercase)  # word-sense
         | set(string.digits)
         | set("()!.,?/[]{} ")
     )

@@ -36,10 +36,10 @@ class Rule:
     """A rule for token classification based on a matching function.
 
     Args:
-        matcher (Callable[[str], bool]): A function that takes a token (str) as input and returns a boolean
-            indicating whether the token matches the rule.
+        matcher (Callable[[str], bool]): A function that takes a token (str) as input
+            and returns a boolean indicating whether the token matches the rule.
         tag (Any): The tag associated with tokens that match the rule.
-        priority (int): The priority level of the rule. Higher priority (smaller value) rules overwrite the others.
+        priority (int): The priority level of the rule.
 
     Methods:
         is_match(token: str) -> bool:
@@ -87,7 +87,9 @@ class Tagger:
 
     Args:
         rules (List[Rule]): A list of Rule objects representing the classification rules.
-        default (Tags, optional): The default tag to assign when no rule matches a token. Defaults to Tags.DEFAULT.
+            Smaller priority value rules overwrite the others.
+        default (Tags, optional): The default tag to assign when no rule matches a token.
+            Defaults to Tags.DEFAULT.
 
     Methods:
         tag(tokens: List[str]) -> List[Tuple[str, Any]]:
@@ -99,7 +101,8 @@ class Tagger:
             Returns a list of tags corresponding to the input tokens.
 
     Note:
-        - The rules are applied in the order they appear in the list but higher priority (smaller value) rules overpower.
+        - The rules are applied in the order they appear in the list
+            but higher priority (smaller value) rules overpower.
         - The default tag is assigned to tokens that do not match any rule.
     """
 

@@ -6,7 +6,7 @@ from sign_language_translator.languages.text.urdu import Tags, Urdu
 
 
 def get_urdu_processor_object():
-    # :TODO: clean up this commented code:
+    # # :TODO: clean up this commented code:
     # from sign_language_translator import set_dataset_dir
 
     # set_dataset_dir(
@@ -54,13 +54,13 @@ def test_urdu_tokenizer():
     raw_texts = [
         "hello world!",
         "صبح ۸ بجے، اور شام ۹:۳۰پر",
-        "میں اسلام آباد جا رہا ہوں۔",  # "اسلام آباد سے وہ آئے"
+        "سبحان(نام) اسلام آباد جا رہا ہے۔",  # "اسلام آباد سے وہ آئے"
         # :TODO: ["word(word-sense)", "word"]
     ]
     expected_tokenized = [
         ["hello", " ", "world", "!"],
         ["صبح", " ", "۸", " ", "بجے", "،", " ", "اور", " ", "شام", " ", "۹:۳۰", "پر"],
-        ["میں", " ", "اسلام آباد", " ", "جا", " ", "رہا", " ", "ہوں", "۔"],
+        ["سبحان(نام)", " ", "اسلام آباد", " ", "جا", " ", "رہا", " ", "ہے", "۔"],
     ]
     tokenized = list(map(ur_nlp.tokenize, raw_texts))
     assert tokenized == expected_tokenized
@@ -107,10 +107,12 @@ def test_urdu_tagger():
     tokens = [
         ["hello", " ", "world", "!"],
         ["شام", " ", "۰۹:۳۰", "پر"],
+        ["سبحان(نام)"],
     ]
     expected_tags = [
         [Tags.WORD, Tags.SPACE, Tags.WORD, Tags.PUNCTUATION],
         [Tags.SUPPORTED_WORD, Tags.SPACE, Tags.TIME, Tags.SUPPORTED_WORD],
+        [Tags.NAME],
     ]
     tags = list(map(ur_nlp.get_tags, tokens))
     assert tags == expected_tags

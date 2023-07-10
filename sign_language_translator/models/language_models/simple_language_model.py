@@ -9,8 +9,11 @@ from typing import Any, Dict, Iterable, List, Tuple
 
 import numpy
 
-from ...text.utils import make_ngrams, normpdf
-from .abstract_language_model import LanguageModel
+from sign_language_translator.models.language_models.abstract_language_model import (
+    LanguageModel,
+)
+from sign_language_translator.text.metrics import normpdf
+from sign_language_translator.text.utils import make_ngrams
 
 
 class SimpleLanguageModel(LanguageModel):
