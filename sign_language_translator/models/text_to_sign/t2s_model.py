@@ -1,27 +1,23 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
+from typing import Any, Union, Iterable
 
 
 class TextToSignModel(ABC):
-    @property
-    @abstractmethod
-    def tokenizer(self):
-        pass
-
-    @property
-    @abstractmethod
+    @abstractproperty
     def sign_language(self):
         pass
 
-    @property
-    @abstractmethod
+    @abstractproperty
     def text_language(self):
         pass
 
-    @property
-    @abstractmethod
+    @abstractproperty
     def sign_features(self):
         pass
 
     @abstractmethod
-    def translate(self, text: str): # -> VideoFeatures
+    def translate(self, text: Union[str, Iterable[str]]) -> Any: # -> VideoFeatures
         pass
+
+    def __call__(self, text: Union[str, Iterable[str]]) -> Any:
+        return self.translate(text)

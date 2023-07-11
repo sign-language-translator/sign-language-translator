@@ -30,7 +30,7 @@ def load_data(data_filename):
 
 
 def load_recordings_labels() -> List[str]:
-    json_data: Dict[str, List[str]] = load_data(
+    json_data = load_data(
         os.path.join(
             "sign_recordings",
             "recordings_labels.json",
@@ -39,21 +39,21 @@ def load_recordings_labels() -> List[str]:
     if not json_data:
         return []
 
-    json_data = [
+    flattened_data = [
         Settings.FILENAME_SEPARATOR.join((sign_collection, label))
         for sign_collection, label_list in json_data.items()
         for label in label_list
     ]
 
-    return json_data
+    return flattened_data
 
 
 def validate_sign_label_pattern(sign_label: str):
     assert re.match(
         (
-            r"^\w+"
+            r"^[a-z]+"
             + re.escape(Settings.FILENAME_CONNECTOR)
-            + r"\w+"
+            + r"[a-z]+"
             + re.escape(Settings.FILENAME_CONNECTOR)
             + r"[0-9]+"
             + re.escape(Settings.FILENAME_SEPARATOR)

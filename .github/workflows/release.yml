@@ -1,0 +1,71 @@
+# This workflow will test, build & upload a Python Package to PyPI using Pytest, Poetry & Twine
+# only when version is updated in pyproject.toml and pushed into main branch.
+
+name: Release Python Package
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  check_version:
+    runs-on: ubuntu-latest
+
+    outputs:
+      version_updated: ${{ steps.version.outputs.version_updated }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          fetch-depth: 2
+
+      - name: Check version update
+        id: version
+        run: |
+          dif=$(git diff --unified=0 HEAD^ HEAD -- pyproject.toml)
+          ver=$(if grep -q '^\+version' <<< $dif; then echo 'true'; else echo 'false'; fi)
+          echo "version_updated=$ver" >> $GITHUB_OUTPUT
+
+      - name: Notify on version update
+        if: steps.version.outputs.version_updated == 'true'
+        run: |
+          echo "Version change detected in pyproject.toml"
+
+  release:
+    needs: check_version
+    runs-on: ubuntu-latest
+    if: needs.check_version.outputs.version_updated == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry twine
+          poetry install
+
+      - name: Run tests
+        run: |
+          poetry run pytest -vv
+
+      - name: Build
+        run: |
+          poetry build
+
+      - name: Publish to PyPI
+        if: success()
+        run: |
+          python -m twine upload --username __token__ --password ${{ secrets.PYPI_API_TOKEN }} dist/*

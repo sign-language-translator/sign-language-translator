@@ -1,15 +1,18 @@
 import re
-from typing import Any, Dict, Iterable, List, Set, Tuple, Union
+from typing import Dict, Iterable, List
+
+from sign_language_translator.text.utils import ListRegex
 
 
 class SignTokenizer:
     def __init__(
         self,
         word_regex: str = r"\w+",
-        compound_words: List[str] = [],
-        end_of_sentence_tokens: List[str] = [".", "?", "!"],
-        full_stops=["."],
-        non_sentence_end_words: List[str] = ["A", "B", "C"],
+        compound_words: Iterable[str] = (),
+        end_of_sentence_tokens: Iterable[str] = (".", "?", "!"),
+        full_stops=(".",),
+        non_sentence_end_words: Iterable[str] = ("A", "B", "C"),
+        tokenized_word_sense_pattern: List|None=None,
     ):
         self.word_regex = word_regex
 
@@ -20,8 +23,17 @@ class SignTokenizer:
         )
         self.non_sentence_end_words = non_sentence_end_words
         self.full_stops = full_stops
+        self.tokenized_word_sense_pattern = tokenized_word_sense_pattern or [
+            r"\w+",
+            r"\(",
+            r"\w+",
+            ([r"-", r"\w+"], (0, None)),  # interval quantifier
+            r"\)",
+        ]
 
-    def tokenize(self, text: str, join_compound_words: bool = True) -> List[str]:
+    def tokenize(
+        self, text: str, join_compound_words: bool = True, join_word_sense: bool = False
+    ) -> List[str]:
         matches = re.finditer(self.word_regex, text)
         word_spans = [m.span() for m in matches]
 
@@ -46,8 +58,8 @@ class SignTokenizer:
         if join_compound_words:
             broken = self._join_subwords(broken)
 
-        # if join_word_sense:
-        #     broken = self._join_word_sense(broken)
+        if join_word_sense:
+            broken = self._join_word_sense(broken)
 
         return broken
 
@@ -62,7 +74,7 @@ class SignTokenizer:
                 ended = True
                 if (
                     token in self.full_stops
-                    and previous_token in self.non_sentence_end_words
+                    and previous_token in self.non_sentence_end_words  # type: ignore
                 ):
                     ended = False
             else:
@@ -118,5 +130,16 @@ class SignTokenizer:
         return new_tokens
 
     def _join_word_sense(self, tokens: List[str]):
-        # :TODO: handle ["word", "word", "(", "word", "-", "sense", ")"] --> ["word", "word(word-sense)"] in tokenization
-        return tokens
+        spans = ListRegex.find_all_spans(tokens, self.tokenized_word_sense_pattern)
+        spans = [(None, 0)] + spans + [(len(tokens), None)]
+        new_tokens = []
+        for i in range(len(spans) - 1):
+            prev_end = spans[i][1]
+            start = spans[i + 1][0]
+            end = spans[i + 1][1]
+
+            new_tokens.extend(tokens[prev_end:start])
+            if end is not None:
+                new_tokens.append("".join(tokens[start:end]))
+
+        return new_tokens

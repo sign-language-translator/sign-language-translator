@@ -9,6 +9,13 @@ def get_tokenizer():
         full_stops=["."],
         end_of_sentence_tokens=[".", "?", "!"],
         non_sentence_end_words=list(string.ascii_uppercase),
+        tokenized_word_sense_pattern=[
+            r"\w+",
+            r"\(",
+            r"\w+",
+            ([r"-", r"\w+"], (0, None)),  # interval quantifier
+            r"\)",
+        ],
     )
     return tokenizer
 
@@ -69,3 +76,10 @@ def test_join_subwords():
     tokens = ["ice", "-", "cream", " ", "from", " ", "book", " ", "shop"]
     expected_joint = ["ice-cream", " ", "from", " ", "book shop"]
     assert tokenizer._join_subwords(tokens) == expected_joint
+
+def test_join_word_sense():
+    tokenizer = get_tokenizer()
+
+    tokens = ["this", " ", "is", " ", "a", "spring", "(", "metal", "-", "coil", ")", "."]
+    expected_joint = ["this", " ", "is", " ", "a", "spring(metal-coil)", "."]
+    assert tokenizer._join_word_sense(tokens) == expected_joint

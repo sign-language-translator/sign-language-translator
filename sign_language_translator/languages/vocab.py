@@ -1,10 +1,9 @@
-"""File-handling to create word maps.
-"""
+"""load word datasets to create word maps etc."""
 
 import json
 import os
 import re
-from typing import Any, Dict, List, Set, Tuple, Union
+from typing import Any, Dict, Iterable, List, Set
 
 from sign_language_translator.config.settings import Settings
 
@@ -14,180 +13,283 @@ class Vocab:
 
     def __init__(
         self,
-        language: str,
-        sign_collections: List[str] | None = None,
+        language: str = r"$.",
+        sign_collections: Iterable[str] = (r"$.",),
         data_root_dir: str = Settings.DATASET_ROOT_DIRECTORY,
+        arg_is_regex: bool = True,
     ) -> None:
         # save arguments
         self.language = language
         self.sign_collections = sign_collections
         self.data_root_dir = data_root_dir
-        # :TODO: regex matching of sign_collections e.g. pk-*-*
+        self.arg_is_regex = arg_is_regex
 
-        # read files
-        self.sign_labels = self._load_sign_labels(sign_collections)
-        self.preprocessing_map = self._load_preprocessing(self.language)
-        self.label_to_words = self._load_label_to_words(language, sign_collections)
-        self.label_sequence_to_words = self._load_constructable_words(
-            language, sign_collections
+        # source file paths
+        self.label_to_words_path = os.path.join(
+            self.data_root_dir,
+            "sign_recordings",
+            "collection_to_label_to_language_to_words.json",
+        )
+        self.constructed_words_path = os.path.join(
+            self.data_root_dir,
+            "sign_recordings",
+            "organization_to_language_to_constructable_words.json",
+        )
+        self.preprocessing_path = os.path.join(
+            self.data_root_dir,
+            "text_preprocessing.json",
+        )
+        self.token_to_id_path = os.path.join(
+            self.data_root_dir,
+            "language_to_token_to_id.json",
         )
 
-        # create vocab
-        self.WORD_SENSE_REGEX = r"\([^\(\)]*\)"  # all occurrences of everything wrapped in a pair of parenthesis
-        self.supported_words_with_word_sense = self._make_supported_words()
+        # defaults
+        self.word_sense_regex = r"\([^\(\)]*\)"  # everything in parenthesis
+        self.word_to_labels: Dict[str, List[List[str]]] = {}
+        self.token_to_id: Dict[str, int] = {}
+        self.supported_words_with_word_sense: Set[str] = set()
+        self.supported_words: Set[str] = set()
+        self.ambiguous_to_unambiguous: Dict[str, List[str]] = {}
+        self.ambiguous_to_unambiguous: Dict[str, List[str]] = {}
+
+        # load jsons
+        self.word_to_labels.update(
+            self._make_word_to_labels(
+                language=language,
+                sign_collections=sign_collections,
+                collection_to_label_to_language_to_words=self.__load_label_to_words(),
+                organization_to_language_to_constructable_words=self.__load_constructable_words(),
+                regex=arg_is_regex,
+            )
+        )
+        self.token_to_id.update(self.__load_token_to_id(language, arg_is_regex))
+        self.id_to_token: Dict[int, str] = {v: k for k, v in self.token_to_id.items()}
+
+        # populate data from files
+        self.supported_words_with_word_sense = set(self.word_to_labels)
         self.supported_words = {
-            self.remove_word_sense(word) for word in self.supported_words_with_word_sense
+            self.remove_word_sense(w) for w in self.supported_words_with_word_sense
         }
         self.ambiguous_to_unambiguous = self._make_disambiguation_map(
             self.supported_words_with_word_sense
         )
-        self.person_names = self.preprocessing_map.get('person_names',[])
-        self.words_to_numbers = self.preprocessing_map.get('words_to_numbers', {})
+        self.labels: Set[str] = {
+            label
+            for label_sequences in self.word_to_labels.values()
+            for label_sequence in label_sequences
+            for label in label_sequence
+        }
 
-    def get_word_sense(self, word: str) -> str:
-        word_sense = re.match(self.WORD_SENSE_REGEX, word)
-        word_sense = word_sense.group() if word_sense else ""
+        preprocessing_map = self.__load_preprocessing(language)
+        self.person_names: List[str] = preprocessing_map.get("person_names", [])
+        self.words_to_numbers: Dict[str, int] = preprocessing_map.get(
+            "words_to_numbers", {}
+        )
+        self.misspelled_to_correct: Dict[str, str] = preprocessing_map.get(
+            "misspelled_to_correct", {}
+        )
+        self.number_suffix_to_zeros: Dict[str, str] = preprocessing_map.get(
+            "number_suffixes_to_zeros", {}
+        )
+        self.joint_word_to_split_words: Dict[str, str] = preprocessing_map.get(
+            "joint_word_to_split_words", {}
+        )
+        # TODO: improve coverage of key.isnumeric()
+        self.numeric_keys: Set[str] = {
+            key for key in self.word_to_labels if key.isnumeric()
+        }
 
-        return word_sense
+    def remove_word_sense(self, text: str) -> str:
+        """Remove the word sense or disambiguation information from given text.
 
-    def remove_word_sense(self, word: str) -> str:
-        without_word_sense = re.sub(self.WORD_SENSE_REGEX, "", word)
+        Args:
+            text (str): The text from which the word sense needs to be removed.
+
+        Returns:
+            str: The word without the word sense or disambiguation information.
+
+        Example:
+            word = "this is a spring(metal-coil). those are glasses(water-containers)."
+            without_word_sense = remove_word_sense(word)
+            print(without_word_sense)  # Output: "this is a spring. those are glasses."
+        """
+
+        without_word_sense = re.sub(self.word_sense_regex, "", text)
         return without_word_sense
 
-    def _load_label_to_words(
-        self, language: str, sign_collections: List[str]
-    ) -> Dict[str, List[str]]:
+    def __load_label_to_words(self):
         with open(
-            os.path.join(
-                self.data_root_dir,
-                "sign_recordings",
-                "collection_to_label_to_language_to_words.json",
-            ),
+            self.label_to_words_path,
             "r",
-        ) as f:
-            raw_data: Dict[str, Dict[str, Dict[str, List[str]]]] = json.load(f)
-            label_2_words = {
-                f"{sc}{Settings.FILENAME_SEPARATOR}{label}": lang_to_word_list[language]
-                for sc in sign_collections or raw_data.keys()
-                for label, lang_to_word_list in raw_data.get(sc, {}).items()
-                if language in lang_to_word_list
-            }
-
-        return label_2_words
-
-    def _load_constructable_words(
-        self, language: str, sign_collections: str
-    ) -> Dict[Tuple[str], List[str]]:
-        with open(
-            os.path.join(
-                self.data_root_dir,
-                "sign_recordings",
-                "collection_to_label_to_language_to_words.json",
-            ),
-            "r",
-        ) as f:
+            encoding="utf-8",
+        ) as file_pointer:
             collection_to_label_to_language_to_words: Dict[
                 str, Dict[str, Dict[str, List[str]]]
-            ] = json.load(f)
+            ] = json.load(file_pointer)
 
+        return collection_to_label_to_language_to_words
+
+    def __load_constructable_words(self):
         with open(
-            os.path.join(
-                self.data_root_dir,
-                "sign_recordings",
-                "organization_to_language_to_constructable_words.json",
-            ),
+            self.constructed_words_path,
             "r",
-        ) as f:
-            raw_data: Dict[str, Dict[str, List[str]]] = json.load(f)
-            label_sequence_2_words = {
-                tuple(sign_dict["components"]): sign_dict[language]
-                for sc in sign_collections or raw_data.keys()
-                for sign_dict in raw_data.get(
-                    Settings.FILENAME_CONNECTOR.join(
-                        sc.split(Settings.FILENAME_CONNECTOR)[:2]
-                    ),
-                    [],
-                )
-                + [
-                    v
-                    for sc in sign_collections
-                    or collection_to_label_to_language_to_words.keys()
-                    for label, v in collection_to_label_to_language_to_words.get(
-                        sc, {}
-                    ).items()
-                    if "components" in v
-                ]
-                if language in sign_dict
-                and (
-                    all(
-                        [
-                            comp.split(Settings.FILENAME_SEPARATOR)[0] in sc
-                            for comp in sign_dict["components"]
-                        ]
-                    )
-                    if sign_collections
-                    else True
-                )
-            }
+            encoding="utf-8",
+        ) as file_pointer:
+            organization_to_language_to_constructable_words: Dict[
+                str, List[Dict[str, List[str]]]
+            ] = json.load(file_pointer)
 
-        return label_sequence_2_words
+        return organization_to_language_to_constructable_words
 
-    def _load_preprocessing(self, language: str) -> Dict[str, Any]:
+    def __load_preprocessing(self, language: str, regex: bool = True) -> Dict[str, Any]:
         with open(
-            os.path.join(
-                self.data_root_dir,
-                "text_preprocessing.json",
-            ),
+            self.preprocessing_path,
             "r",
-        ) as f:
-            raw_data: Dict[str, Dict[str, Any]] = json.load(f)
-            preprocessing_map: Dict[str, Any] = {
-                k: v.get(language, type(list(v.values())[0])())
-                for k, v in raw_data.items()
-            }
+            encoding="utf-8",
+        ) as file_pointer:
+            raw_data: Dict[str, Dict[str, Any]] = json.load(file_pointer)
+
+        preprocessing_map: Dict[str, Any] = {
+            key: lang_to_data.get(lang, self.__get_default_value(lang_to_data))
+            for key, lang_to_data in raw_data.items()
+            for lang in lang_to_data
+            if self.__check_text_in_list(lang, [language], regex=regex)
+        }
 
         return preprocessing_map
 
-    def _load_sign_labels(
-        self, sign_collections: List[str] | None = None
-    ) -> Dict[str, List[str]]:
+    def __load_token_to_id(self, language: str, regex: bool = True) -> Dict[str, int]:
         with open(
-            os.path.join(
-                self.data_root_dir,
-                "sign_recordings",
-                "recordings_labels.json",
-            ),
+            self.token_to_id_path,
             "r",
-        ) as f:
-            sign_labels: Dict[str, List[str]] = json.load(f)
-            sign_labels = [
-                f"{sign_collection}{Settings.FILENAME_SEPARATOR}{label}"
-                for sign_collection, label_list in sign_labels.items()
-                for label in label_list
-                if sign_collection in (sign_collections or sign_labels.keys())
-            ]
+            encoding="utf-8",
+        ) as file_pointer:
+            raw_data: Dict[str, Dict[str, int]] = json.load(file_pointer)
 
-        return sign_labels
-
-    def _make_supported_words(self) -> Set[str]:
-        vocab = set()
-        vocab |= {w for words in self.label_sequence_to_words.values() for w in words}
-        vocab |= {w for words in self.label_to_words.values() for w in words}
-
-        # self.preprocessing_map["joint_word_to_split_words"],
-        vocab |= set(self.preprocessing_map.get("person_names", {}))
-        # self.preprocessing_map["named_entities"],
-        vocab |= {
-            w
-            for w, n in self.preprocessing_map.get("words_to_numbers", {}).items()
-            # :TODO: Should be in TextLanguage. figure something out! delete from json?
-            if "0" not in str(n)
+        token_to_id: Dict[str, int] = {
+            key: val
+            for lang, data in raw_data.items()
+            for key, val in data.items()
+            if self.__check_text_in_list(lang, [language], regex=regex)
         }
-        # self.preprocessing_map["number_suffixes_to_zeros"],
-        return vocab
 
-    def _make_disambiguation_map(self, words: List[str]) -> Dict[str, List[str]]:
-        ambiguous_2_unambiguous = dict()
+        return token_to_id
+
+    def _make_word_to_labels(
+        self,
+        language: str,
+        sign_collections: Iterable[str],
+        collection_to_label_to_language_to_words: Dict[
+            str, Dict[str, Dict[str, List[str]]]
+        ],
+        organization_to_language_to_constructable_words: Dict[
+            str, List[Dict[str, List[str]]]
+        ],
+        regex: bool = True,
+    ):
+        """takes json word mapping datasets and creates a dict mapping text tokens to sign_labels
+
+        Args:
+            language (str | None, optional): language code used in json or a regex matching it whose data should be extracted. Defaults to None.
+            sign_collections (Iterable[str] | None, optional): all sign collections to extract from json or regex matching them. Defaults to None.
+            regex (bool, optional): treat the provided language code and sign_collections as regex when comparing against json keys. Defaults to True.
+
+        Returns:
+            Dict[str, List[List[str]]]: maps each text token to a list containing sequences of signs
+        """
+        word_to_labels: Dict[str, List[List[str]]] = {}
+
+        # simple word map
+        for (
+            sign_coll,
+            label_to_language_to_words,
+        ) in collection_to_label_to_language_to_words.items():
+            if not self.__check_text_in_list(sign_coll, sign_collections, regex=regex):
+                continue
+            for label, language_to_words in label_to_language_to_words.items():
+                for lang, words in language_to_words.items():
+                    if lang == "components" or not self.__check_text_in_list(
+                        lang, [language], regex=regex
+                    ):
+                        continue
+                    for word in words:
+                        if word not in word_to_labels:
+                            word_to_labels[word] = []
+
+                        word_to_labels[word].append(
+                            [f"{sign_coll}{Settings.FILENAME_SEPARATOR}{label}"]
+                        )
+                        if "components" in language_to_words:
+                            # all components are from specified sign collections only
+                            if all(
+                                self.__check_text_in_list(
+                                    comp.split(Settings.FILENAME_SEPARATOR)[0],
+                                    sign_collections,
+                                    regex=regex,
+                                )
+                                for comp in language_to_words["components"]
+                            ):
+                                word_to_labels[word].append(
+                                    language_to_words["components"]
+                                )
+
+        # constructable words
+        for (
+            sign_coll,
+            list_of_language_to_words,
+        ) in organization_to_language_to_constructable_words.items():
+            if not self.__check_text_in_list(sign_coll, sign_collections, regex=regex):
+                continue
+            for language_to_words in list_of_language_to_words:
+                for lang, words in language_to_words.items():
+                    if lang == "components" or not (
+                        self.__check_text_in_list(lang, [language], regex=regex)
+                        and "components" in language_to_words
+                    ):
+                        continue
+
+                    for word in words:
+                        if word not in word_to_labels:
+                            word_to_labels[word] = []
+                        word_to_labels[word].append(language_to_words["components"])
+
+        # drop duplicates (when language = r".*", digits etc are repeated)
+        word_to_labels = {
+            word: list(list(seq) for seq in set(tuple(seq) for seq in label_seqs))
+            for word, label_seqs in word_to_labels.items()
+        }
+
+        return word_to_labels
+
+    def __check_text_in_list(
+        self,
+        text: str,
+        list_of_texts: Iterable[str],
+        regex: bool = True,
+    ):
+        if not (list_of_texts and all(list_of_texts)):
+            return False
+
+        return (
+            any(re.match(pattern, text) for pattern in list_of_texts)
+            if regex
+            else text in list_of_texts
+        )
+
+    def __get_default_value(self, dictionary: Dict) -> Any:
+        default_obj = None
+
+        if dictionary:
+            # get an empty instance of first value's class
+            first_value = list(dictionary.values())[0]
+            value_class = type(first_value)
+            default_obj = value_class()
+
+        return default_obj
+
+    def _make_disambiguation_map(self, words: Iterable[str]) -> Dict[str, List[str]]:
+        ambiguous_2_unambiguous = {}
         for word in words:
             without_word_sense = self.remove_word_sense(word)
             if without_word_sense != word:
@@ -200,8 +302,6 @@ class Vocab:
     # load sign video/features
 
 
-BAD_CHARACTERS_REGEX = r"|".join(
-    {"\ufeff", "\u200b", "\u2005", "\u2009", "\u200b", "\u200c"}
-    | {"\u0601", "\u2002", "\u2061", "\u202c", "\u3000", "\u200d"}
-    | {"\u2003", "\u0602", "\xad", " ", "‎", "\u200f"}
-)
+__all__ = [
+    "Vocab",
+]

@@ -1,22 +1,37 @@
-[build-system]
-requires = ["hatchling>=1.10.0"]
-build-backend = "hatchling.build"
-
-[project]
+[tool.poetry]
 name = "sign_language_translator"
-version = "0.3.0"
+version = "0.4.0"
+description = "Translate between spoken/text and sign language using AI."
+authors = ["Mudassar Iqbal <mdsriqb@gmail.com>"]
+license = "Apache-2.0"
 readme = "README.md"
-description = "Translate between text and sign language using AI"
-authors = [{author = "Mudassar Iqbal", email = "mdsriqb@gmail.com"}]
-url = "https://github.com/mdsrqbl"
+packages = [{include = "sign_language_translator"}]
 repository = "https://github.com/sign-language-translator/sign-language-translator"
-keywords = ["sign", "translation", "pose", "pakistan"]
+keywords = ["sign", "translation", "pose", "pakistan", "deep-learning", "computer-vision", "nlp", "sign-language", "sign-language-translation"]
 
 [tool.poetry.dependencies]
+python = ">=3.9,<3.13"
 pytest = "^7.0.0"
+matplotlib = "^3.7.2"
+mediapipe = "^0.10.2"
+moviepy = "^1.0.3"
+numpy = "^1.25.1"
+pandas = "^2.0.3"
+pillow = "^10.0.0"
+scipy = "^1.11.1"
+torch = "^2.0.1"
+scikit-image = "^0.21.0"
+beautifulsoup4 = "^4.12.2"
+deep-translator = "^1.11.4"
+opencv-contrib-python = "^4.8.0.74"
+tqdm = "^4.65.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-addopts = "-v "
+addopts = "-vv "
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]

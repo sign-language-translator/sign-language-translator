@@ -1,6 +1,7 @@
 from sign_language_translator.text.utils import (
-    extract_supported_subsequence,
+    extract_supported_subsequences,
     make_ngrams,
+    ListRegex,
 )
 
 
@@ -28,8 +29,44 @@ def test_extract_supported_subsequence():
     skipped = {5}
     expected_subsequences = [[2, 3, 4], [6], [9, 10]]
 
-    subsequences = extract_supported_subsequence(
+    subsequences = extract_supported_subsequences(
         seqn, tags, supported_tags, skipped_items=skipped
     )
 
     assert subsequences == expected_subsequences
+
+
+def test_list_regex():
+    items = ["abc", "lmn", "123", "123", "123", "xyz", "def", "pqr"]
+    span = ListRegex.match(
+        items,
+        [
+            r"(abc|cba)",
+            [r"jk", r"lmno?"],
+            ("123", (0, 2)), # test for max_count=0
+        ],
+    )
+    assert span == (0, 4)
+
+    items = [
+        "hello",
+        "(",
+        "word",
+        "-",
+        "word",
+        ")",
+        "something",
+        "somgething",
+        "world",
+        "(",
+        "sense",
+        ")",
+        ".",
+    ]
+    matches = ListRegex.find_all(
+        items, [r"\w+", r"\(", r"\w+", ([r"-", r"\w+"], (0, None)), r"\)"]
+    )
+    assert matches == [
+        ["hello", "(", "word", "-", "word", ")"],
+        ["world", "(", "sense", ")"],
+    ]

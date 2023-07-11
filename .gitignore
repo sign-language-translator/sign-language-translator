@@ -11,3 +11,6 @@ pytestdebug.log
 .idea
 temp/
 temp*
+
+# build
+dist/
