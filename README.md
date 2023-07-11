@@ -1,14 +1,20 @@
 # Sign Language Translator ⠎⠇⠞
 
+[![python](https://img.shields.io/pypi/pyversions/sign-language-tranlator)](https://pypi.org/project/sign-language-tranlator/)
+
+[![PyPi](https://img.shields.io/pypi/v/sign-language-tranlator)](https://pypi.org/project/sign-language-tranlator/)
+
+[![Downloads](https://pepy.tech/badge/sign-language-translator)](https://pepy.tech/project/sign-language-translator)
+
 1. [Overview](#overview)
-   1.1. [Solution](#solution)
-   1.2. [Major Components and Goals](#major-components-and-goals)
-   1.3. [Datasets](#datasets)
+   1. [Solution](#solution)
+   2. [Major Components and Goals](#major-components-and-goals)
+   3. [Datasets](#datasets)
 2. [How to install the package](#how-to-install-the-package)
 3. [Usage](#usage)
-    3.1. [basic translation](#basic-translation)
-    3.2. [text language processor](#text-language-processor)
-    3.3. [sign language processor](#sign-language-processor)
+   1. [basic translation](#basic-translation)
+   2. [text language processor](#text-language-processor)
+   3. [sign language processor](#sign-language-processor)
 4. [Directory Tree](#directory-tree)
 5. [Research Paper](#research-paper)
 6. [Credits and Gratitude](#credits-and-gratitude)
@@ -122,7 +128,7 @@ import sign_language_translator as slt
 # deep_t2s_model = slt.get_model("generative_t2s_base-01") # pytorch
 # rule-based model (concatenates clips of each word)
 t2s_model = slt.get_model(
-    approach = "ConcatenativeSynthesis", # concatenate sign video for each word in text
+    model_code = "ConcatenativeSynthesis", # slt.enums.ModelCodes.CONCATENATIVE_SYNTHESIS.value
     text_language = "English", # or object of any child of slt.languages.text.text_language.TextLanguage class
     sign_language = "PakistanSignLanguage", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
     sign_feature_model = "mediapipe_pose_v2_hand_v1",
@@ -131,7 +137,7 @@ t2s_model = slt.get_model(
 text = "hello world!"
 sign_language_sentence = t2s_model(text)
 
-moviepy_video_object = sign_language_sentence.video()
+# moviepy_video_object = sign_language_sentence.video()
 # moviepy_video_object.ipython_display()
 # moviepy_video_object.write_videofile(f"sentences/{text}.mp4")
 ```
@@ -313,6 +319,12 @@ A: Communication skills
 
     ```bash
     poetry new project-name
+    ```
+
+    add dependencies to pyproject.toml
+
+    ```bash
+    poetry add $(cat requirements.txt)
     ```
 
 3. Build Distribution Files (might wanna add "dist/" to .gitignore)

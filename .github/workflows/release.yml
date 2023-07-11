@@ -15,15 +15,22 @@ jobs:
   check_version:
     runs-on: ubuntu-latest
 
+    outputs:
+      version_updated: ${{ steps.version.outputs.version_updated }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: main
+          fetch-depth: 2
 
       - name: Check version update
         id: version
         run: |
-          git diff HEAD^ HEAD pyproject.toml | grep -q +version
-          echo "::set-output name=version_updated::$(if [ $? -eq 0 ]; then echo 'true'; else echo 'false'; fi)"
+          dif=$(git diff --unified=0 HEAD^ HEAD -- pyproject.toml)
+          ver=$(if grep -q '^\+version' <<< $dif; then echo 'true'; else echo 'false'; fi)
+          echo "version_updated=$ver" >> $GITHUB_OUTPUT
 
       - name: Notify on version update
         if: steps.version.outputs.version_updated == 'true'
@@ -47,12 +54,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
+          pip install poetry twine
           poetry install
 
       - name: Run tests
         run: |
-          python -m pytest
+          poetry run pytest -vv
 
       - name: Build
         run: |

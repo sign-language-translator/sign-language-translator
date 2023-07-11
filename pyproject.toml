@@ -10,8 +10,21 @@ repository = "https://github.com/sign-language-translator/sign-language-translat
 keywords = ["sign", "translation", "pose", "pakistan", "deep-learning", "computer-vision", "nlp", "sign-language", "sign-language-translation"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9,<3.13"
 pytest = "^7.0.0"
+matplotlib = "^3.7.2"
+mediapipe = "^0.10.2"
+moviepy = "^1.0.3"
+numpy = "^1.25.1"
+pandas = "^2.0.3"
+pillow = "^10.0.0"
+scipy = "^1.11.1"
+torch = "^2.0.1"
+scikit-image = "^0.21.0"
+beautifulsoup4 = "^4.12.2"
+deep-translator = "^1.11.4"
+opencv-contrib-python = "^4.8.0.74"
+tqdm = "^4.65.0"
 
 [build-system]
 requires = ["poetry-core"]

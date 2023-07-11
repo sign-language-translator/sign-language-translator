@@ -44,6 +44,10 @@ class VideoFeatures(enum.Enum):
     # Image Segmentation
 
 
+class ModelCodes(enum.Enum):
+    CONCATENATIVE_SYNTHESIS = "concatenative-synthesis"
+
+
 __all__ = [
     "Countries",
     "Organizations",
@@ -51,4 +55,5 @@ __all__ = [
     "TextLanguages",
     "SignLanguages",
     "VideoFeatures",
+    "ModelCodes",
 ]

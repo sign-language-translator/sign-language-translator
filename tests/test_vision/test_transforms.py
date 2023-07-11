@@ -1,5 +1,6 @@
 import numpy as np
-from sign_language_translator.vision import transforms as T
+
+# from sign_language_translator.vision import transforms as T
 
 
 def test_zoom_landmarks():

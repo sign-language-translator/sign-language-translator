@@ -17,7 +17,7 @@ import sign_language_translator as slt
 # deep_t2s_model = slt.get_model("generative_t2s_base-01") # pytorch
 # rule-based model (concatenates clips of each word)
 t2s_model = slt.get_model(
-    approach = "ConcatenativeSynthesis",
+    model_code = "ConcatenativeSynthesis", # slt.enums.ModelCodes.CONCATENATIVE_SYNTHESIS.value
     text_language = "English", # or object of any child of slt.languages.text.text_language.TextLanguage class
     sign_language = "PakistanSignLanguage", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
     sign_feature_model = "mediapipe_pose_v2_hand_v1",
@@ -26,7 +26,7 @@ t2s_model = slt.get_model(
 text = "hello world!"
 sign_language_sentence = t2s_model(text)
 
-moviepy_video_object = sign_language_sentence.video()
+# moviepy_video_object = sign_language_sentence.video()
 # moviepy_video_object.ipython_display()
 # moviepy_video_object.write_videofile(f"sentences/{text}.mp4")
 
@@ -55,6 +55,7 @@ from sign_language_translator import (
     utils,
     vision,
 )
+from sign_language_translator.config import enums
 from sign_language_translator.config.settings import Settings
 from sign_language_translator.config.helpers import set_dataset_dir
 from sign_language_translator.languages import get_sign_language, get_text_language
@@ -70,6 +71,7 @@ __all__ = [
     "languages",
     "utils",
     "config",
+    "enums",
     # object loaders
     "get_sign_language",
     "get_text_language",
