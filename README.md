@@ -1,9 +1,7 @@
 # Sign Language Translator ⠎⠇⠞
 
-[![python](https://img.shields.io/pypi/pyversions/sign-language-tranlator)](https://pypi.org/project/sign-language-tranlator/)
-
-[![PyPi](https://img.shields.io/pypi/v/sign-language-tranlator)](https://pypi.org/project/sign-language-tranlator/)
-
+[![python](https://img.shields.io/pypi/pyversions/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
+[![PyPi](https://img.shields.io/pypi/v/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
 [![Downloads](https://pepy.tech/badge/sign-language-translator)](https://pepy.tech/project/sign-language-translator)
 
 1. [Overview](#overview)
@@ -282,7 +280,7 @@ Immense gratitude towards:
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **6580** + Tests: **780**):
+Count total number of **lines of code** (Package: **6595** + Tests: **781**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
