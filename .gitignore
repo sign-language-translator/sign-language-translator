@@ -4,6 +4,7 @@ __pycache__/
 .pytest_cache
 pytestdebug.log
 .coverage
+.python-version
 
 # Other
 .DS_Store
