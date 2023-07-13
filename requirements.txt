@@ -3,7 +3,7 @@ deep_translator==1.11.4
 opencv_contrib_python==4.8.0.74
 tqdm==4.65.0
 matplotlib==3.7.2
-mediapipe==0.10.2
+mediapipe>=0.9
 moviepy==1.0.3
 numpy==1.25.1
 pandas==2.0.3

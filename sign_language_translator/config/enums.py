@@ -45,7 +45,13 @@ class VideoFeatures(enum.Enum):
 
 
 class ModelCodes(enum.Enum):
+    # text-to-sign
     CONCATENATIVE_SYNTHESIS = "concatenative-synthesis"
+
+    # language-models
+    SIMPLE_LM = "simple-language-model"
+    MIXER_LM = "mixer"
+    TRANSFORMER_LM = "transformer-language-model"
 
 
 __all__ = [

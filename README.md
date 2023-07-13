@@ -13,6 +13,7 @@
    1. [basic translation](#basic-translation)
    2. [text language processor](#text-language-processor)
    3. [sign language processor](#sign-language-processor)
+   4. [language models](#language-models)
 4. [Directory Tree](#directory-tree)
 5. [Research Paper](#research-paper)
 6. [Credits and Gratitude](#credits-and-gratitude)
@@ -186,9 +187,23 @@ from sign_language_translator.languages.sign import PakistanSignLanguage
 
 psl = PakistanSignLanguage()
 
-tokens = ["he", "school", "went"]
-file_labels = psl.to_file_label(tokens)
-# file_labels = ["pk-hfad-1_وہ", "pk-hfad-1_school", "pk-hfad-1_گیا"]
+tokens = ["he", " ", "went", " ", "to", " ", "school", "."]
+tags = [Tags.WORD, Tags.SPACE] * 3 + [Tags.WORD, Tags.PUNCTUATION]
+tokens, tags, _ = psl.restructure_sentence(tokens, tags) # ["he", "school", "go"]
+signs  = psl.tokens_to_sign_dicts(tokens, tags)
+# signs = [
+#   {'signs': [['pk-hfad-1_وہ']], 'weights': [1.0]},
+#   {'signs': [['pk-hfad-1_school']], 'weights': [1.0]},
+#   {'signs': [['pk-hfad-1_گیا']], 'weights': [1.0]}
+# ]
+```
+
+###### language models
+
+```python
+from sign_language_translator.models.language_models import BeamSampling, SimpleLanguageModel, Mixer, TransformerLanguageModel
+
+
 ```
 
 ## Directory Tree
@@ -265,14 +280,14 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor at PUCIT. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-07-11.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-07-11.
 
 Immense gratitude towards:
 
 - [Mudassar Iqbal](https://github.com/mdsrqbl) for leading and coding the project so far.
 - Rabbia Arshad for help in initial R&D and web development.
 - Waqas Bin Abbas for assistance in video data collection process.
-- Dr Kamran Malik for teaching us AI, setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
+- Kamran Malik for setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
 - [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing for collaboration and providing the reference clips, hearing-impaired performers for data creation, and creating the text2gloss dataset.
 - [UrduHack](https://github.com/urduhack/urduhack) (espacially Ikram Ali) for their work on Urdu character normalization.
 
