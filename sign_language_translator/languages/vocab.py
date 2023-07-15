@@ -6,6 +6,7 @@ import re
 from typing import Any, Dict, Iterable, List, Set
 
 from sign_language_translator.config.settings import Settings
+from sign_language_translator.utils import download_resource
 
 
 class Vocab:
@@ -119,6 +120,7 @@ class Vocab:
         return without_word_sense
 
     def __load_label_to_words(self):
+        self._download_resource(self.label_to_words_path)
         with open(
             self.label_to_words_path,
             "r",
@@ -131,6 +133,7 @@ class Vocab:
         return collection_to_label_to_language_to_words
 
     def __load_constructable_words(self):
+        self._download_resource(self.constructed_words_path)
         with open(
             self.constructed_words_path,
             "r",
@@ -143,6 +146,7 @@ class Vocab:
         return organization_to_language_to_constructable_words
 
     def __load_preprocessing(self, language: str, regex: bool = True) -> Dict[str, Any]:
+        self._download_resource(self.preprocessing_path)
         with open(
             self.preprocessing_path,
             "r",
@@ -160,6 +164,7 @@ class Vocab:
         return preprocessing_map
 
     def __load_token_to_id(self, language: str, regex: bool = True) -> Dict[str, int]:
+        self._download_resource(self.token_to_id_path)
         with open(
             self.token_to_id_path,
             "r",
@@ -298,6 +303,16 @@ class Vocab:
                 ambiguous_2_unambiguous[without_word_sense].append(word)
 
         return ambiguous_2_unambiguous
+
+    def _download_resource(self, full_path: str):
+        if not Settings.AUTO_DOWNLOAD:
+            return
+        if os.path.exists(full_path):
+            return
+        if full_path.startswith(Settings.DATASET_ROOT_DIRECTORY):
+            filename = full_path[len(Settings.DATASET_ROOT_DIRECTORY) :]
+            filename = re.escape(filename.strip(os.path.sep))
+            download_resource(filename, overwrite=False)
 
     # load sign video/features
 

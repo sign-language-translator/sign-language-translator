@@ -25,6 +25,8 @@ beautifulsoup4 = "^4.12.2"
 deep-translator = "^1.11.4"
 opencv-contrib-python = "^4.8.0.74"
 tqdm = "^4.65.0"
+pyyaml = "^6.0"
+click = "^8.1.4"
 
 [build-system]
 requires = ["poetry-core"]
@@ -38,3 +40,6 @@ filterwarnings = [
 
 [tool.isort]
 profile = "black"
+
+[tool.poetry.scripts]
+slt = "sign_language_translator.cli:slt"

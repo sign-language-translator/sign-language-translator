@@ -6,15 +6,11 @@ from glob import glob
 from typing import Dict, List
 
 from sign_language_translator import Settings
+from sign_language_translator.utils import download_resource
 
 
 def load_data(data_filename):
-    # :TODO: clean up this commented code:
-    # from sign_language_translator import set_dataset_dir
-
-    # set_dataset_dir(
-    #     "/Users/mudassar.iqbal/Library/CloudStorage/GoogleDrive-mdsriqb@gmail.com/My Drive/sign-language-translator/sign-language-datasets"
-    # )
+    download_resource(data_filename, overwrite=False)
 
     data = None
     data_path = os.path.join(
@@ -93,20 +89,27 @@ def validate_word_dict(word_dict: Dict[str, List[str]], sign_labels=set()):
 
 
 def test_recordings_labels():
+    # TODO: clean up this commented code:
+    # from sign_language_translator import set_dataset_dir
+
+    # set_dataset_dir(
+    #     "/Users/mudassar.iqbal/Library/CloudStorage/GoogleDrive-mdsriqb@gmail.com/My Drive/sign-language-translator/sign-language-datasets"
+    # )
+
     json_data = load_recordings_labels()
     if not json_data:
         warnings.warn("'recordings_labels' json file from dataset could not be loaded")
         return
 
-    filepaths = glob(
-        os.path.join(
-            Settings.DATASET_ROOT_DIRECTORY,
-            "sign_recordings",
-            "reference_clips",
-            "**",
-            "*.mp4",
-        )
+    ref_clips_path = os.path.join(
+        Settings.DATASET_ROOT_DIRECTORY, "sign_recordings", "reference_clips"
     )
+
+    if not os.path.exists(ref_clips_path):
+        warnings.warn("'reference_clips' from dataset could not be loaded")
+        return
+
+    filepaths = glob(os.path.join(ref_clips_path, "**", "*.mp4"))
     # :TODO: [-1][:-4] after files renamed to sign-collection_label_person_camera.mp4
     file_labels = [
         (Settings.FILENAME_SEPARATOR.join(p.split(os.sep)[-2:]))[:-4] for p in filepaths
@@ -182,17 +185,17 @@ def test_label_to_words():
             validate_word_dict(word_dict, sign_labels=sign_labels)
 
 
-def test_repetition():
-    pass
+# def test_repetition():
+#     pass
 
 
-def test_ambiguous_words():
-    pass
+# def test_ambiguous_words():
+#     pass
 
 
-def test_word_senses():
-    pass
+# def test_word_senses():
+#     pass
 
 
-def test_test_data():
-    pass
+# def test_test_data():
+#     pass

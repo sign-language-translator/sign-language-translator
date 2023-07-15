@@ -6,13 +6,6 @@ from sign_language_translator.languages.text.urdu import Tags, Urdu
 
 
 def get_urdu_processor_object():
-    # # :TODO: clean up this commented code:
-    # from sign_language_translator import set_dataset_dir
-
-    # set_dataset_dir(
-    #     "/Users/mudassar.iqbal/Library/CloudStorage/GoogleDrive-mdsriqb@gmail.com/My Drive/sign-language-translator/sign-language-datasets"
-    # )
-
     return Urdu() if os.path.exists(Settings.DATASET_ROOT_DIRECTORY) else None
 
 

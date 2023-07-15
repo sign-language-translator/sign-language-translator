@@ -2,18 +2,22 @@
 
 [![python](https://img.shields.io/pypi/pyversions/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
-[![Downloads](https://pepy.tech/badge/sign-language-translator)](https://pepy.tech/project/sign-language-translator)
+[![Downloads](https://static.pepy.tech/personalized-badge/sign-language-translator?period=total&units=international_system&left_color=black&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/sign-language-translator)
 
 1. [Overview](#overview)
    1. [Solution](#solution)
    2. [Major Components and Goals](#major-components-and-goals)
-   3. [Datasets](#datasets)
 2. [How to install the package](#how-to-install-the-package)
 3. [Usage](#usage)
-   1. [basic translation](#basic-translation)
-   2. [text language processor](#text-language-processor)
-   3. [sign language processor](#sign-language-processor)
-   4. [language models](#language-models)
+   1. [Command Line](#command-line)
+      <!-- 1. [configure](#configure) -->
+      1. [download](#download)
+      2. [translate](#translate)
+   2. [Python](#python)
+      1. [basic translation](#basic-translation)
+      2. [text language processor](#text-language-processor)
+      3. [sign language processor](#sign-language-processor)
+      4. [language models](#language-models)
 4. [Directory Tree](#directory-tree)
 5. [Research Paper](#research-paper)
 6. [Credits and Gratitude](#credits-and-gratitude)
@@ -26,67 +30,75 @@
 
 Sign language consists of gestures and expressions used mainly by the hearing-impaired to talk. This project is an effort to bridge the communication gap between the hearing and the hearing-impaired community using Artificial Intelligence.
 
-The goal is to provide a user friendly API to novel Sign Language Translation solutions that can easily adapt to any regional sign language. This is the package that powers the [slt_ai website](https://github.com/mdsrqbl/slt_ai).
+The goal is to provide a user friendly API to novel Sign Language Translation solutions that can easily adapt to any regional sign language. This python library can translate full sentences and not just the alphabet like most other projects. This is the package that powers the [slt_ai website](https://github.com/mdsrqbl/slt_ai).
 
-A bigger hurdle is the lack of datasets and frameworks that deep learning engineers and software developers can use to build useful products for the target community. That is what this project aims to deliver.
+A bigger hurdle is the lack of datasets and frameworks that deep learning engineers and software developers can use to build useful products for the target community. This project aims to empower sign language translation by providing robust components, tools and models for both sign language to text and text to sign language conversion. It seeks to advance the development of sign language translators for various regions while providing a way to sign language standardization.
 
 ### Solution
 
-We've have built an *extensible rule-based* text-to-sign translation system that can be used to *train Deep Learning* models.
+We've have built an *extensible rule-based* text-to-sign translation system that can be used to *train Deep Learning* models for both sign to text & text to sign translation.
 
-Just inherit the TextLanguage and SignLanguage classes to build a rule-based translation system for your regional language. Later you can use that system to fine-tune our AI models.
+To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. Later you can use that system to fine-tune our AI models.
 
 ### Major Components and Goals
 
 1. `Sign language to Text`
 
-    - Features such as pose vectors (2D or 3D) are extracted from video, and to be mapped to text corresponding to the performed signs, they are fed into a neural network which could be a checkpoint of a SOTA speech-to-text model fine-tuned using gradual unfreezing starting from the layers near input towards the output layers.
+    - Extract pose vectors (2D or 3D) from videos and map them to corresponding text representations of the performed signs.
+    - Fine-tuned a neural network, such as a state-of-the-art speech-to-text model, with gradual unfreezing starting from the input layers to convert pose vectors to text.
 
 2. `Text to Sign Language`
-    - This is a relatively easier task as it can even be solved with HashTables. Just parse the input text and play appropriate video clip for each word.
+    - This is a relatively easier task if you parse input text and play appropriate video clips for each word.
 
     1. Motion Transfer
-        - The idea is to concatenate pose vectors in the time dimension and transfer the movements onto any given image of any person. This allows for seamless transitions between the clips.
+         - Concatenate pose vectors in the time dimension and transfer the movements onto any given image of a person. This ensures smooth transitions between video clips.
     2. Sign Feature Synthesis
-        - This is similar to speech synthesis. It solves the challenge of unknown synonyms or hard to tokenize/process words/phrases.
-        - It can be achieved by conditioning a pose sequence generating model on a pre-trained text encoder (e.g finetune the decoder of a multilingual T5 to output pose vectors instead of text tokens).
+         - Condition a pose sequence generation model on a pre-trained text encoder (e.g., fine-tuned decoder of a multilingual T5) to output pose vectors instead of text tokens. This solves challenges related to unknown synonyms or hard-to-tokenize/process words or phrases.
 
-1. `Preprocessing Utilities`
+3. `Preprocessing Utilities`
     1. Pose Extraction
-        - Mediapipe 3D world coordinates and 2D image coordinates
-        - Pose Visualization
+        - Mediapipe 3D world coordinates
+        - Pose Visualization to aid in analysis and understanding.
     2. Text normalization
-        - Since the supported vocabulary is handcrafted, unknown words (or spellings) must be substituted with the supported words and ambiguous words must be disambiguated.
+        - Normalize text input by substituting unknown characters/spellings with supported words.
+        - Disambiguate ambiguous words to ensure accurate translation.
 
-2. `Data Collection and Creation`
-    Sign languages are very diverse and every small region will require their own translator. So, the product needed first is the one that can help build sign language translators. This project is designed with the capacity to handle all the variations and even lead to sign standardization.
+4. `Data Collection and Creation`
+    - Capture variations in signs in a scalable and diversity accommodating way and enable advancing sign language standardization efforts.
 
-   1. Clip extraction from long videos
-   2. Multithreaded Web scraping
-   3. Language Models to write sentences of supported words
+      1. Clip extraction from long videos using timestamps
+      2. Multithreaded Web scraping
+      3. Language Models to generate sentences composed of supported word
 
-### Datasets
+5. `Datasets`
 
-The sign videos are categorized by:
+    The sign videos are categorized by:
 
-1. country
-2. source organization
-3. session number
-4. camera angle
-5. person code ((d: deaf | h: hearing)(m: male | f: female)000001)
-6. equivalent text language word
+    ```text
+    1. country
+    2. source organization
+    3. session number
+    4. camera angle
+    5. person code ((d: deaf | h: hearing)(m: male | f: female)000001)
+    6. equivalent text language word
+    ```
 
-The files are labeled as follows:
-`country_organization_sessionNumber_cameraAngle_personCode_word.extension`
+    The files are labeled as follows:
 
-The text data includes:
+    ```text
+    country_organization_sessionNumber_cameraAngle_personCode_word.extension
+    ```
 
-1. word/sentence mappings to videos
-2. spoken language sentences and phrases
-3. spoken language sentences & corresponding sign video label sequences
-4. preprocessing data such as word-to-numbers, misspellings, named-entities etc
+    The text data includes:
 
-[See the *sign-language-datasets* repo and its *release files* for the actual data & details](https://github.com/sign-language-translator/sign-language-datasets)
+    ```text
+    1. word/sentence mappings to videos
+    2. spoken language sentences and phrases
+    3. spoken language sentences & corresponding sign video label sequences
+    4. preprocessing data such as word-to-numbers, misspellings, named-entities etc
+    ```
+
+    [See the *sign-language-datasets* repo and its *release files* for the actual data & details](https://github.com/sign-language-translator/sign-language-datasets)
 
 ## How to install the package
 
@@ -105,14 +117,53 @@ pip install -e .
 ```
 
 ```bash
-pip install -e git+https://github.com/sign-language-translator/sign-language-translator.git
+pip install -e git+https://github.com/sign-language-translator/sign-language-translator.git#egg=sign_language_translator
 ```
 
 ## Usage
 
 see the *test cases* or [the *notebooks* repo](https://github.com/sign-language-translator/notebooks) for detailed use
 
-###### basic translation
+### Command Line
+
+<!-- #### configure
+
+(Optional) Set the dataset directory.
+
+```bash
+slt configure --dataset-dir "/path/to/sign-language-datasets"
+``` -->
+
+#### Download
+
+Download dataset files or models. The parameters are regular expressions.
+
+```bash
+slt download --overwrite true '.*\.json' '.*\.txt'
+```
+
+```bash
+slt download --progress-bar true 't2s_model_base.pth'
+```
+
+(By default, the dataset is downloaded into `/install-directory/sign_language_translator/sign-language-datasets/`)
+
+#### Translate
+
+Translate text to sign language using a rule-based model
+
+```bash
+slt translate \
+--model-code "concatenative" \
+--text-lang urdu --sign-lang psl \
+--sign-features 'mp-landmarks' \
+"وہ سکول گیا تھا۔" \
+'مجھے COVID نہیں ہے!'
+```
+
+### Python
+
+#### basic translation
 
 ```python
 import sign_language_translator as slt
@@ -210,16 +261,22 @@ from sign_language_translator.models.language_models import BeamSampling, Simple
 
 ```text
 sign-language-translator
+├── MANIFEST.in
 ├── README.md
+├── poetry.lock
 ├── pyproject.toml
 ├── requirements.txt
 ├── roadmap.md
 ├── tests
+│   └── *
+│
 └── sign_language_translator
+    ├── cli.py
     ├── config
     │   ├── enums.py
     │   ├── helpers.py
-    │   └── settings.py
+    │   ├── settings.py
+    │   └── urls.yaml
     │
     ├── data_collection
     │   ├── completeness.py
@@ -253,6 +310,9 @@ sign-language-translator
     │       ├── concatenative_synthesis.py
     │       └── t2s_model.py
     │
+    ├── sign-language-datasets
+    │   └── *
+    │
     ├── text
     │   ├── metrics.py
     │   ├── preprocess.py
@@ -263,6 +323,7 @@ sign-language-translator
     │
     ├── utils
     │   ├── data_loader.py
+    │   ├── download.py
     │   ├── landmarks_info.py
     │   ├── sign_data_attributes.py
     │   └── tree.py
@@ -295,7 +356,7 @@ Immense gratitude towards:
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **6595** + Tests: **781**):
+Count total number of **lines of code** (Package: **7018** + Tests: **774**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

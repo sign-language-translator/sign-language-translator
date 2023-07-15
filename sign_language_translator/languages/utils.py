@@ -2,28 +2,19 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, Set, Type
+from typing import TYPE_CHECKING
 
+from sign_language_translator.config.enums import (
+    SignLanguages,
+    TextLanguages,
+    normalize_short_code,
+)
 from sign_language_translator.languages.sign import PakistanSignLanguage
 from sign_language_translator.languages.text import Urdu
 
 if TYPE_CHECKING:
     from sign_language_translator.languages.sign import SignLanguage
     from sign_language_translator.languages.text import TextLanguage
-
-
-def __search_in_values_to_retrieve_key(
-    code_name: str, class_to_codes: Dict[Type, Set[str]]
-):
-    # verify there is no repetition/reuse in language codes
-    all_codes = [code for codes in class_to_codes.values() for code in codes]
-    assert len(all_codes) == len(set(all_codes)), "code reused for multiple keys"
-
-    for class_, codes in class_to_codes.items():
-        if code_name.lower() in codes:
-            return class_
-
-    return None
 
 
 def get_text_language(language_name: str) -> TextLanguage:
@@ -40,11 +31,11 @@ def get_text_language(language_name: str) -> TextLanguage:
         ValueError: If no TextLanguage class is known for the provided language name.
     """
 
-    language_codes = {
-        Urdu: {"urdu", "ur"},
+    code_to_class = {
+        TextLanguages.URDU.value: Urdu,
     }
 
-    class_ = __search_in_values_to_retrieve_key(language_name, language_codes)
+    class_ = code_to_class.get(normalize_short_code(language_name), None)
     if class_:
         return class_()  # constructor called
 
@@ -66,11 +57,11 @@ def get_sign_language(language_name: str) -> SignLanguage:
         ValueError: If no SignLanguage class is known for the provided language name.
     """
 
-    language_codes = {
-        PakistanSignLanguage: {"pakistansignlanguage", "pakistan_sign_language", "psl"},
+    code_to_class = {
+        SignLanguages.PAKISTAN_SIGN_LANGUAGE.value: PakistanSignLanguage,
     }
 
-    class_ = __search_in_values_to_retrieve_key(language_name, language_codes)
+    class_ = code_to_class.get(normalize_short_code(language_name), None)
     if class_:
         return class_()  # constructor called
 

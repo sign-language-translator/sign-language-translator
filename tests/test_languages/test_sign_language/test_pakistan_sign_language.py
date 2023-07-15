@@ -1,5 +1,6 @@
 import os
 import warnings
+from copy import deepcopy
 
 from sign_language_translator import Settings
 from sign_language_translator.languages.sign.pakistan_sign_language import (
@@ -9,13 +10,6 @@ from sign_language_translator.text.tagger import Tags
 
 
 def get_pakistan_sl_object():
-    # :TODO: clean up this commented code:
-    # from sign_language_translator import set_dataset_dir
-
-    # set_dataset_dir(
-    #     "/Users/mudassar.iqbal/Library/CloudStorage/GoogleDrive-mdsriqb@gmail.com/My Drive/sign-language-translator/sign-language-datasets"
-    # )
-
     return (
         PakistanSignLanguage()
         if os.path.exists(Settings.DATASET_ROOT_DIRECTORY)
@@ -68,7 +62,7 @@ def test_pakistan_token_to_sign():
     tags += [Tags.SUPPORTED_WORD, Tags.SUPPORTED_WORD, Tags.SUPPORTED_WORD]
 
     signs = psl.tokens_to_sign_dicts(tokens, tags=tags)
-    expected_signs = [
+    expected_signs_1 = [
         {"signs": [["pk-hfad-1_میں(i)"]], "weights": [1.0]},
         {
             "signs": [
@@ -93,5 +87,8 @@ def test_pakistan_token_to_sign():
         {"signs": [["pk-hfad-1_گھر"]], "weights": [1.0]},
         {"signs": [["pk-hfad-1_گیا"]], "weights": [1.0]},
     ]
+    # the other order
+    expected_signs_2 = deepcopy(expected_signs_1)
+    expected_signs_2[1]["signs"] = expected_signs_2[1]["signs"][::-1]
 
-    assert signs == expected_signs
+    assert signs in [expected_signs_1, expected_signs_2]
