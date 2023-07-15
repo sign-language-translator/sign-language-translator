@@ -6,13 +6,6 @@ from sign_language_translator.languages.text.urdu import Tags, Urdu
 
 
 def get_urdu_processor_object():
-    # # :TODO: clean up this commented code:
-    # from sign_language_translator import set_dataset_dir
-
-    # set_dataset_dir(
-    #     "/Users/mudassar.iqbal/Library/CloudStorage/GoogleDrive-mdsriqb@gmail.com/My Drive/sign-language-translator/sign-language-datasets"
-    # )
-
     return Urdu() if os.path.exists(Settings.DATASET_ROOT_DIRECTORY) else None
 
 
@@ -106,12 +99,12 @@ def test_urdu_tagger():
 
     tokens = [
         ["hello", " ", "world", "!"],
-        ["شام", " ", "۰۹:۳۰", "پر"],
+        ["شام", " ", "۰۹:۳۰", "پر(پہ)"],
         ["سبحان(نام)"],
     ]
     expected_tags = [
         [Tags.WORD, Tags.SPACE, Tags.WORD, Tags.PUNCTUATION],
-        [Tags.SUPPORTED_WORD, Tags.SPACE, Tags.TIME, Tags.SUPPORTED_WORD],
+        [Tags.AMBIGUOUS, Tags.SPACE, Tags.TIME, Tags.SUPPORTED_WORD],
         [Tags.NAME],
     ]
     tags = list(map(ur_nlp.get_tags, tokens))
@@ -131,7 +124,7 @@ def test_word_senses():
         "میں",
     ]
     expected_word_senses = [
-        {"میں(i)", "میں(in)"},
+        {'میں(متکلم)', 'میں(اندر)'},
     ]
     word_senses = list(map(lambda x: set(ur_nlp.get_word_senses(x)[0]), raw_words))
 

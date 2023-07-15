@@ -46,7 +46,7 @@ class Urdu(TextLanguage):
         self.tokenizer = SignTokenizer(
             word_regex=self.word_regex(),
             compound_words=(
-                self.vocab.supported_words
+                self.vocab.supported_words # TODO why does this variable exist?
                 | self.vocab.supported_words_with_word_sense
                 | {
                     w
@@ -103,6 +103,12 @@ class Urdu(TextLanguage):
                 ),
                 Tags.NUMBER,
                 4,
+            ),
+            # e.g. "میں" -> ["میں(i)", "میں(in)"]
+            Rule(
+                lambda token: token in self.vocab.ambiguous_to_unambiguous,
+                Tags.AMBIGUOUS,
+                2,
             ),
         ]
         self.tagger = Tagger(

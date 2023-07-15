@@ -56,10 +56,12 @@ from sign_language_translator import (
     vision,
 )
 from sign_language_translator.config import enums
-from sign_language_translator.config.settings import Settings
-from sign_language_translator.config.helpers import set_dataset_dir
+from sign_language_translator.config.settings import Settings, set_dataset_dir
 from sign_language_translator.languages import get_sign_language, get_text_language
 from sign_language_translator.models import get_model
+
+
+__version__ = config.helpers.get_package_version()
 
 __all__ = [
     "set_dataset_dir",
