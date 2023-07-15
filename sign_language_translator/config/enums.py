@@ -1,12 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from ..languages.text.text_language import TextLanguage
-    from ..languages.sign.sign_language import SignLanguage
-
 import enum
+from sign_language_translator.utils import search_in_values_to_retrieve_key
 
 
 class Countries(enum.Enum):
@@ -26,12 +21,12 @@ class SignCollections(enum.Enum):
 
 
 class TextLanguages(enum.Enum):
-    URDU = "Urdu"
-    # ENGLISH = "English"
+    URDU = "urdu"
+    # ENGLISH = "english"
 
 
 class SignLanguages(enum.Enum):
-    PAKISTAN_SIGN_LANGUAGE = "PakistanSignLanguage"
+    PAKISTAN_SIGN_LANGUAGE = "pakistan-sign-language"
 
 
 class VideoFeatures(enum.Enum):
@@ -54,6 +49,48 @@ class ModelCodes(enum.Enum):
     TRANSFORMER_LM = "transformer-language-model"
 
 
+def normalize_short_code(short_code: str) -> str:
+    """
+    Normalize the provided short code to a standard form that is recognized package wide.
+
+    Args:
+        short_code (str): The short code to be normalized.
+
+    Returns:
+        str: The normalized short code.
+
+    Raises:
+        ValueError: If the provided short code is unknown.
+    """
+
+    normalized_to_codes = {
+        ModelCodes.CONCATENATIVE_SYNTHESIS.value: {
+            "rule-based",
+            "concatenative",
+            "concatenativesynthesis",
+            "concatenative-synthesis",
+            "concatenative_synthesis",
+        },
+        TextLanguages.URDU.value: {
+            "urdu",
+            "ur",
+        },
+        SignLanguages.PAKISTAN_SIGN_LANGUAGE.value: {
+            "psl",
+            "pk-sl",
+            "pakistan-sign-language",
+            "pakistansignlanguage",
+            "pakistan_sign_language",
+        },
+    }
+    normalized = search_in_values_to_retrieve_key(short_code, normalized_to_codes)
+    if normalized:
+        return normalized  # constructor called
+
+    # Unknown
+    raise ValueError(f"nothing identified by code: '{short_code = }'")
+
+
 __all__ = [
     "Countries",
     "Organizations",
@@ -62,4 +99,5 @@ __all__ = [
     "SignLanguages",
     "VideoFeatures",
     "ModelCodes",
+    "normalize_short_code",
 ]
