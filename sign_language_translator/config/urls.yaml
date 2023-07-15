@@ -3,15 +3,15 @@ datasets:
     version: 1.0.0
     files:
       - name: sign_recordings/collection_to_label_to_language_to_words.json
-        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/ebbf543e4840aa61e674941d3e84fc630d7ca47c/sign_recordings/collection_to_label_to_language_to_words.json
+        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/sign_recordings/collection_to_label_to_language_to_words.json
       - name: sign_recordings/organization_to_language_to_constructable_words.json
-        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/ebbf543e4840aa61e674941d3e84fc630d7ca47c/sign_recordings/organization_to_language_to_constructable_words.json
+        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/sign_recordings/organization_to_language_to_constructable_words.json
       - name: sign_recordings/recordings_labels.json
-        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/ebbf543e4840aa61e674941d3e84fc630d7ca47c/sign_recordings/recordings_labels.json
+        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/sign_recordings/recordings_labels.json
       - name: text_preprocessing.json
-        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/ebbf543e4840aa61e674941d3e84fc630d7ca47c/text_preprocessing.json
+        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/text_preprocessing.json
       - name: language_to_token_to_id.json
-        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/ebbf543e4840aa61e674941d3e84fc630d7ca47c/language_to_token_to_id.json
+        url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/language_to_token_to_id.json
 
 package_versions:
   - version: 0.4.2

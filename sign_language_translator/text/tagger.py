@@ -18,6 +18,8 @@ class Tags(enum.Enum):
     DEFAULT = ""
     END_OF_SEQUENCE = "EOS"
     START_OF_SEQUENCE = "SOS"
+    AMBIGUOUS = "AMBIGUOUS"
+    WORDLESS = "WORDLESS"
     # WORD_SENSE = "(anything)"
     # PERSON = {
     #     'id': 'PERSON',

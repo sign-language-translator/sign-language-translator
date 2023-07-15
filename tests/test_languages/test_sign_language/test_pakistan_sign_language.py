@@ -56,7 +56,7 @@ def test_pakistan_token_to_sign():
         )
         return
 
-    tokens = ["میں(i)", "وزیراعظم", "عمران", "خان", "کے(of)", "گھر", "گیا"]
+    tokens = ["میں(متکلم)", "وزیراعظم", "عمران", "خان", "کے(حرف-اضافت)", "گھر", "گیا"]
 
     tags = [Tags.SUPPORTED_WORD, Tags.SUPPORTED_WORD, Tags.NAME, Tags.NAME]
     tags += [Tags.SUPPORTED_WORD, Tags.SUPPORTED_WORD, Tags.SUPPORTED_WORD]

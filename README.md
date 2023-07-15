@@ -2,7 +2,7 @@
 
 [![python](https://img.shields.io/pypi/pyversions/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
-[![Downloads](https://static.pepy.tech/personalized-badge/sign-language-translator?period=total&units=international_system&left_color=black&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/sign-language-translator)
+[![Downloads](https://static.pepy.tech/personalized-badge/sign-language-translator?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/sign-language-translator)
 
 1. [Overview](#overview)
    1. [Solution](#solution)
@@ -30,7 +30,7 @@
 
 Sign language consists of gestures and expressions used mainly by the hearing-impaired to talk. This project is an effort to bridge the communication gap between the hearing and the hearing-impaired community using Artificial Intelligence.
 
-The goal is to provide a user friendly API to novel Sign Language Translation solutions that can easily adapt to any regional sign language. This python library can translate full sentences and not just the alphabet like most other projects. This is the package that powers the [slt_ai website](https://github.com/mdsrqbl/slt_ai).
+The goal is to provide a user friendly API to novel Sign Language Translation solutions that can easily adapt to any regional sign language. Unlike most other projects, this python library can translate full sentences and not just the alphabet. This is the package that powers the [slt_ai website](https://github.com/mdsrqbl/slt_ai).
 
 A bigger hurdle is the lack of datasets and frameworks that deep learning engineers and software developers can use to build useful products for the target community. This project aims to empower sign language translation by providing robust components, tools and models for both sign language to text and text to sign language conversion. It seeks to advance the development of sign language translators for various regions while providing a way to sign language standardization.
 
@@ -356,7 +356,7 @@ Immense gratitude towards:
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **7018** + Tests: **774**):
+Count total number of **lines of code** (Package: **7064** + Tests: **774**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

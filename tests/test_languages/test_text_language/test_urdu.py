@@ -99,12 +99,12 @@ def test_urdu_tagger():
 
     tokens = [
         ["hello", " ", "world", "!"],
-        ["شام", " ", "۰۹:۳۰", "پر"],
+        ["شام", " ", "۰۹:۳۰", "پر(پہ)"],
         ["سبحان(نام)"],
     ]
     expected_tags = [
         [Tags.WORD, Tags.SPACE, Tags.WORD, Tags.PUNCTUATION],
-        [Tags.SUPPORTED_WORD, Tags.SPACE, Tags.TIME, Tags.SUPPORTED_WORD],
+        [Tags.AMBIGUOUS, Tags.SPACE, Tags.TIME, Tags.SUPPORTED_WORD],
         [Tags.NAME],
     ]
     tags = list(map(ur_nlp.get_tags, tokens))
@@ -124,7 +124,7 @@ def test_word_senses():
         "میں",
     ]
     expected_word_senses = [
-        {"میں(i)", "میں(in)"},
+        {'میں(متکلم)', 'میں(اندر)'},
     ]
     word_senses = list(map(lambda x: set(ur_nlp.get_word_senses(x)[0]), raw_words))
 

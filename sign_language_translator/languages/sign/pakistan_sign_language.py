@@ -109,8 +109,13 @@ class PakistanSignLanguage(SignLanguage):
                     sign = rule.apply(token)
                     priority = rule.priority
 
+        if sign is None and tag == Tags.AMBIGUOUS:
+            raise ValueError(
+                f"Token '{token}' is ambiguous."
+                + f"Try from {self.vocab.ambiguous_to_unambiguous.get(token,[])}."
+            )
         if sign is None:
-            raise ValueError(f"No PakistanSL sign could be inferred for {token = }")
+            raise ValueError(f"No PakistanSL sign could be inferred for {token = }.")
 
         return sign
 

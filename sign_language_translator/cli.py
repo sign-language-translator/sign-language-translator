@@ -103,5 +103,8 @@ def translate(inputs, model_code, text_lang, sign_lang, sign_features, target_pa
         click.echo("This type of translation is not yet supported!")
 
 
+# TODO: $ slt complete --model en-char-lm-1 --eos " " 'auto-complete is gre'
+
+
 if __name__ == "__main__":
     slt()

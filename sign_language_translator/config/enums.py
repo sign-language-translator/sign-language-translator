@@ -99,4 +99,5 @@ __all__ = [
     "SignLanguages",
     "VideoFeatures",
     "ModelCodes",
+    "normalize_short_code",
 ]
