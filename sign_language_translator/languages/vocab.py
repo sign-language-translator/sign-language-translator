@@ -16,7 +16,7 @@ class Vocab:
         self,
         language: str = r"$.",
         sign_collections: Iterable[str] = (r"$.",),
-        data_root_dir: str = Settings.DATASET_ROOT_DIRECTORY,
+        data_root_dir: str = Settings.RESOURCES_ROOT_DIRECTORY,
         arg_is_regex: bool = True,
     ) -> None:
         # save arguments
@@ -309,8 +309,8 @@ class Vocab:
             return
         if os.path.exists(full_path):
             return
-        if full_path.startswith(Settings.DATASET_ROOT_DIRECTORY):
-            filename = full_path[len(Settings.DATASET_ROOT_DIRECTORY) :]
+        if full_path.startswith(Settings.RESOURCES_ROOT_DIRECTORY):
+            filename = full_path[len(Settings.RESOURCES_ROOT_DIRECTORY) :]
             filename = re.escape(filename.strip(os.path.sep))
             download_resource(filename, overwrite=False)
 

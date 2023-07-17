@@ -30,7 +30,7 @@ class Urdu(TextLanguage):
         self.vocab = Vocab(
             language=self.name(),
             sign_collections=[r".*"],
-            data_root_dir=Settings.DATASET_ROOT_DIRECTORY,
+            data_root_dir=Settings.RESOURCES_ROOT_DIRECTORY,
             arg_is_regex=True,
         )
 
@@ -366,8 +366,6 @@ class Urdu(TextLanguage):
         | set(URDU_DIACRITICS)
         | set(SYMBOLS)
         | set(string.ascii_uppercase)  # acronyms
-        # TODO: remove ascii_lowercase when word-senses are also urdu in dataset
-        # | set(string.ascii_lowercase)  # word-sense
         | set(string.digits)
         | set("()!.,?/[]{} ")
     )

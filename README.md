@@ -4,27 +4,16 @@
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
 [![Downloads](https://static.pepy.tech/personalized-badge/sign-language-translator?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/sign-language-translator)
 
-1. [Overview](#overview)
-   1. [Solution](#solution)
-   2. [Major Components and Goals](#major-components-and-goals)
-2. [How to install the package](#how-to-install-the-package)
-3. [Usage](#usage)
-   1. [Command Line](#command-line)
-      <!-- 1. [configure](#configure) -->
-      1. [download](#download)
-      2. [translate](#translate)
-   2. [Python](#python)
-      1. [basic translation](#basic-translation)
-      2. [text language processor](#text-language-processor)
-      3. [sign language processor](#sign-language-processor)
-      4. [language models](#language-models)
-4. [Directory Tree](#directory-tree)
-5. [Research Paper](#research-paper)
-6. [Credits and Gratitude](#credits-and-gratitude)
-7. [Bonus](#bonus)
-   1. number of lines of code
-   2. just for fun
-   3. publish package on PyPI
+1. [dummy code:](#dummy-code)
+         1. [text language processor](#text-language-processor)
+         2. [sign language processor](#sign-language-processor)
+         3. [Vision](#vision)
+         4. [language models](#language-models)
+   1. [Directory Tree](#directory-tree)
+   2. [Upcoming/Roadmap](#upcomingroadmap)
+   3. [Research Paper](#research-paper)
+   4. [Credits and Gratitude](#credits-and-gratitude)
+   5. [Bonus](#bonus)
 
 ## Overview
 
@@ -32,13 +21,13 @@ Sign language consists of gestures and expressions used mainly by the hearing-im
 
 The goal is to provide a user friendly API to novel Sign Language Translation solutions that can easily adapt to any regional sign language. Unlike most other projects, this python library can translate full sentences and not just the alphabet. This is the package that powers the [slt_ai website](https://github.com/mdsrqbl/slt_ai).
 
-A bigger hurdle is the lack of datasets and frameworks that deep learning engineers and software developers can use to build useful products for the target community. This project aims to empower sign language translation by providing robust components, tools and models for both sign language to text and text to sign language conversion. It seeks to advance the development of sign language translators for various regions while providing a way to sign language standardization.
+A bigger hurdle is the lack of datasets and frameworks that deep learning engineers and software developers can use to build useful products for the target community. This project aims to empower sign language translation by providing robust components, tools and models for both sign language to text and text to sign language conversion. It seeks to advance the development of sign language translators for various regions while providing a way towards sign language standardization.
 
 ### Solution
 
-We've have built an *extensible rule-based* text-to-sign translation system that can be used to *train Deep Learning* models for both sign to text & text to sign translation.
+We've have built an *extensible rule-based* text-to-sign translation system that can be used to generate training data for *Deep Learning* models for both sign to text & text to sign translation.
 
-To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. Later you can use that system to fine-tune our AI models.
+To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. To write sample texts of supported words, you can use our language models. Then, you can use that system to fine-tune our AI models.
 
 ### Major Components and Goals
 
@@ -55,13 +44,16 @@ To create a rule-based translation system for your regional language, you can in
     2. Sign Feature Synthesis
          - Condition a pose sequence generation model on a pre-trained text encoder (e.g., fine-tuned decoder of a multilingual T5) to output pose vectors instead of text tokens. This solves challenges related to unknown synonyms or hard-to-tokenize/process words or phrases.
 
-3. `Preprocessing Utilities`
-    1. Pose Extraction
-        - Mediapipe 3D world coordinates
-        - Pose Visualization to aid in analysis and understanding.
-    2. Text normalization
+3. `Language Processing Utilities`
+    1. Sign Processing
+        - 3D world landmarks extraction with Mediapipe.
+        - Pose Visualization with matplotlib and moviepy.
+        - Pose transformations (data augmentation) with scipy.
+    2. Text Processing
         - Normalize text input by substituting unknown characters/spellings with supported words.
         - Disambiguate ambiguous words to ensure accurate translation.
+        - Tokenize text (word & sentence level).
+        - Classify tokens and mark them with Tags.
 
 4. `Data Collection and Creation`
     - Capture variations in signs in a scalable and diversity accommodating way and enable advancing sign language standardization efforts.
@@ -122,7 +114,7 @@ pip install -e git+https://github.com/sign-language-translator/sign-language-tra
 
 ## Usage
 
-see the *test cases* or [the *notebooks* repo](https://github.com/sign-language-translator/notebooks) for detailed use
+see the [*test cases*](https://github.com/sign-language-translator/sign-language-translator/tree/main/tests) or [the *notebooks* repo](https://github.com/sign-language-translator/notebooks) for detailed use
 
 ### Command Line
 
@@ -146,7 +138,7 @@ slt download --overwrite true '.*\.json' '.*\.txt'
 slt download --progress-bar true 't2s_model_base.pth'
 ```
 
-(By default, the dataset is downloaded into `/install-directory/sign_language_translator/sign-language-datasets/`)
+(By default, the stuff is downloaded into `/install-directory/sign_language_translator/sign-language-resources/`)
 
 #### Translate
 
@@ -161,6 +153,14 @@ slt translate \
 'مجھے COVID نہیں ہے!'
 ```
 
+#### Complete
+
+Auto complete a sentence using our language models. You can write sentences of only supported words or just predict next characters until a specified token.
+
+```bash
+slt complete --model en-char-lm-1 --eos "." 'auto-complete is gre'
+```
+
 ### Python
 
 #### basic translation
@@ -168,14 +168,17 @@ slt translate \
 ```python
 import sign_language_translator as slt
 
-# download dataset (by default, dataset is downloaded within the install directory)
-# slt.set_dataset_dir("path/to/sign-language-datasets") # optional
-# slt.download("id")
+# download dataset or models (if you need them separate)
+# (by default, dataset is auto-downloaded within the install directory)
+# slt.set_resource_dir("path/to/sign-language-datasets") # optional. Helps when data is synced with cloud
+
+# slt.utils.download("path", "url") # optional
+# slt.utils.download_resource(".*.json") # optional
 ```
 
 ```python
 # Load text-to-sign model
-# deep_t2s_model = slt.get_model("generative_t2s_base-01") # pytorch
+# deep_t2s_model = slt.get_model("t2s-flan-T5-base-01.pth") # pytorch
 # rule-based model (concatenates clips of each word)
 t2s_model = slt.get_model(
     model_code = "ConcatenativeSynthesis", # slt.enums.ModelCodes.CONCATENATIVE_SYNTHESIS.value
@@ -192,6 +195,8 @@ sign_language_sentence = t2s_model(text)
 # moviepy_video_object.write_videofile(f"sentences/{text}.mp4")
 ```
 
+dummy code:
+
 ```python
 # load sign
 video = slt.read_video("video.mp4")
@@ -206,7 +211,7 @@ text = deep_s2t_model(features)
 print(text)
 ```
 
-###### text language processor
+#### text language processor
 
 ```python
 
@@ -231,7 +236,7 @@ tags = ur_nlp.get_tags(tokens)
 # word_senses = [["میں(i)", "میں(in)"]]
 ```
 
-###### sign language processor
+#### sign language processor
 
 ```python
 from sign_language_translator.languages.sign import PakistanSignLanguage
@@ -249,90 +254,215 @@ signs  = psl.tokens_to_sign_dicts(tokens, tags)
 # ]
 ```
 
-###### language models
+#### Vision
+
+dummy code:
 
 ```python
-from sign_language_translator.models.language_models import BeamSampling, SimpleLanguageModel, Mixer, TransformerLanguageModel
+import sign_language_translator as slt
 
+# load video
+video = slt.read_video("sign.mp4")
 
+# extract features
+features = video.extract_features(model="mediapipe_pose_v2_hand_v1")
+
+# transform / augment data
+features = slt.vision.rotate_landmarks(features, xyz=[60, 10, 90], degrees=True)
+
+# plot
+video = slt.vision.plot_landmarks(features)
+
+# display
+video.show()
+print(features.numpy())
+```
+
+#### language models
+
+```python
+from sign_language_translator.models.language_models import SimpleLanguageModel
+names_data = [
+    '[abeera]', '[areej]', '[farida]', '[hiba]', '[kinza]',
+    '[mishal]', '[nimra]', '[rabbia]', '[tehmina]','[zoya]',
+    '[amjad]', '[atif]', '[farhan]', '[huzaifa]', '[majeed]',
+    '[nasir]', '[rizwan]', '[mudassar]', '[tayyab]', '[zain]',
+]
+
+# train an n-gram model (considers previous n tokens to predict)
+model = SimpleLanguageModel(window_size=2, unknown_token="")
+model.fit(names_data)
+
+# inference loop
+name = '[r'
+for _ in range(10):
+    nxt, prob = model.next(name) # selects next token randomly from learnt probability distribution
+    name += nxt
+    if nxt in [']' , model.unknown_token]:
+        break
+print(name)
+# '[rabeej]'
+
+# see ngram model's implementation
+print(model.__dict__)
+```
+
+```python
+from sign_language_translator.models.language_models import MixerLM, BeamSampling, SimpleLanguageModel
+
+names_data = [...] # slt.languages.English().vocab.person_names # concat start/end symbols
+
+SLMs = [
+    SimpleLanguageModel(window_size=size, unknown_token="")
+    for size in range(1,4)
+]
+[lm.fit(names_data) for lm in SLMs]
+
+# randomly select a model and infer through it
+mixed_model = slt.models.Mixer(
+    models=SLMs,
+    selection_probabilities=[1,2,4],
+    unknown_token=""
+)
+print(mixed_model)
+# Mixer LM: unk_tok=""[3]
+# ├── Simple LM: unk_tok="", window=1, params=85 | prob=14.3%
+# ├── Simple LM: unk_tok="", window=2, params=113 | prob=28.6%
+# └── Simple LM: unk_tok="", window=3, params=96 | prob=57.1%
+
+# use Beam Search to find high likelihood names
+sampler = BeamSampling(mixed_model, beam_width=3) #, scoring_function = ...)
+name = sampler.complete('[')
+print(name)
+# [rabbia]
+```
+
+Write sentences composed of only those words for which sign videos are available so that the rule-based model can generate training examples for a deep learning model:
+
+```python
+from sign_language_translator.models.language_models import TransformerLanguageModel
+
+model = TransformerLanguageModel.load("ur-supported-word-lm.pth")
+model.next_all(["میں(متکلم)", " ", "وزیراعظم", " ",])
+# (["سے", "عمران", ...], [0.1415926535, 0.7182818284, ...])
 ```
 
 ## Directory Tree
 
-```text
-sign-language-translator
-├── MANIFEST.in
-├── README.md
-├── poetry.lock
-├── pyproject.toml
-├── requirements.txt
-├── roadmap.md
-├── tests
-│   └── *
+<pre>
+<big><b>sign-language-translator</b></big>
+├── <a href="">MANIFEST.in</a>
+├── <a href="">README.md</a>
+├── <a href="">poetry.lock</a>
+├── <a href="">pyproject.toml</a>
+├── <a href="">requirements.txt</a>
+├── <b>tests</b>
+│   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/tests">*</a>
 │
-└── sign_language_translator
-    ├── cli.py
-    ├── config
-    │   ├── enums.py
-    │   ├── helpers.py
-    │   ├── settings.py
-    │   └── urls.yaml
+└── <big><b>sign_language_translator</b></big>
+    ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/cli.py">cli.py</a>
+    ├── <b>config</b>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/enums.py">enums.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/helpers.py">helpers.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/settings.py">settings.py</a>
+    │   └── <i><a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/urls.yaml">urls.yaml</a></i>
     │
-    ├── data_collection
-    │   ├── completeness.py
-    │   ├── scraping.py
-    │   └── synonyms.py
+    ├── <b>data_collection</b>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/data_collection/completeness.py">completeness.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/data_collection/scraping.py">scraping.py</a>
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/data_collection/synonyms.py">synonyms.py</a>
     │
-    ├── languages
-    │   ├── utils.py
-    │   ├── vocab.py
+    ├── <b>languages</b>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/utils.py">utils.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/vocab.p">vocab.py</a>
     │   ├── sign
-    │   │   ├── mapping_rules.py
-    │   │   ├── pakistan_sign_language.py
-    │   │   └── sign_language.py
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/sign/mapping_rules.py">mapping_rules.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/sign/pakistan_sign_language.py">pakistan_sign_language.py</a>
+    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/sign/sign_language.py">sign_language.py</a>
     │   │
     │   └── text
-    │       ├── english.py
-    │       ├── text_language.py
-    │       └── urdu.py
+    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/text/english.py">english.py</a>
+    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/text/text_language.py">text_language.py</a>
+    │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/text/urdu.py">urdu.py</a>
     │
-    ├── models
-    │   ├── utils.py
+    ├── <b>models</b>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/utils.py">utils.py</a>
     │   ├── language_models
-    │   │   ├── abstract_language_model.py
-    │   │   ├── beam_sampling.py
-    │   │   ├── mixer.py
-    │   │   ├── simple_language_model.py
-    │   │   └── transformer_language_model.py
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/abstract_language_model.py">abstract_language_model.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/beam_sampling.py">beam_sampling.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/mixer.py">mixer.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/simple_language_model.py">simple_language_model.py</a>
+    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/transformer_language_model.py">transformer_language_model.py</a>
     │   │
     │   ├── sign_to_text
     │   └── text_to_sign
-    │       ├── concatenative_synthesis.py
-    │       └── t2s_model.py
+    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py">concatenative_synthesis.py</a>
+    │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/text_to_sign/t2s_model.py">t2s_model.py</a>
     │
-    ├── sign-language-datasets
-    │   └── *
+    ├── <i><b>sign-language-resources</b></i>
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-datasets">*</a>
     │
-    ├── text
-    │   ├── metrics.py
-    │   ├── preprocess.py
-    │   ├── subtitles.py
-    │   ├── tagger.py
-    │   ├── tokenizer.py
-    │   └── utils.py
+    ├── <b>text</b>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/metrics.py">metrics.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/preprocess.py">preprocess.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/subtitles.py">subtitles.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/tagger.py">tagger.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/tokenizer.py">tokenizer.py</a>
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/utils.py">utils.py</a>
     │
-    ├── utils
-    │   ├── data_loader.py
-    │   ├── download.py
-    │   ├── landmarks_info.py
-    │   ├── sign_data_attributes.py
-    │   └── tree.py
+    ├── <b>utils</b>
+    │   ├── <del>data_loader.py</del>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/download.py">download.py</a>
+    │   ├── <del>landmarks_info.py</del>
+    │   ├── <del>sign_data_attributes.py</del>
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/tree.py">tree.py</a>
     │
-    └── vision
-        ├── concatenate.py
-        ├── embed.py
-        ├── transforms.py
-        └── visualization.py
+    └── <b>vision</b>
+        ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/concatenate.py">concatenate.py</a>
+        ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/embed.py">embed.py</a>
+        ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/transforms.py">transforms.py</a>
+        └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/visualization.py">visualization.py</a>
+</pre>
+
+## Upcoming/Roadmap
+
+```python
+# :LANGUAGE_MODELS: v0.6
+    # download model, CLI
+    # token_to_id
+    # GPT
+    # basic sentence dataset
+
+# :CLEAN_ARCHITECTURE_VISION: v0.7
+    # class according to feature type (pose/video/mesh)
+    # video loader
+    # feature extraction
+    # feature model names
+    # subtitles
+    # 2D/3D avatars
+
+# push notebooks
+# expand reference clip data by scraping everything
+# data info table
+# https://sign-language-translator.readthedocs.io/en/latest/
+
+# :DEEP_TRANSLATION: v0.8-v1.x
+    # sign to text with fine-tuned whisper
+    # pose vector generation with flan-T5
+    # motion transfer
+    # pose2video: stable diffusion?
+
+# RESEARCH PAPERs
+    # datasets: clips, text, sentences, disambiguation
+    # rule based translation: describe entire repo
+    # deep sign-to-text: pipeline + experiments
+    # deep text-to-sign: pipeline + experiments
+
+# WEB DEVELOPMENT
+    # ML inference server
+    # Django backend server
+    # React Frontend
+    # React Native mobile app
 ```
 
 ## Research Paper
@@ -341,13 +471,13 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-07-11.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-07-16.
 
 Immense gratitude towards:
 
 - [Mudassar Iqbal](https://github.com/mdsrqbl) for leading and coding the project so far.
 - Rabbia Arshad for help in initial R&D and web development.
-- Waqas Bin Abbas for assistance in video data collection process.
+- Waqas Bin Abbas for assistance in initial video data collection process.
 - Kamran Malik for setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
 - [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing for collaboration and providing the reference clips, hearing-impaired performers for data creation, and creating the text2gloss dataset.
 - [UrduHack](https://github.com/urduhack/urduhack) (espacially Ikram Ali) for their work on Urdu character normalization.
@@ -356,13 +486,13 @@ Immense gratitude towards:
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **7064** + Tests: **774**):
+Count total number of **lines of code** (Package: **7063** + Tests: **774**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
 ```
 
-**Just for fun**
+**Just for `Fun`**
 
 ```text
 Q: What was the deaf student's favorite course?

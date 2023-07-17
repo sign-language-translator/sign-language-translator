@@ -96,7 +96,7 @@ def download_resource(
     statuses = []
     for filename, url in matching_filenames_to_url.items():
         # Make sure that the file/directory exists
-        file_path = os.path.join(Settings.DATASET_ROOT_DIRECTORY, filename)
+        file_path = os.path.join(Settings.RESOURCES_ROOT_DIRECTORY, filename)
         if os.path.exists(file_path) and not overwrite:
             continue
         os.makedirs(os.path.dirname(file_path), exist_ok=True)

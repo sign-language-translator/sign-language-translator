@@ -2,7 +2,7 @@ from sign_language_translator.models import language_models, sign_to_text, text_
 from sign_language_translator.models.language_models import (
     BeamSampling,
     LanguageModel,
-    Mixer,
+    MixerLM,
     SimpleLanguageModel,
 )
 from sign_language_translator.models.text_to_sign import ConcatenativeSynthesis
@@ -16,6 +16,6 @@ __all__ = [
     "ConcatenativeSynthesis",
     "SimpleLanguageModel",
     "BeamSampling",
-    "Mixer",
+    "MixerLM",
     "LanguageModel",
 ]
