@@ -1,5 +1,5 @@
 import re
-import string
+from string import ascii_uppercase, digits
 from typing import Any, Dict, Iterable, List, Set, Union
 
 from sign_language_translator.config.settings import Settings
@@ -46,13 +46,10 @@ class Urdu(TextLanguage):
         self.tokenizer = SignTokenizer(
             word_regex=self.word_regex(),
             compound_words=(
-                self.vocab.supported_words # TODO why does this variable exist?
+                self.vocab.supported_words  # TODO why does this variable exist?
                 | self.vocab.supported_words_with_word_sense
-                | {
-                    w
-                    for word in self.vocab.words_to_numbers.keys()
-                    for w in [word, word.replace("-", " ")]
-                }
+                | set(self.vocab.words_to_numbers.keys())
+                | set(self.vocab.person_names)
             ),  # TODO: | one-hundred twenty-three (\d[ \d]*): ["100", "23"] --> ["123"]
             end_of_sentence_tokens=self.END_OF_SENTENCE_MARKS,
             full_stops=self.FULL_STOPS,
@@ -365,8 +362,8 @@ class Urdu(TextLanguage):
         set(CORRECT_URDU_CHARACTERS_TO_INCORRECT.keys())
         | set(URDU_DIACRITICS)
         | set(SYMBOLS)
-        | set(string.ascii_uppercase)  # acronyms
-        | set(string.digits)
+        | set(ascii_uppercase)  # acronyms
+        | set(digits)
         | set("()!.,?/[]{} ")
     )
     UNALLOWED_CHARACTERS_REGEX = (

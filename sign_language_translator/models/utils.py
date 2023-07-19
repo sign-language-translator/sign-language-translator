@@ -1,10 +1,11 @@
 """utility functions for models"""
 
-from sign_language_translator.config.enums import ModelCodes
-from sign_language_translator.models.text_to_sign.concatenative_synthesis import (
-    ConcatenativeSynthesis,
-)
-from sign_language_translator.config.enums import normalize_short_code
+from os.path import join
+
+from sign_language_translator.config.enums import ModelCodes, normalize_short_code
+from sign_language_translator.config.settings import Settings
+from sign_language_translator.models import ConcatenativeSynthesis, NgramLanguageModel
+from sign_language_translator.utils import download_resource
 
 
 def get_model(
@@ -29,7 +30,8 @@ def get_model(
         ValueError: If inappropriate argument values are provided for text_language, sign_language, or video_feature_model.
     """
 
-    if normalize_short_code(model_code) == ModelCodes.CONCATENATIVE_SYNTHESIS.value:
+    model_code = normalize_short_code(model_code)
+    if model_code == ModelCodes.CONCATENATIVE_SYNTHESIS.value:
         if text_language and sign_language and video_feature_model:
             # TODO: validate arg types
             return ConcatenativeSynthesis(
@@ -37,10 +39,14 @@ def get_model(
                 sign_language=sign_language,
                 sign_features=video_feature_model,
             )
-        else:
-            raise ValueError(
-                "Inappropriate argument value for text_language, sign_language or video_feature_model"
-            )
+        raise ValueError(
+            "Inappropriate argument value for text_language, sign_language or video_feature_model"
+        )
+    elif model_code in ModelCodes.ALL_NGRAM_LANGUAGE_MODELS.value:
+        download_resource("models/" + model_code, progress_bar=True, leave=False)
+        return NgramLanguageModel.load(
+            join(Settings.RESOURCES_ROOT_DIRECTORY, "models", model_code)
+        )
     elif model_code.lower() in ["stt", "sign-to-text", "sign_to_text"]:
         pass
 

@@ -3,9 +3,10 @@ from sign_language_translator.models.language_models import (
     BeamSampling,
     LanguageModel,
     MixerLM,
-    SimpleLanguageModel,
+    NgramLanguageModel,
 )
 from sign_language_translator.models.text_to_sign import ConcatenativeSynthesis
+from sign_language_translator.models.text_to_sign.t2s_model import TextToSignModel
 from sign_language_translator.models.utils import get_model
 
 __all__ = [
@@ -14,8 +15,9 @@ __all__ = [
     "sign_to_text",
     "text_to_sign",
     "ConcatenativeSynthesis",
-    "SimpleLanguageModel",
+    "NgramLanguageModel",
     "BeamSampling",
     "MixerLM",
     "LanguageModel",
+    "TextToSignModel",
 ]

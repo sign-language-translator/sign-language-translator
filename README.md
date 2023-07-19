@@ -4,16 +4,30 @@
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
 [![Downloads](https://static.pepy.tech/personalized-badge/sign-language-translator?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/sign-language-translator)
 
-1. [dummy code:](#dummy-code)
-         1. [text language processor](#text-language-processor)
-         2. [sign language processor](#sign-language-processor)
-         3. [Vision](#vision)
-         4. [language models](#language-models)
-   1. [Directory Tree](#directory-tree)
-   2. [Upcoming/Roadmap](#upcomingroadmap)
-   3. [Research Paper](#research-paper)
-   4. [Credits and Gratitude](#credits-and-gratitude)
-   5. [Bonus](#bonus)
+1. [Overview](#overview)
+   1. [Solution](#solution)
+   2. [Major Components and Goals](#major-components-and-goals)
+2. [How to install the package](#how-to-install-the-package)
+3. [Usage](#usage)
+   1. [Command Line](#command-line)
+      <!-- 1. [configure](#configure) -->
+      1. [$ slt download ...](#download)
+      2. [$ slt translate ...](#translate)
+      3. [$ slt complete ...](#complete)
+   2. [Python](#python)
+      1. [basic translation](#basic-translation)
+      2. [text language processor](#text-language-processor)
+      3. [sign language processor](#sign-language-processor)
+      4. [video/feature processing](#vision)
+      5. [language models](#language-models)
+4. [Directory Tree](#directory-tree)
+5. [Research Paper](#research-paper)
+6. [Upcoming/Roadmap](#upcomingroadmap)
+7. [How to Contribute](#how-to-contribute)
+8. [Credits and Gratitude](#credits-and-gratitude)
+9. [Bonus](#bonus)
+   1. Number of lines of code
+   2. :)
 
 ## Overview
 
@@ -42,7 +56,7 @@ To create a rule-based translation system for your regional language, you can in
     1. Motion Transfer
          - Concatenate pose vectors in the time dimension and transfer the movements onto any given image of a person. This ensures smooth transitions between video clips.
     2. Sign Feature Synthesis
-         - Condition a pose sequence generation model on a pre-trained text encoder (e.g., fine-tuned decoder of a multilingual T5) to output pose vectors instead of text tokens. This solves challenges related to unknown synonyms or hard-to-tokenize/process words or phrases.
+         - Condition a pose sequence generation model on a pre-trained text encoder (e.g., fine-tune decoder of a multilingual T5) to output pose vectors instead of text tokens. This solves challenges related to unknown synonyms or hard-to-tokenize/process words or phrases.
 
 3. `Language Processing Utilities`
     1. Sign Processing
@@ -51,7 +65,8 @@ To create a rule-based translation system for your regional language, you can in
         - Pose transformations (data augmentation) with scipy.
     2. Text Processing
         - Normalize text input by substituting unknown characters/spellings with supported words.
-        - Disambiguate ambiguous words to ensure accurate translation.
+        - Disambiguate context-dependent words to ensure accurate translation.
+            "spring" -> ["spring(water-spring)", "spring(metal-coil)"]
         - Tokenize text (word & sentence level).
         - Classify tokens and mark them with Tags.
 
@@ -128,17 +143,17 @@ slt configure --dataset-dir "/path/to/sign-language-datasets"
 
 #### Download
 
-Download dataset files or models. The parameters are regular expressions.
+Download dataset files or models if you need them. The parameters are regular expressions.
 
 ```bash
 slt download --overwrite true '.*\.json' '.*\.txt'
 ```
 
 ```bash
-slt download --progress-bar true 't2s_model_base.pth'
+slt download --progress-bar true 't2s_model_base.pt'
 ```
 
-(By default, the stuff is downloaded into `/install-directory/sign_language_translator/sign-language-resources/`)
+By default, auto-download is enabled. Default download directory is `/install-directory/sign_language_translator/sign-language-resources/`. (See slt.config.settings.Settings)
 
 #### Translate
 
@@ -155,10 +170,28 @@ slt translate \
 
 #### Complete
 
-Auto complete a sentence using our language models. You can write sentences of only supported words or just predict next characters until a specified token.
+Auto complete a sentence using our language models. You can write sentences composed of supported words only:
 
 ```bash
-slt complete --model en-char-lm-1 --eos "." 'auto-complete is gre'
+$ slt complete --model-code ur-supported-words-lm --end-token ">" \
+    '<' \
+    'شوکت' \
+    ' ' \
+    'نے' \
+    ' '
+آگے میری ماں کو دیکھا۔۔۔>
+```
+
+or just predict next characters until a specified token. (e.g. to generate names):
+
+```bash
+$ slt complete \
+    --model-code unigram-names --model-weight 1 \
+    -model-code bigram-names -w 2 \
+    -m trigram-names -w 3 \
+    --selection-strategy merge --beam-width 2.5 --end-token "]" \
+    "[s"
+[shazala]
 ```
 
 ### Python
@@ -175,6 +208,8 @@ import sign_language_translator as slt
 # slt.utils.download("path", "url") # optional
 # slt.utils.download_resource(".*.json") # optional
 ```
+
+Text to Sign:
 
 ```python
 # Load text-to-sign model
@@ -195,6 +230,7 @@ sign_language_sentence = t2s_model(text)
 # moviepy_video_object.write_videofile(f"sentences/{text}.mp4")
 ```
 
+Sign to text
 dummy code:
 
 ```python
@@ -254,7 +290,7 @@ signs  = psl.tokens_to_sign_dicts(tokens, tags)
 # ]
 ```
 
-#### Vision
+#### vision
 
 dummy code:
 
@@ -280,17 +316,20 @@ print(features.numpy())
 
 #### language models
 
+simple statistical n-gram model:
+
 ```python
-from sign_language_translator.models.language_models import SimpleLanguageModel
+from sign_language_translator.models.language_models import NgramLanguageModel
+
 names_data = [
-    '[abeera]', '[areej]', '[farida]', '[hiba]', '[kinza]',
-    '[mishal]', '[nimra]', '[rabbia]', '[tehmina]','[zoya]',
-    '[amjad]', '[atif]', '[farhan]', '[huzaifa]', '[majeed]',
-    '[nasir]', '[rizwan]', '[mudassar]', '[tayyab]', '[zain]',
+    '[abeera]', '[areej]',  '[farida]',  '[hiba]',    '[kinza]',
+    '[mishal]', '[nimra]',  '[rabbia]',  '[tehmina]', '[zoya]',
+    '[amjad]',  '[atif]',   '[farhan]',  '[huzaifa]', '[mudassar]',
+    '[nasir]',  '[rizwan]', '[shahzad]', '[tayyab]',  '[zain]',
 ]
 
 # train an n-gram model (considers previous n tokens to predict)
-model = SimpleLanguageModel(window_size=2, unknown_token="")
+model = NgramLanguageModel(window_size=2, unknown_token="")
 model.fit(names_data)
 
 # inference loop
@@ -307,28 +346,33 @@ print(name)
 print(model.__dict__)
 ```
 
+Mash up multiple models & complete generation through beam search:
+
 ```python
-from sign_language_translator.models.language_models import MixerLM, BeamSampling, SimpleLanguageModel
+from sign_language_translator.models.language_models import MixerLM, BeamSampling, NgramLanguageModel
 
-names_data = [...] # slt.languages.English().vocab.person_names # concat start/end symbols
+# using data from previous example
+names_data = [...] # or slt.languages.English().vocab.person_names # concat start/end symbols
 
+# train models
 SLMs = [
-    SimpleLanguageModel(window_size=size, unknown_token="")
+    NgramLanguageModel(window_size=size, unknown_token="")
     for size in range(1,4)
 ]
 [lm.fit(names_data) for lm in SLMs]
 
 # randomly select a model and infer through it
-mixed_model = slt.models.Mixer(
+mixed_model = MixerLM(
     models=SLMs,
     selection_probabilities=[1,2,4],
-    unknown_token=""
+    unknown_token="",
+    model_selection_strategy = "choose", # or "merge"
 )
 print(mixed_model)
 # Mixer LM: unk_tok=""[3]
-# ├── Simple LM: unk_tok="", window=1, params=85 | prob=14.3%
-# ├── Simple LM: unk_tok="", window=2, params=113 | prob=28.6%
-# └── Simple LM: unk_tok="", window=3, params=96 | prob=57.1%
+# ├── Ngram LM: unk_tok="", window=1, params=85 | prob=14.3%
+# ├── Ngram LM: unk_tok="", window=2, params=113 | prob=28.6%
+# └── Ngram LM: unk_tok="", window=3, params=96 | prob=57.1%
 
 # use Beam Search to find high likelihood names
 sampler = BeamSampling(mixed_model, beam_width=3) #, scoring_function = ...)
@@ -343,6 +387,10 @@ Write sentences composed of only those words for which sign videos are available
 from sign_language_translator.models.language_models import TransformerLanguageModel
 
 model = TransformerLanguageModel.load("ur-supported-word-lm.pth")
+# sampler = BeamSampling(model, ...)
+# sampler.complete(("<", ))
+
+# see probabilities of all tokens
 model.next_all(["میں(متکلم)", " ", "وزیراعظم", " ",])
 # (["سے", "عمران", ...], [0.1415926535, 0.7182818284, ...])
 ```
@@ -391,7 +439,7 @@ model.next_all(["میں(متکلم)", " ", "وزیراعظم", " ",])
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/abstract_language_model.py">abstract_language_model.py</a>
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/beam_sampling.py">beam_sampling.py</a>
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/mixer.py">mixer.py</a>
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/simple_language_model.py">simple_language_model.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/ngram_language_model.py">ngram_language_model.py</a>
     │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/transformer_language_model.py">transformer_language_model.py</a>
     │   │
     │   ├── sign_to_text
@@ -399,7 +447,7 @@ model.next_all(["میں(متکلم)", " ", "وزیراعظم", " ",])
     │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py">concatenative_synthesis.py</a>
     │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/text_to_sign/t2s_model.py">t2s_model.py</a>
     │
-    ├── <i><b>sign-language-resources</b></i>
+    ├── <i><b>sign-language-resources</b></i> (auto-downloaded)
     │   └── <a href="https://github.com/sign-language-translator/sign-language-datasets">*</a>
     │
     ├── <b>text</b>
@@ -415,7 +463,8 @@ model.next_all(["میں(متکلم)", " ", "وزیراعظم", " ",])
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/download.py">download.py</a>
     │   ├── <del>landmarks_info.py</del>
     │   ├── <del>sign_data_attributes.py</del>
-    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/tree.py">tree.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/tree.py">tree.py</a>
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/utils.py">utils.py</a>
     │
     └── <b>vision</b>
         ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/concatenate.py">concatenate.py</a>
@@ -424,11 +473,15 @@ model.next_all(["میں(متکلم)", " ", "وزیراعظم", " ",])
         └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/visualization.py">visualization.py</a>
 </pre>
 
+## Research Paper
+
+Stay Tuned!
+
 ## Upcoming/Roadmap
 
 ```python
 # :LANGUAGE_MODELS: v0.6
-    # download model, CLI
+    # CLI (tokenized)
     # token_to_id
     # GPT
     # basic sentence dataset
@@ -437,7 +490,8 @@ model.next_all(["میں(متکلم)", " ", "وزیراعظم", " ",])
     # class according to feature type (pose/video/mesh)
     # video loader
     # feature extraction
-    # feature model names
+    # feature augmentation
+    # feature model names enums
     # subtitles
     # 2D/3D avatars
 
@@ -451,6 +505,8 @@ model.next_all(["میں(متکلم)", " ", "وزیراعظم", " ",])
     # pose vector generation with flan-T5
     # motion transfer
     # pose2video: stable diffusion?
+    # speech to text
+    # text to speech
 
 # RESEARCH PAPERs
     # datasets: clips, text, sentences, disambiguation
@@ -458,20 +514,34 @@ model.next_all(["میں(متکلم)", " ", "وزیراعظم", " ",])
     # deep sign-to-text: pipeline + experiments
     # deep text-to-sign: pipeline + experiments
 
-# WEB DEVELOPMENT
+# PRODUCT DEVELOPMENT
     # ML inference server
     # Django backend server
     # React Frontend
     # React Native mobile app
 ```
 
-## Research Paper
+## How to Contribute
 
-Stay Tuned!
+- Datasets:
+  - Scrape and upload video datasets.
+  - Label word mapping datasets.
+  - Reach out to to Academies for Deaf and have them write down *sign language grammar*.
+- New Code
+  - Make sign language classes for various languages.
+  - Make text language classes for various languages.
+  - Train models with various hyper-parameters.
+  - Remember to add `string short codes` of your classes and models to **`enums.py`** and update get_model(), get_.*_language().
+  - Add docstrings, Example usage and test cases.
+- Existing Code:
+  - Optimize the code.
+  - Add docstrings, Example usage and test cases.
+  - Write documentation for `sign-language-translator.readthedocs.io`
+- Contribute in [MLOps]()/[backend]()/[web]()/[mobile]() development.
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-07-16.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-07-20.
 
 Immense gratitude towards:
 
@@ -486,7 +556,7 @@ Immense gratitude towards:
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **7063** + Tests: **774**):
+Count total number of **lines of code** (Package: **7511** + Tests: **803**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
@@ -498,63 +568,3 @@ git ls-files | grep '\.py' | xargs wc -l
 Q: What was the deaf student's favorite course?
 A: Communication skills
 ```
-
-**Publish package on `PyPI`**
-
-1. Install Poetry [(official docs)](https://python-poetry.org/docs/#installation) and twine:
-
-    ```bash
-    curl -sSL https://install.python-poetry.org | python3 -
-    ```
-
-    ```bash
-    pip install twine
-    ```
-
-2. Initialize Poetry using the following command to create a new pyproject.toml file with the necessary project information
-
-    existing project:
-
-    ```bash
-    poetry init
-    ```
-
-    new project:
-
-    ```bash
-    poetry new project-name
-    ```
-
-    add dependencies to pyproject.toml
-
-    ```bash
-    poetry add $(cat requirements.txt)
-    ```
-
-3. Build Distribution Files (might wanna add "dist/" to .gitignore)
-
-    ```bash
-    poetry build
-    ```
-
-4. Publish to PyPI
-
-    ```bash
-    twine upload dist/*
-    ```
-
-    Provide the credentials associated with your PyPI account.
-
-5. Automate the Release Process (GitHub Actions)
-
-    - Set up PyPI Configuration:
-    - on Github repository page, go to "Settings" > "Secrets" and add PYPI_API_TOKEN as secret
-    - Create and push .github/workflows/release.yml. Configure the workflow to:
-    - trigger on the main branch update event.
-    - check if version has updated using git diff
-    - build and test your package.
-    - publish the package to PyPI using Twine using secret credentials.
-
-    - before actual publish, test your publishing process on test.pypi.org with `twine upload --repository testpypi dist/*`
-
-    With this setup, whenever there is a new version update on the main branch, the CI tool will automatically build and release the package to PyPI.

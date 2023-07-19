@@ -22,7 +22,12 @@ from sign_language_translator.config.settings import Settings
 
 
 def download(
-    file_path: str, url: str, overwrite=False, progress_bar=False, timeout: float = 20.0
+    file_path: str,
+    url: str,
+    overwrite=False,
+    progress_bar=False,
+    timeout: float = 20.0,
+    leave=True,
 ) -> bool:
     """
     Downloads a file from the specified URL and saves it to the given file path.
@@ -60,6 +65,7 @@ def download(
                     stream,
                     total=(total_bytes // 1024) + 1,
                     desc=f"Downloading {os.path.split(file_path)[-1]}",
+                    leave=leave,
                 )
 
             for chunk in stream:
@@ -73,7 +79,11 @@ def download(
 
 
 def download_resource(
-    filename_regex: str, overwrite=False, progress_bar=False, timeout: float = 20.0
+    filename_regex: str,
+    overwrite=False,
+    progress_bar=False,
+    timeout: float = 20.0,
+    leave=True,
 ) -> bool:
     """
     Downloads package resources matching the given filename regex and saves them to the appropriate file paths.
@@ -108,6 +118,7 @@ def download_resource(
             progress_bar=progress_bar,
             timeout=timeout,
             overwrite=overwrite,
+            leave=leave,
         )
         statuses.append(status)
 

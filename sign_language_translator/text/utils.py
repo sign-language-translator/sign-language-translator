@@ -22,7 +22,7 @@ def make_ngrams(sequence: Iterable, n: int) -> List[Iterable]:
     end = len(sequence) - n  # type: ignore
 
     ngrams = (
-        [sequence[i : i + n] for i in range(start, end + 1)] if end >= start else [] # type: ignore
+        [sequence[i : i + n] for i in range(start, end + 1)] if end >= start else []  # type: ignore
     )
     return ngrams
 
@@ -69,6 +69,42 @@ def extract_supported_subsequences(
     return subsequences
 
 
+def concatenate_sentence_terminals(sentences: List, start_token, end_token):
+    """
+    Inserts start and end tokens between the sentences the input list and
+    concatenates them to the sentences (useful when the input is coming from a sentence tokenizer.)
+
+    This function takes a list of sentences and adds a start token to the beginning
+    of each sentence except the first and an end token to the end of each sentence except the last.
+
+    Parameters:
+        sentences (List): A list of sentences to be processed.
+            Sentences can be strings or list of tokens or any type but it must support + operator for concatenation.
+        start_token: The token to be added at the start of sentences. Must be same type as a sentence.
+        end_token: The token to be added at the end of sentences. Must be same type as a sentence.
+
+    Returns:
+        List: A new list of sentences with start and end tokens inserted.
+
+    Example:
+        sentences = ["Hello!", "How are you?", "Goodbye."]
+        start_token = "<start>"
+        end_token = "<end>"
+        result = concatenate_sentence_terminals(sentences, start_token, end_token)
+        # Output: ["Hello!<end>", "<start>How are you?<end>", "<start>Goodbye."]
+    """
+
+    new_sentences = []
+    for i, sentence in enumerate(sentences):
+        if i > 0:
+            sentence = start_token + sentence
+        if i < len(sentences) - 1:
+            sentence = sentence + end_token
+        new_sentences.append(sentence)
+
+    return new_sentences
+
+
 class ListRegex:
     """A utility class for finding sub-lists within a list of strings that match specified patterns.
 
@@ -109,7 +145,9 @@ class ListRegex:
     """
 
     @staticmethod
-    def match(items: List[str], patterns: List[str | List | Tuple]) -> Tuple[int, int] | None:
+    def match(
+        items: List[str], patterns: List[str | List | Tuple]
+    ) -> Tuple[int, int] | None:
         """
         Matches the given patterns against the items in the list.
         Applies the patterns at the start of the list of string.

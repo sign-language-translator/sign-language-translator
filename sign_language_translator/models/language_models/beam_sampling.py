@@ -1,8 +1,8 @@
 """This module provides BeamSampling class for generating completions using beam search sampling."""
 
-import random
 from math import exp, exp2, log2
-from typing import Any, Callable, Iterable
+from random import random
+from typing import Any, Callable, Iterable, Tuple
 
 from sign_language_translator.models.language_models.abstract_language_model import (
     LanguageModel,
@@ -55,13 +55,13 @@ class BeamSampling:
         self,
         initial_context: Iterable | None = None,
         append_func: Callable[[Any, Any], Any] = lambda context, token: (
-            context.append(token)
+            context + [token]
             if isinstance(context, list)
             else context + (token,)
             if isinstance(context, tuple)
             else context + token
         ),
-    ) -> Iterable:
+    ) -> Tuple[Iterable, float]:
         """Generate completions based on the given initial context.
 
         Args:
@@ -70,7 +70,7 @@ class BeamSampling:
                 Defaults to a lambda function that can append to list, tuple & str.
 
         Returns:
-            Iterable: One generated completion.
+            Tuple[Iterable, float]: One generated completion and its score.
         """
 
         if initial_context is None:
@@ -79,7 +79,7 @@ class BeamSampling:
         branches = [(initial_context, 0.0)]
 
         for _ in range(self.max_length):
-            n_branches = round(self.beam_width + random.random() * 0.8 - 0.4)
+            n_branches = round(self.beam_width + random() * 0.8 - 0.4)
 
             # Expand
             new_branches = []

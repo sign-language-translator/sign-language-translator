@@ -7,10 +7,7 @@ Module Structure:
 
 from os.path import dirname, isdir, join
 
-from sign_language_translator.config.helpers import (
-    get_package_version,
-    prepare_filename_url_dict,
-)
+from sign_language_translator.config.helpers import prepare_filename_url_dict
 
 
 class Settings:
@@ -29,7 +26,7 @@ class Settings:
     """The connector used in filenames to join parts of same attribute."""
 
     FILE_TO_URLS = prepare_filename_url_dict(
-        get_package_version(), join(dirname(__file__), "urls.yaml")
+        join(dirname(__file__), "urls.yaml")
     )
     """A dictionary mapping filenames to their corresponding URLs, based on the package version."""
 

@@ -1,7 +1,7 @@
 """This module provides a simple n-gram-based statistical language model implementation.
 
 Classes:
-- SimpleLanguageModel: A simple n-gram-based statistical language model.
+- NgramLanguageModel: A simple n-gram-based statistical language model.
 """
 
 from __future__ import annotations
@@ -19,8 +19,8 @@ from sign_language_translator.text.utils import make_ngrams
 from sign_language_translator.utils import sample_one_index
 
 
-class SimpleLanguageModel(LanguageModel):
-    """SimpleLanguageModel is a statistical language model based on n-grams. It provides functionality for training the model on a given training corpus, generating the next token based on a context, and saving/loading the model.
+class NgramLanguageModel(LanguageModel):
+    """NgramLanguageModel is a statistical language model based on n-grams. It provides functionality for training the model on a given training corpus, generating the next token based on a context, and saving/loading the model.
 
     Attributes:
     - window_size (int): The size of the context window for predicting the next token.
@@ -34,9 +34,9 @@ class SimpleLanguageModel(LanguageModel):
     - finetune(self, training_corpus, weightage: float): Fine-tunes the language model on an additional training corpus with a specified weightage.
     - next(self, context: Iterable) -> Tuple[Any, float]: Samples the next token from the learned distribution based on the given context.
     - next_all(self, context: Iterable) -> Tuple[List[Any], List[float]]: Returns a list of possible next tokens and their associated probabilities based on the given context.
-    - load(model_path: str) -> SimpleLanguageModel: Deserializes the model from a JSON file.
+    - load(model_path: str) -> NgramLanguageModel: Deserializes the model from a JSON file.
     - save(self, model_path: str, indent=None, ensure_ascii=False): Serializes the model to a JSON file.
-    - __str__(self) -> str: Returns a string representation of the SimpleLanguageModel instance.
+    - __str__(self) -> str: Returns a string representation of the NgramLanguageModel instance.
 
     Private Methods:
     - _to_key_datatype(self, item: Iterable) -> Tuple: Converts an iterable item to the appropriate datatype for use as a key in the model dictionary.
@@ -65,6 +65,15 @@ class SimpleLanguageModel(LanguageModel):
         self._sep = "|||"
 
     def train(self, training_corpus):
+        """Alias for fit(). Trains the language model on the given training corpus.
+
+        Args:
+            training_corpus (Iterable[Iterable]): The training corpus, an iterable of sequences representing the text data.
+
+        Returns:
+            None
+        """
+
         self.fit(training_corpus)
 
     def fit(self, training_corpus) -> None:
@@ -192,14 +201,14 @@ class SimpleLanguageModel(LanguageModel):
         return sum(len(v[self._WEIGHTS]) for v in self.model.values())
 
     @staticmethod
-    def load(model_path: str) -> SimpleLanguageModel:
+    def load(model_path: str) -> NgramLanguageModel:
         """Deserializes the model (from JSON).
 
         Args:
             model_path (str): The source file path.
 
         Returns:
-            SimpleLanguageModel: The deserialized SimpleLanguageModel instance.
+            NgramLanguageModel: The deserialized NgramLanguageModel instance.
         """
 
         with open(model_path, "r", encoding="utf-8") as f:
@@ -214,7 +223,7 @@ class SimpleLanguageModel(LanguageModel):
         _sep = str(model_data["sep"])
         sampling_temperature = float(model_data["sampling_temperature"])
 
-        slm = SimpleLanguageModel(
+        slm = NgramLanguageModel(
             window_size=window_size,
             unknown_token=unknown_token,
             name=name,
@@ -263,4 +272,4 @@ class SimpleLanguageModel(LanguageModel):
             json.dump(model_data, f, indent=indent, ensure_ascii=ensure_ascii)
 
     def __str__(self) -> str:
-        return f"Simple LM: {super().__str__()}, window={self.window_size}, params={self.n_parameters}"
+        return f"Ngram LM: {super().__str__()}, window={self.window_size}, params={self.n_parameters}"

@@ -1,6 +1,5 @@
 datasets:
-  - name: sign-language-dataset-1
-    version: 1.0.0
+  - name: word-mapping-dataset
     files:
       - name: sign_recordings/collection_to_label_to_language_to_words.json
         url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/sign_recordings/collection_to_label_to_language_to_words.json
@@ -13,9 +12,28 @@ datasets:
       - name: language_to_token_to_id.json
         url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/language_to_token_to_id.json
 
-package_versions:
-  - version: 0.4.2
-    dataset_version: 1.0.0
+models:
+  - name: language-models
+    files:
+      - name: models/names-stat-lm-w1.json
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/names-stat-lm-w1.json
+      - name: models/names-stat-lm-w2.json
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/names-stat-lm-w2.json
+      - name: models/names-stat-lm-w3.json
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/names-stat-lm-w3.json
 
-  - version: 0.5.0
-    dataset_version: 1.0.0
+  - name: text-to-sign
+    files:
+      - name: x.x
+        url: https://
+
+  - name: sign-to-text
+    files:
+      - name: x.y
+        url: https://
+
+others:
+  - name: extra-url-files
+    files:
+      - name: extra_urls.yaml
+        url: "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/1456b64b4ed38247a7a792f706403af1ed2287b4/extra_urls.yaml"
