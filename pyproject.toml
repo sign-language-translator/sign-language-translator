@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sign_language_translator"
-version = "0.5.4"
+version = "0.6.0"
 description = "Translate between spoken/text languages and sign language videos using AI."
 authors = ["Mudassar Iqbal <mdsriqb@gmail.com>"]
 license = "Apache-2.0"
