@@ -55,7 +55,12 @@ def slt():
     default=20,
     help="Timeout duration for download requests. Defaults to 20 sec.",
 )
-def download(filenames, overwrite, progress_bar, timeout):
+@click.option(
+    "--chunk-size",
+    default=131072,
+    help="number of bytes to download in each step. Defaults to 131072 or 128K.",
+)
+def download(filenames, overwrite, progress_bar, timeout, chunk_size):
     """
     Download resource files with regex.
 
@@ -71,6 +76,7 @@ def download(filenames, overwrite, progress_bar, timeout):
             overwrite=overwrite,
             progress_bar=progress_bar,
             timeout=timeout,
+            chunk_size=chunk_size,
         )
         if success:
             click.echo(f"Downloaded package resource(s) matching: '{filename}'")
@@ -125,7 +131,7 @@ def translate(inputs, model_code, text_lang, sign_lang, sign_features, target_pa
     "--model-code",
     "-m",
     required=True,
-    help="Short code to identify the language model. You can use multiple models.",
+    help="Short code to identify the language model. You can use multiple models (but of same input type).",
     multiple=True,
 )
 @click.option(
@@ -169,10 +175,12 @@ def complete(
 
     Predicts next tokens in the given sequence and completes it using the specified model and beam search.
     You can also use multiple models and also pass along model selection weights for each model (using --model-weights).
-    Currently you can use the following model-codes:
-    1. unigram-names
-    2. bigram-names
-    3. trigram-names
+    Currently you can use the following model-codes:\n
+    1. urdu-mixed-ngram (token | start: "<")\n
+    2. ur-supported-gpt (token | start: "<")\n
+    3. unigram-names (char | start: "[")\n
+    4. bigram-names  (char | start: "[a")\n
+    5. trigram-names (char | start: "[ab")\n
     """
 
     from sign_language_translator import get_model

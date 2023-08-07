@@ -1,6 +1,6 @@
 """This module provides BeamSampling class for generating completions using beam search sampling."""
 
-from math import exp, exp2, log2
+from math import exp, log2
 from random import random
 from typing import Any, Callable, Iterable, Tuple
 
@@ -129,6 +129,6 @@ class BeamSampling:
 
         # reformat score
         if not self.return_log_of_probability:
-            score = exp2(score)
+            score = 2 ** score # math.exp2(score)
 
         return selected_completion, score

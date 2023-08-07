@@ -31,19 +31,6 @@ class LanguageModel(ABC):
         self.unknown_token = unknown_token
         self.name = name
 
-    def __call__(self, context: Iterable) -> Tuple[Any, float]:
-        """Samples the next token from the model based on the given context.
-
-        Args:
-            context (Iterable): A piece of sequence like the training examples.
-
-        Returns:
-            Tuple[Any, float]: The next token and its associated probability.
-                Token has the same type as the items in the context iterable.
-        """
-
-        return self.next(context)
-
     @abstractmethod
     def next(self, context: Iterable) -> Tuple[Any, float]:
         """Generates the next token based on the given context and also returns its probability.

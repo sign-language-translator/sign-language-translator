@@ -1,4 +1,16 @@
-"""other functions
+"""
+Utility Functions for Text Processing
+
+This module contains utility functions for text processing tasks.
+
+Functions:
+    make_ngrams: Creates n-grams from a given sequence.
+    extract_supported_subsequences_indexes: Extracts the indexes of subsequences based on provided tags and skipped items.
+    extract_supported_subsequences: Extracts subsequences from a given sequence based on provided tags and skipped items.
+    concatenate_sentence_terminals: Concatenates start and end of sentence tokens to a list of sentences.
+
+Classes:
+    ListRegex: A utility class for finding sub-lists within a list of strings that match specified patterns.
 """
 
 import re
@@ -27,6 +39,48 @@ def make_ngrams(sequence: Iterable, n: int) -> List[Iterable]:
     return ngrams
 
 
+def extract_supported_subsequences_indexes(
+    sequence: Iterable[Any],
+    tags: Iterable[Any],
+    supported_tags: Set[Any],
+    skipped_items: Set[Any],
+) -> List[List[int]]:
+    """Extract indexes of supported subsequences from a sequence based on tags and skipped items.
+
+    Args:
+        sequence (Iterable[Any]): The input sequence.
+        tags (Iterable[Any]): Tags corresponding to each item in the sequence.
+        supported_tags (Set[Any]): Set of tags indicating support for a subsequence.
+        skipped_items (Set[Any]): Set of items to be skipped.
+
+    Returns:
+        List[List[int]]: A list indices of supported subsequences, where each inner list represents a subsequence.
+
+    Examples:
+        >>> sequence = [1, 2, 3, 4, 5, 6]
+        >>> tags = ['A', 'A', 'B', 'A', 'A', 'C']
+        >>> supported_tags = {'A'}
+        >>> skipped_items = {2}
+        >>> extract_supported_subsequences(sequence, tags, supported_tags, skipped_items)
+        [[0], [3, 4]]
+    """
+
+    all_subsequences = []
+    subsequence = []
+    for i, (token, tag) in enumerate(zip(sequence, tags)):
+        if (tag in supported_tags) and (token not in skipped_items):
+            subsequence.append(i)
+        else:
+            if subsequence:
+                all_subsequences.append(subsequence)
+                subsequence = []
+
+    if subsequence:
+        all_subsequences.append(subsequence)
+
+    return all_subsequences
+
+
 def extract_supported_subsequences(
     sequence: Iterable[Any],
     tags: Iterable[Any],
@@ -53,18 +107,14 @@ def extract_supported_subsequences(
         [[1], [4, 5]]
     """
 
-    subsequences = []
-    subseq = []
-    for token, tag in zip(sequence, tags):
-        if (tag in supported_tags) and (token not in skipped_items):
-            subseq.append(token)
-        else:
-            if subseq:
-                subsequences.append(subseq)
-                subseq = []
+    indexes = extract_supported_subsequences_indexes(
+        sequence=sequence,
+        tags=tags,
+        supported_tags=supported_tags,
+        skipped_items=skipped_items,
+    )
 
-    if subseq:
-        subsequences.append(subseq)
+    subsequences = [[sequence[i] for i in index] for index in indexes]  # type: ignore
 
     return subsequences
 
@@ -296,6 +346,8 @@ class ListRegex:
 
 __all__ = [
     "make_ngrams",
+    "extract_supported_subsequences_indexes",
     "extract_supported_subsequences",
+    "concatenate_sentence_terminals",
     "ListRegex",
 ]

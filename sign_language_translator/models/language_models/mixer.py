@@ -4,6 +4,10 @@ Classes:
 - MixerLM: A language model that combines the outputs of multiple language models based on a selection strategy. It extends the abstract base class LanguageModel.
 """
 
+from __future__ import annotations
+
+import pickle
+from os.path import exists
 from typing import Any, Iterable, List, Tuple
 
 from sign_language_translator.models.language_models.abstract_language_model import (
@@ -29,6 +33,8 @@ class MixerLM(LanguageModel):
     - next(self, context: Iterable) -> Tuple[Any, float]: Generates the next token based on the given context.
     - next_all(self, context: Iterable) -> Tuple[List[Any], List[float]]: Generates all next
         tokens and their associated probabilities based on the given context.
+    - save(self, model_path: str) -> None: saves the mixer model as a pickle file.
+    - load(model_path: str) -> MixerLM: loads the mixer model from a pickle file.
     - __str__(self) -> str: Returns a string representation of the MixerLM instance.
     """
 
@@ -121,6 +127,40 @@ class MixerLM(LanguageModel):
         ), f"{probabilities= }\nsum = {sum(probabilities)}"
 
         return next_tokens, probabilities
+
+    def save(self, model_path: str, overwrite=False) -> None:
+        """
+        Save the model to a file.
+
+        Args:
+            model_path (str): The path to save the model.
+            overwrite (bool, optional): Whether to overwrite an existing file. Defaults to False.
+
+        Raises:
+            FileExistsError: If a file already exists at `model_path` and `overwrite` is False.
+        """
+
+        if exists(model_path) and not overwrite:
+            raise FileExistsError(f"there is already a file at {model_path = }")
+
+        with open(model_path, "wb") as f:
+            pickle.dump(self, f)
+
+    @staticmethod
+    def load(model_path: str) -> MixerLM:
+        """
+        Loads a MixerLM model from the given model path.
+
+        Parameters:
+            model_path (str): The path to the model file.
+
+        Returns:
+            MixerLM: The loaded MixerLM model.
+        """
+
+        with open(model_path, "rb") as f:
+            mixer_model = pickle.load(f)
+        return mixer_model
 
     def __str__(self) -> str:
         # don't judge my code by its looks.. it works!

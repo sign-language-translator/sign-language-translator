@@ -6,7 +6,7 @@ It also includes a function for downloading package resources matching a specifi
 to the appropriate file paths.
 
 Functions:
-- download(file_path, url, overwrite=False, progress_bar=False, timeout=20.0):
+- download(file_path, url, overwrite=False, progress_bar=False, timeout=20.0, chunk_size=65536):
     Downloads a file from the specified URL and saves it to the given file path.
 - download_package_resource(filename_regex, overwrite=False, progress_bar=False, timeout=20.0):
     Downloads package resources matching the given filename regex and saves them to the appropriate file paths.
@@ -14,6 +14,7 @@ Functions:
 
 import os
 import re
+from time import time
 
 import requests
 from tqdm.auto import tqdm
@@ -28,6 +29,7 @@ def download(
     progress_bar=False,
     timeout: float = 20.0,
     leave=True,
+    chunk_size=65536,
 ) -> bool:
     """
     Downloads a file from the specified URL and saves it to the given file path.
@@ -45,6 +47,9 @@ def download(
     Raises:
         FileExistsError: if overwrite is False and the destination path already contains a file.
     """
+
+    # TODO: resume failed download
+
     if os.path.exists(file_path) and not overwrite:
         raise FileExistsError(f"There is already a file at {file_path}")
 
@@ -55,7 +60,7 @@ def download(
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
         with open(file_path, "wb") as fp:
-            stream = response.iter_content(chunk_size=1024)
+            stream = response.iter_content(chunk_size=chunk_size)
 
             if progress_bar:
                 total_bytes = int(
@@ -63,14 +68,25 @@ def download(
                 )  # for some reason, some bars finish too early
                 stream = tqdm(
                     stream,
-                    total=(total_bytes // 1024) + 1,
+                    total=(total_bytes // chunk_size) + 1,
                     desc=f"Downloading {os.path.split(file_path)[-1]}",
                     leave=leave,
+                    unit="chunk",
                 )
 
+            start_time = time()
+            speed = 0
             for chunk in stream:
                 if chunk:
                     fp.write(chunk)
+
+                # display download speed
+                if progress_bar:
+                    speed = (len(chunk)/(1024**2)/(time() - start_time) + speed)/2
+                    stream.set_postfix_str(  # type:ignore
+                        f"{speed:.3f}MB/s"
+                    )
+                    start_time = time()
 
         return True
 
@@ -84,6 +100,7 @@ def download_resource(
     progress_bar=False,
     timeout: float = 20.0,
     leave=True,
+    chunk_size=65536,
 ) -> bool:
     """
     Downloads package resources matching the given filename regex and saves them to the appropriate file paths.
@@ -119,6 +136,7 @@ def download_resource(
             timeout=timeout,
             overwrite=overwrite,
             leave=leave,
+            chunk_size=chunk_size,
         )
         statuses.append(status)
 

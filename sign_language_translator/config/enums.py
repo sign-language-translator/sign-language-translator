@@ -129,14 +129,21 @@ class ModelCodes(Enum):
     NGRAM_LM_UNIGRAM_NAMES = "names-stat-lm-w1.json"
     NGRAM_LM_BIGRAM_NAMES = "names-stat-lm-w2.json"
     NGRAM_LM_TRIGRAM_NAMES = "names-stat-lm-w3.json"
-
     ALL_NGRAM_LANGUAGE_MODELS = {
         NGRAM_LM_UNIGRAM_NAMES,
         NGRAM_LM_BIGRAM_NAMES,
         NGRAM_LM_TRIGRAM_NAMES,
     }
-    MIXER_LM = "mixer"
-    TRANSFORMER_LM = "transformer-language-model"
+
+    MIXER_LM_NGRAM_URDU = "ur-supported-token-unambiguous-mixed-ngram-w1-w6-lm.pkl"
+    ALL_MIXER_LANGUAGE_MODELS = {
+        MIXER_LM_NGRAM_URDU,
+    }
+
+    TRANSFORMER_LM_UR_SUPPORTED = "tlm_14.0M.pt"
+    ALL_TRANSFORMER_LANGUAGE_MODELS = {
+        TRANSFORMER_LM_UR_SUPPORTED,
+    }
 
 
 def normalize_short_code(short_code: str) -> str:
@@ -180,6 +187,12 @@ def normalize_short_code(short_code: str) -> str:
         },
         ModelCodes.NGRAM_LM_TRIGRAM_NAMES.value: {
             "trigram-names",
+        },
+        ModelCodes.MIXER_LM_NGRAM_URDU.value: {
+            "urdu-mixed-ngram",
+        },
+        ModelCodes.TRANSFORMER_LM_UR_SUPPORTED.value: {
+            "ur-supported-gpt",
         },
     }
     normalized_to_codes = {k: v.union({k}) for k, v in normalized_to_codes.items()}

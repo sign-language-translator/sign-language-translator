@@ -114,6 +114,8 @@ class Urdu(TextLanguage):
         )
 
     def preprocess(self, text: str) -> str:
+
+        # TODO: optimize (especially regex)
         text = self.character_normalize(text)
 
         # spell fix
@@ -122,10 +124,10 @@ class Urdu(TextLanguage):
             word_map=self.vocab.misspelled_to_correct,  # :TODO: split joint words
             word_regex=self.word_regex(),
         )
-        text = remove_space_before_punctuation(text, self.PUNCTUATION)
         text = self.delete_unallowed_characters(text)
         text = re.sub(r"[۔\.][۔\. ]+[\.۔]", "۔۔۔", text)
         text = re.sub(r"[ \t]+", " ", text)
+        text = remove_space_before_punctuation(text, self.PUNCTUATION)
         text = text.strip()
 
         return text
@@ -138,10 +140,13 @@ class Urdu(TextLanguage):
 
     def sentence_tokenize(self, text: str) -> List[str]:
         sentences = self.tokenizer.sentence_tokenize(text)
-        sentences = [sentence.strip() for sentence in sentences]
+        if len(sentences) > 1:
+            sentences[1:] = [sentence.lstrip() for sentence in sentences[1:]]
+            sentences[:-1] = [sentence.rstrip() for sentence in sentences[:-1]]
+        # sentences = [sen for sen in sentences if sen]
         return sentences
 
-    def detokenize(self, tokens: str) -> str:
+    def detokenize(self, tokens: Iterable[str]) -> str:
         text = self.tokenizer.detokenize(tokens)
         return text
 
@@ -184,7 +189,7 @@ class Urdu(TextLanguage):
 
     PUNCTUATION_REGEX = r"[" + "".join([re.escape(punc) for punc in PUNCTUATION]) + r"]"
     URDU_DIACRITICS = " ٍ ً ٰ َ ُ ِ ".split()
-    URDU_WORD_REGEX = r"[\w" + "".join(URDU_DIACRITICS) + r"]+"
+    URDU_WORD_REGEX = r"[\w" + "".join(URDU_DIACRITICS) + r"]+"  # TODO: r"[[^\W\d_]"+ "".join(URDU_DIACRITICS) + r"]+"
 
     NUMBER_REGEX = r"\d+(?:[\.:]\d+)*"
 

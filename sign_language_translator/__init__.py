@@ -19,7 +19,7 @@ import sign_language_translator as slt
 # deep_t2s_model = slt.get_model("generative_t2s_base-01") # pytorch
 # rule-based model (concatenates clips of each word)
 t2s_model = slt.get_model(
-    model_code = "ConcatenativeSynthesis", # slt.enums.ModelCodes.CONCATENATIVE_SYNTHESIS.value
+    model_code = "concatenative-synthesis", # slt.ModelCodes.CONCATENATIVE_SYNTHESIS.value
     text_language = "English", # or object of any child of slt.languages.text.text_language.TextLanguage class
     sign_language = "PakistanSignLanguage", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
     sign_feature_model = "mediapipe_pose_v2_hand_v1",
@@ -58,6 +58,11 @@ from sign_language_translator import (
     vision,
 )
 from sign_language_translator.config import enums
+from sign_language_translator.config.enums import (
+    ModelCodes,
+    TextLanguages as TextLanguageCodes,
+    SignLanguages as SignLanguageCodes,
+)
 from sign_language_translator.config.settings import Settings, set_resources_dir
 from sign_language_translator.languages import get_sign_language, get_text_language
 from sign_language_translator.models import get_model
@@ -65,8 +70,10 @@ from sign_language_translator.models import get_model
 __version__ = config.helpers.get_package_version()
 
 __all__ = [
+    # config
     "set_resources_dir",
     "Settings",
+    # modules
     "vision",
     "text",
     "data_collection",
@@ -75,6 +82,10 @@ __all__ = [
     "utils",
     "config",
     "enums",
+    # classes (enum)
+    "ModelCodes",
+    "TextLanguageCodes",
+    "SignLanguageCodes",
     # object loaders
     "get_sign_language",
     "get_text_language",
