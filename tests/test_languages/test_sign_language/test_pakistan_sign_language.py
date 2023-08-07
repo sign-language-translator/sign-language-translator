@@ -12,7 +12,7 @@ from sign_language_translator.text.tagger import Tags
 def get_pakistan_sl_object():
     return (
         PakistanSignLanguage()
-        if os.path.exists(Settings.DATASET_ROOT_DIRECTORY)
+        if os.path.exists(Settings.RESOURCES_ROOT_DIRECTORY)
         else None
     )
 
@@ -22,7 +22,7 @@ def test_pakistan_sentence_restructure():
 
     if psl is None:
         warnings.warn(
-            "Pakistan Sign Language object could not be initialized (check slt.Settings.DATASET_ROOT_DIRECTORY)"
+            "Pakistan Sign Language object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
         )
         return
 
@@ -52,7 +52,7 @@ def test_pakistan_token_to_sign():
 
     if psl is None:
         warnings.warn(
-            "Pakistan Sign Language object could not be initialized (check slt.Settings.DATASET_ROOT_DIRECTORY)"
+            "Pakistan Sign Language object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
         )
         return
 

@@ -1,5 +1,5 @@
 import re
-import string
+from string import ascii_uppercase, digits
 from typing import Any, Dict, Iterable, List, Set, Union
 
 from sign_language_translator.config.settings import Settings
@@ -30,7 +30,7 @@ class Urdu(TextLanguage):
         self.vocab = Vocab(
             language=self.name(),
             sign_collections=[r".*"],
-            data_root_dir=Settings.DATASET_ROOT_DIRECTORY,
+            data_root_dir=Settings.RESOURCES_ROOT_DIRECTORY,
             arg_is_regex=True,
         )
 
@@ -46,13 +46,10 @@ class Urdu(TextLanguage):
         self.tokenizer = SignTokenizer(
             word_regex=self.word_regex(),
             compound_words=(
-                self.vocab.supported_words # TODO why does this variable exist?
+                self.vocab.supported_words  # TODO why does this variable exist?
                 | self.vocab.supported_words_with_word_sense
-                | {
-                    w
-                    for word in self.vocab.words_to_numbers.keys()
-                    for w in [word, word.replace("-", " ")]
-                }
+                | set(self.vocab.words_to_numbers.keys())
+                | set(self.vocab.person_names)
             ),  # TODO: | one-hundred twenty-three (\d[ \d]*): ["100", "23"] --> ["123"]
             end_of_sentence_tokens=self.END_OF_SENTENCE_MARKS,
             full_stops=self.FULL_STOPS,
@@ -117,6 +114,8 @@ class Urdu(TextLanguage):
         )
 
     def preprocess(self, text: str) -> str:
+
+        # TODO: optimize (especially regex)
         text = self.character_normalize(text)
 
         # spell fix
@@ -125,10 +124,10 @@ class Urdu(TextLanguage):
             word_map=self.vocab.misspelled_to_correct,  # :TODO: split joint words
             word_regex=self.word_regex(),
         )
-        text = remove_space_before_punctuation(text, self.PUNCTUATION)
         text = self.delete_unallowed_characters(text)
         text = re.sub(r"[۔\.][۔\. ]+[\.۔]", "۔۔۔", text)
         text = re.sub(r"[ \t]+", " ", text)
+        text = remove_space_before_punctuation(text, self.PUNCTUATION)
         text = text.strip()
 
         return text
@@ -141,10 +140,13 @@ class Urdu(TextLanguage):
 
     def sentence_tokenize(self, text: str) -> List[str]:
         sentences = self.tokenizer.sentence_tokenize(text)
-        sentences = [sentence.strip() for sentence in sentences]
+        if len(sentences) > 1:
+            sentences[1:] = [sentence.lstrip() for sentence in sentences[1:]]
+            sentences[:-1] = [sentence.rstrip() for sentence in sentences[:-1]]
+        # sentences = [sen for sen in sentences if sen]
         return sentences
 
-    def detokenize(self, tokens: str) -> str:
+    def detokenize(self, tokens: Iterable[str]) -> str:
         text = self.tokenizer.detokenize(tokens)
         return text
 
@@ -187,7 +189,7 @@ class Urdu(TextLanguage):
 
     PUNCTUATION_REGEX = r"[" + "".join([re.escape(punc) for punc in PUNCTUATION]) + r"]"
     URDU_DIACRITICS = " ٍ ً ٰ َ ُ ِ ".split()
-    URDU_WORD_REGEX = r"[\w" + "".join(URDU_DIACRITICS) + r"]+"
+    URDU_WORD_REGEX = r"[\w" + "".join(URDU_DIACRITICS) + r"]+"  # TODO: r"[[^\W\d_]"+ "".join(URDU_DIACRITICS) + r"]+"
 
     NUMBER_REGEX = r"\d+(?:[\.:]\d+)*"
 
@@ -365,10 +367,8 @@ class Urdu(TextLanguage):
         set(CORRECT_URDU_CHARACTERS_TO_INCORRECT.keys())
         | set(URDU_DIACRITICS)
         | set(SYMBOLS)
-        | set(string.ascii_uppercase)  # acronyms
-        # TODO: remove ascii_lowercase when word-senses are also urdu in dataset
-        # | set(string.ascii_lowercase)  # word-sense
-        | set(string.digits)
+        | set(ascii_uppercase)  # acronyms
+        | set(digits)
         | set("()!.,?/[]{} ")
     )
     UNALLOWED_CHARACTERS_REGEX = (

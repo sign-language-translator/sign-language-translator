@@ -1,4 +1,4 @@
-from sign_language_translator.text import metrics
+from sign_language_translator.text import metrics, utils
 from sign_language_translator.text.preprocess import (
     remove_space_before_punctuation,
     replace_words,
@@ -14,4 +14,5 @@ __all__ = [
     "replace_words",
     "remove_space_before_punctuation",
     "metrics",
+    "utils",
 ]

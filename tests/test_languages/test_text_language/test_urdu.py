@@ -6,7 +6,7 @@ from sign_language_translator.languages.text.urdu import Tags, Urdu
 
 
 def get_urdu_processor_object():
-    return Urdu() if os.path.exists(Settings.DATASET_ROOT_DIRECTORY) else None
+    return Urdu() if os.path.exists(Settings.RESOURCES_ROOT_DIRECTORY) else None
 
 
 def test_urdu_preprocessor():
@@ -14,7 +14,7 @@ def test_urdu_preprocessor():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.DATASET_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
         )
         return
 
@@ -40,7 +40,7 @@ def test_urdu_tokenizer():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.DATASET_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
         )
         return
 
@@ -64,7 +64,7 @@ def test_urdu_sentence_tokenizer():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.DATASET_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
         )
         return
 
@@ -93,7 +93,7 @@ def test_urdu_tagger():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.DATASET_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
         )
         return
 
@@ -116,7 +116,7 @@ def test_word_senses():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.DATASET_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
         )
         return
 
@@ -124,7 +124,7 @@ def test_word_senses():
         "میں",
     ]
     expected_word_senses = [
-        {'میں(متکلم)', 'میں(اندر)'},
+        {"میں(متکلم)", "میں(اندر)"},
     ]
     word_senses = list(map(lambda x: set(ur_nlp.get_word_senses(x)[0]), raw_words))
 
