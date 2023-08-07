@@ -32,7 +32,7 @@ class PakistanSignLanguage(SignLanguage):
         self.vocab = Vocab(
             language=r"^(?!.*\bcomponents\b).*$",  # r".*",
             sign_collections=[r"pk-hfad(-\d+)?"],  # [r"pk-.+"]
-            data_root_dir=Settings.DATASET_ROOT_DIRECTORY,
+            data_root_dir=Settings.RESOURCES_ROOT_DIRECTORY,
             arg_is_regex=True,
         )
         # restructure dict values

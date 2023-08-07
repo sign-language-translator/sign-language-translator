@@ -1,1 +1,0 @@
-# use pretrainined embedding layer (openai ada/kamran/other ur lang model)

@@ -1,4 +1,5 @@
-from typing import Any, Dict, Set
+from random import choices
+from typing import Any, Dict, List, Set
 
 
 def search_in_values_to_retrieve_key(
@@ -15,6 +16,29 @@ def search_in_values_to_retrieve_key(
     return None
 
 
+def sample_one_index(weights: List[float], temperature: float = 1.0) -> int:
+    """Select an item based on the given probability distribution.
+    Returns the index of the selected item sampled from weighted random distribution.
+
+    Args:
+        weights (List[float]): the relative weights corresponding to each index.
+        temperature (float): The temperature value for controlling the sampling behavior.
+            High temperature means sampling probabilities are more uniform (says random things).
+            Low temperature means that sampling probabilities are higher for bigger weights.
+            Defaults to 1.0.
+
+    Returns:
+        int: The index of the chosen item.
+    """
+
+    return choices(
+        range(len(weights)),
+        weights=[w / temperature for w in weights],
+        k=1,
+    )[0]
+
+
 __all__ = [
     "search_in_values_to_retrieve_key",
+    "sample_one_index",
 ]

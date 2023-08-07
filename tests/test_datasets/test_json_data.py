@@ -14,7 +14,7 @@ def load_data(data_filename):
 
     data = None
     data_path = os.path.join(
-        Settings.DATASET_ROOT_DIRECTORY,
+        Settings.RESOURCES_ROOT_DIRECTORY,
         data_filename,
     )
     data_path = os.path.realpath(data_path)
@@ -90,9 +90,9 @@ def validate_word_dict(word_dict: Dict[str, List[str]], sign_labels=set()):
 
 def test_recordings_labels():
     # TODO: clean up this commented code:
-    # from sign_language_translator import set_dataset_dir
+    # from sign_language_translator import set_resources_dir
 
-    # set_dataset_dir(
+    # set_resources_dir(
     #     "/Users/mudassar.iqbal/Library/CloudStorage/GoogleDrive-mdsriqb@gmail.com/My Drive/sign-language-translator/sign-language-datasets"
     # )
 
@@ -102,7 +102,7 @@ def test_recordings_labels():
         return
 
     ref_clips_path = os.path.join(
-        Settings.DATASET_ROOT_DIRECTORY, "sign_recordings", "reference_clips"
+        Settings.RESOURCES_ROOT_DIRECTORY, "sign_recordings", "reference_clips"
     )
 
     if not os.path.exists(ref_clips_path):
