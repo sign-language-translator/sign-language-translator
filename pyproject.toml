@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sign_language_translator"
-version = "0.5.3"
+version = "0.5.4"
 description = "Translate between spoken/text languages and sign language videos using AI."
 authors = ["Mudassar Iqbal <mdsriqb@gmail.com>"]
 license = "Apache-2.0"
@@ -19,7 +19,7 @@ numpy = "^1.25.1"
 pandas = "^2.0.3"
 pillow = "^10.0.0"
 scipy = "^1.11.1"
-torch = "^2.0.1"
+torch = ">=2.0.0, !=2.0.1"
 scikit-image = "^0.21.0"
 beautifulsoup4 = "^4.12.2"
 deep-translator = "^1.11.4"
