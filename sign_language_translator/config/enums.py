@@ -160,6 +160,9 @@ def normalize_short_code(short_code: str) -> str:
         ValueError: If the provided short code is unknown.
     """
 
+    if isinstance(short_code, Enum):
+        short_code = short_code.value
+
     normalized_to_codes = {
         ModelCodes.CONCATENATIVE_SYNTHESIS.value: {
             "rule-based",
@@ -167,6 +170,7 @@ def normalize_short_code(short_code: str) -> str:
             "concatenativesynthesis",
             "concatenative-synthesis",
             "concatenative_synthesis",
+            "concat-synth",
         },
         TextLanguages.URDU.value: {
             "urdu",
@@ -190,9 +194,13 @@ def normalize_short_code(short_code: str) -> str:
         },
         ModelCodes.MIXER_LM_NGRAM_URDU.value: {
             "urdu-mixed-ngram",
+            "urdu-supported-ngram",
+            "ur-mixed-ngram",
+            "ur-supported-ngram",
         },
         ModelCodes.TRANSFORMER_LM_UR_SUPPORTED.value: {
             "ur-supported-gpt",
+            "urdu-supported-gpt",
         },
     }
     normalized_to_codes = {k: v.union({k}) for k, v in normalized_to_codes.items()}

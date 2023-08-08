@@ -57,7 +57,8 @@ def download(
         response = requests.get(url, stream=True, timeout=timeout)
         response.raise_for_status()
 
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        if os.path.dirname(file_path):
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
         with open(file_path, "wb") as fp:
             stream = response.iter_content(chunk_size=chunk_size)
