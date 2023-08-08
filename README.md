@@ -15,11 +15,11 @@
       2. [$ slt translate ...](#translate)
       3. [$ slt complete ...](#complete)
    2. [Python](#python)
-      1. [basic translation](#basic-translation)
-      2. [text language processor](#text-language-processor)
-      3. [sign language processor](#sign-language-processor)
-      4. [video/feature processing](#vision)
-      5. [language models](#language-models)
+      1. [Translation](#basics)
+      2. [Text language processor](#text-language-processor)
+      3. [Sign language processor](#sign-language-processor)
+      4. [Video processing](#vision)
+      5. [Language models](#language-models)
 4. [Directory Tree](#directory-tree)
 5. [Research Paper](#research-paper)
 6. [Upcoming/Roadmap](#upcomingroadmap)
@@ -193,7 +193,8 @@ $ slt complete --end-token ">" --model-code urdu-mixed-ngram "<"
 ('<', 'وہ', ' ', 'یہ', ' ', 'نہیں', ' ', 'چاہتا', ' ', 'تھا', '۔', '>')
 ```
 
-These models predict next characters until a specified token appears. (e.g. generating names using a mixture of models):
+<details>
+<summary>These models predict next characters until a specified token appears. (e.g. generating names using a mixture of models):</summary>
 
 ```bash
 $ slt complete \
@@ -205,9 +206,11 @@ $ slt complete \
 [shazala]
 ```
 
+</details>
+
 ### Python
 
-#### basic translation
+#### Basics
 
 ```python
 import sign_language_translator as slt
@@ -225,14 +228,14 @@ print(list(slt.ModelCodes)) # from slt.config.enums
 # print(list(slt.SignLanguageCodes))
 ```
 
-**Text to Sign**:
+**Text to Sign Translation**:
 
 ```python
 # Load text-to-sign model
 # deep_t2s_model = slt.get_model("t2s-flan-T5-base-01.pt") # pytorch
 # rule-based model (concatenates clips of each word)
 t2s_model = slt.get_model(
-    model_code = "concatenative-synthesis", # slt.ModelCodes.CONCATENATIVE_SYNTHESIS.value
+    model_code = "concatenative-synthesis", # slt.ModelCodes.CONCATENATIVE_SYNTHESIS
     text_language = "urdu", # or object of any child of slt.languages.text.text_language.TextLanguage class
     sign_language = "PakistanSignLanguage", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
     sign_feature_model = "mediapipe_pose_v2_hand_v1",
@@ -246,8 +249,10 @@ sign_language_sentence = t2s_model(text)
 # moviepy_video_object.write_videofile(f"sentences/{text}.mp4")
 ```
 
-**Sign to text**
-dummy code: (will be finalized in v0.8+)
+**Sign to Text Translation**
+
+<details>
+<summary>dummy code: (will be finalized in v0.8+)</summary>
 
 ```python
 # load sign
@@ -263,10 +268,13 @@ text = deep_s2t_model(features)
 print(text)
 ```
 
+</details>
+
 #### Text Language Processor
 
-```python
+Process text strings using language specific classes:
 
+```python
 from sign_language_translator.languages.text import Urdu
 ur_nlp = Urdu()
 
@@ -310,7 +318,8 @@ signs  = psl.tokens_to_sign_dicts(tokens, tags)
 
 #### Vision
 
-dummy code: (will be finalized in v0.7)
+<details>
+<summary>dummy code: (will be finalized in v0.7)</summary>
 
 ```python
 import sign_language_translator as slt
@@ -332,9 +341,12 @@ video.show()
 print(features.numpy())
 ```
 
+</details>
+
 #### Language models
 
-Simple statistical n-gram model:
+<details open>
+<summary>Simple statistical n-gram model:</summary>
 
 ```python
 from sign_language_translator.models.language_models import NgramLanguageModel
@@ -364,7 +376,10 @@ print(name)
 print(model.__dict__)
 ```
 
-Mash up multiple language models & complete generation through beam search:
+</details>
+
+<details open>
+<summary>Mash up multiple language models & complete generation through beam search:</summary>
 
 ```python
 from sign_language_translator.models.language_models import MixerLM, BeamSampling, NgramLanguageModel
@@ -399,7 +414,10 @@ print(name)
 # [rabbia]
 ```
 
-Write sentences composed of only those words for which sign videos are available so that the rule-based text-to-sign model can generate training examples for a deep learning model:
+</details>
+
+<details open>
+<summary>Write sentences composed of only those words for which sign videos are available so that the rule-based text-to-sign model can generate training examples for a deep learning model:</summary>
 
 ```python
 from sign_language_translator.models.language_models import TransformerLanguageModel
@@ -414,15 +432,17 @@ model.next_all(["میں", " ", "وزیراعظم", " ",])
 # (["سے", "عمران", ...], [0.1415926535, 0.7182818284, ...])
 ```
 
+</details>
+
 ## Directory Tree
 
 <pre>
 <big><b>sign-language-translator</b></big>
-├── <a href="">MANIFEST.in</a>
-├── <a href="">README.md</a>
-├── <a href="">poetry.lock</a>
-├── <a href="">pyproject.toml</a>
-├── <a href="">requirements.txt</a>
+├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/MANIFEST.in">MANIFEST.in</a>
+├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/README.md">README.md</a>
+├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/poetry.lock">poetry.lock</a>
+├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/pyproject.toml">pyproject.toml</a>
+├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/requirements.txt">requirements.txt</a>
 ├── <b>tests</b>
 │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/tests">*</a>
 │
@@ -502,43 +522,73 @@ Stay Tuned!
 
 ## Upcoming/Roadmap
 
-```python
-# :CLEAN_ARCHITECTURE_VISION: v0.7
-    # class according to feature type (pose/video/mesh)
-    # video loader
-    # feature extraction
-    # feature augmentation
-    # feature model names enums
-    # subtitles
-    # 2D/3D avatars
+<details>
+<summary>CLEAN_ARCHITECTURE_VISION: v0.7</summary>
 
-# push notebooks
+```python
+# class according to feature type (pose/video/mesh)
+# video loader
+# feature extraction
+# feature augmentation
+# feature model names enums
+# subtitles
+# 2D/3D avatars
+```
+
+</details>
+
+<details>
+<summary>MISCELLANEOUS</summary>
+
+```python
+# clean demonstration notebooks
 # expand reference clip data by scraping everything
 # data info table
 # https://sign-language-translator.readthedocs.io/en/latest/
-
-# :DEEP_TRANSLATION: v0.8-v1.x
-    # sign to text with fine-tuned whisper
-    # pose vector generation with fine-tuned flan-T5
-    # motion transfer
-    # pose2video: stable diffusion or GAN?
-    # speech to text
-    # text to speech
-    # LanguageModel: experiment by dropping space tokens
-    # parallel text corpus
-
-# RESEARCH PAPERs
-    # datasets: clips, text, sentences, disambiguation
-    # rule based translation: describe entire repo
-    # deep sign-to-text: pipeline + experiments
-    # deep text-to-sign: pipeline + experiments
-
-# PRODUCT DEVELOPMENT
-    # ML inference server
-    # Django backend server
-    # React Frontend
-    # React Native mobile app
+# sequence diagram for creating a translator
 ```
+
+</details>
+
+<details>
+<summary>DEEP_TRANSLATION: v0.8-v1.x</summary>
+
+```python
+# sign to text with fine-tuned whisper
+# pose vector generation with fine-tuned flan-T5
+# motion transfer
+# pose2video: stable diffusion or GAN?
+# speech to text
+# text to speech
+# LanguageModel: experiment by dropping space tokens
+# parallel text corpus
+```
+
+</details>
+
+<details>
+<summary>RESEARCH PAPERs</summary>
+
+```python
+# datasets: clips, text, sentences, disambiguation
+# rule based translation: describe entire repo
+# deep sign-to-text: pipeline + experiments
+# deep text-to-sign: pipeline + experiments
+```
+
+</details>
+
+<details>
+<summary>PRODUCT DEVELOPMENT</summary>
+
+```python
+# ML inference server
+# Django backend server
+# React Frontend
+# React Native mobile app
+```
+
+</details>
 
 ## How to Contribute
 
@@ -575,7 +625,7 @@ Immense gratitude towards:
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9248** + Tests: **877**):
+Count total number of **lines of code** (Package: **9259** + Tests: **885**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

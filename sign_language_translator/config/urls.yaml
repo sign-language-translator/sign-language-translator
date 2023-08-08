@@ -24,17 +24,17 @@ models:
       - name: models/ur-supported-token-unambiguous-mixed-ngram-w1-w6-lm.pkl
         url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/ur-supported-token-unambiguous-mixed-ngram-w1-w6-lm.pkl
       - name: models/tlm_14.0M.pt
-        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/tlm_8.7M.pt
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/tlm_14.0M.pt
 
   - name: text-to-sign
     files:
       - name: x.x
-        url: https://
+        url: https://github.com/sign-language-translator/sign-language-translator
 
   - name: sign-to-text
     files:
       - name: x.y
-        url: https://
+        url: https://github.com/sign-language-translator/sign-language-translator
 
 others:
   - name: extra-url-files

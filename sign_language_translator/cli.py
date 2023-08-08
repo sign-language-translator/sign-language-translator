@@ -2,7 +2,8 @@
 Sign Language Translator (SLT) Command Line Interface
 
 This module provides a command line interface (CLI) for the Sign Language Translator (SLT) library.
-It allows you to perform various operations, such as downloading resource files and translating text to sign language or vice versa.
+It allows you to perform various operations such as translating text to sign language or vice versa,
+downloading resource files & completing text sequences using Language Models.
 
 Usage:
     slt [OPTIONS] COMMAND [ARGS]...
@@ -11,6 +12,7 @@ Options:
     --help  Show this message and exit.
 
 Commands:
+    complete   Complete a sequence using Language Models.
     download   Download resource files.
     translate  Translate text into sign language or vice versa.
 """
