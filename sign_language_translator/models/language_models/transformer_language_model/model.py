@@ -258,12 +258,14 @@ class TransformerLanguageModel(LanguageModel, torch.nn.Module):
         ids = self.tokens_to_ids(context)  # type: ignore
         ids = torch.Tensor(ids).type(torch.long).to(self.device)
 
-        logits = self.forward(ids)
-        probabilities = torch.nn.functional.softmax(logits, dim=-1)
+        with torch.no_grad():
+            logits = self.forward(ids)
+            logits = logits[..., last_input_token_index, :]
+            probabilities = torch.nn.functional.softmax(logits, dim=-1)
 
         return (
             self._next_all_tokens,
-            probabilities[..., last_input_token_index, :].tolist(),  # .squeeze()
+            probabilities.tolist(),  # .squeeze()
         )
 
     @staticmethod

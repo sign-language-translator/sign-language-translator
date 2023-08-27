@@ -121,13 +121,13 @@ class CausalMultiHeadSelfAttention(torch.nn.Module):
 
         # ([batch,] seq_len, embed_size)
         seq_len = x.shape[-2]
-        input_had_batch_dim = x.dim()==2
+        input_had_batch_dim = x.dim() == 2
 
         # get Q, K, V matrices ([batch,] seq_len, embed_size)
         x = self.all_queries_keys_values(x)  # ([batch,] seq_len, 3 * embed_size)
         querys, keys, values = x.split(self.embed_size, dim=-1)
 
-        # break up embedding dimension into (n_heads, head_size)
+        # break up embedding dimension ([batch,] seq_len,     n_heads, head_size)
         querys = querys.view(-1, seq_len, self.n_heads, self.embed_size // self.n_heads)
         keys = keys.view(-1, seq_len, self.n_heads, self.embed_size // self.n_heads)
         values = values.view(-1, seq_len, self.n_heads, self.embed_size // self.n_heads)
