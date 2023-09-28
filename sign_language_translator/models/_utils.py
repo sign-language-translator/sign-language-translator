@@ -7,30 +7,38 @@ Functions:
         Get the model based on the provided model code and optional parameters.
 """
 
-from os.path import join
+from __future__ import annotations
 
-from sign_language_translator.config.enums import ModelCodes, normalize_short_code
+__all__ = [
+    "get_model",
+]
+
+from os.path import join
+from typing import TYPE_CHECKING
+
+from sign_language_translator.config.enums import (
+    ModelCodeGroups,
+    ModelCodes,
+    normalize_short_code,
+)
 from sign_language_translator.config.settings import Settings
 from sign_language_translator.utils import download_resource
 
+if TYPE_CHECKING:
+    from enum import Enum
 
-def get_model(
-    model_code: str,
-    sign_language: str | None = None,
-    text_language: str | None = None,
-    video_feature_model: str | None = None,
-):
+
+def get_model(model_code: str | Enum, *args, **kwargs):
     """
     Get the model based on the provided model code and optional parameters.
+    See sign_language_translator.config.enums.ModelCodes
+    (or slt.ModelCodes) for a list of supported model codes.
 
     Args:
         model_code (str): The code representing the desired model.
-        sign_language (str, optional): The sign language used in the model. Defaults to None.
-        text_language (str, optional): The text language used in the model. Defaults to None.
-        video_feature_model (str, optional): The video feature model to be used for translation. Defaults to None.
 
     Returns:
-        Any: The instantiated sign language model if successful, or None if no model found.
+        Any: The instantiated model object if successful, or None if no model found.
 
     Raises:
         ValueError: If inappropriate argument values are provided for text_language, sign_language, or video_feature_model.
@@ -40,17 +48,10 @@ def get_model(
     if model_code == ModelCodes.CONCATENATIVE_SYNTHESIS.value:
         from sign_language_translator.models import ConcatenativeSynthesis
 
-        if text_language and sign_language and video_feature_model:
-            # TODO: validate arg types
-            return ConcatenativeSynthesis(
-                text_language=text_language,
-                sign_language=sign_language,
-                sign_features=video_feature_model,
-            )
-        raise ValueError(
-            "Inappropriate argument value for text_language, sign_language or video_feature_model"
-        )
-    elif model_code in ModelCodes.ALL_NGRAM_LANGUAGE_MODELS.value:
+        # TODO: validate arg types
+        return ConcatenativeSynthesis(*args, **kwargs)
+
+    elif model_code in ModelCodeGroups.ALL_NGRAM_LANGUAGE_MODELS.value:
         from sign_language_translator.models import NgramLanguageModel
 
         download_resource(
@@ -59,7 +60,7 @@ def get_model(
         return NgramLanguageModel.load(
             join(Settings.RESOURCES_ROOT_DIRECTORY, "models", model_code)
         )
-    elif model_code in ModelCodes.ALL_MIXER_LANGUAGE_MODELS.value:
+    elif model_code in ModelCodeGroups.ALL_MIXER_LANGUAGE_MODELS.value:
         from sign_language_translator.models import MixerLM
 
         download_resource(
@@ -68,7 +69,7 @@ def get_model(
         return MixerLM.load(
             join(Settings.RESOURCES_ROOT_DIRECTORY, "models", model_code)
         )
-    elif model_code in ModelCodes.ALL_TRANSFORMER_LANGUAGE_MODELS.value:
+    elif model_code in ModelCodeGroups.ALL_TRANSFORMER_LANGUAGE_MODELS.value:
         from sign_language_translator.models import TransformerLanguageModel
 
         download_resource(
@@ -77,10 +78,19 @@ def get_model(
         return TransformerLanguageModel.load(
             join(Settings.RESOURCES_ROOT_DIRECTORY, "models", model_code)
         )
+    elif model_code in ModelCodeGroups.ALL_MEDIAPIPE_EMBEDDING_MODELS.value:
+        from sign_language_translator.models import MediaPipeLandmarksModel
+
+        parts = model_code.split("-")
+
+        pose_version = int(parts[parts.index("pose") + 1])
+        # hand_version = int(parts[parts.index("hand") + 1])
+        names = ["lite", "full", "heavy"]
+
+        return MediaPipeLandmarksModel(
+            pose_model_name=f"pose_landmarker_{names[pose_version]}.task",
+            # hand_model_name=f"hand_landmarker_{names[hand_version]}.task",
+            # number_of_persons=1,
+        )
 
     return None
-
-
-__all__ = [
-    "get_model",
-]

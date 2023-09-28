@@ -15,8 +15,13 @@ Language Models:
 
 Text to Sign Translation:
 -------------------------
-- TextToSignModel: A model that translates text into sign language gestures.
+- TextToSignModel: An abstract base class for all model that translates text into sign language gestures in this package.
 - ConcatenativeSynthesis: A rule-based model for synthesizing sign language gestures from text.
+
+Video Embedding:
+----------------
+- VideoEmbeddingModel: An abstract model that embeds video frames into a vector space.
+- MediaPipeLandmarksModel: A video embedding model that utilizes MediaPipe for pose and hand landmark extraction.
 
 Utilities:
 ----------
@@ -29,6 +34,7 @@ from sign_language_translator.models import (
     sign_to_text,
     text_to_sign,
     utils,
+    video_embedding,
 )
 from sign_language_translator.models._utils import get_model
 from sign_language_translator.models.language_models import (
@@ -40,6 +46,10 @@ from sign_language_translator.models.language_models import (
 )
 from sign_language_translator.models.text_to_sign import ConcatenativeSynthesis
 from sign_language_translator.models.text_to_sign.t2s_model import TextToSignModel
+from sign_language_translator.models.video_embedding import (
+    MediaPipeLandmarksModel,
+    VideoEmbeddingModel,
+)
 
 __all__ = [
     "get_model",
@@ -47,6 +57,7 @@ __all__ = [
     "sign_to_text",
     "text_to_sign",
     "utils",
+    "video_embedding",
     "ConcatenativeSynthesis",
     "NgramLanguageModel",
     "TransformerLanguageModel",
@@ -54,4 +65,6 @@ __all__ = [
     "MixerLM",
     "LanguageModel",
     "TextToSignModel",
+    "MediaPipeLandmarksModel",
+    "VideoEmbeddingModel",
 ]
