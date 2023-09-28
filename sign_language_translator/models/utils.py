@@ -19,15 +19,41 @@ Classes:
     FullyLambdaLR(torch.optim.lr_scheduler.LRScheduler):
         Sets the learning rate of each parameter group to a given function that takes step_num, base_lr & last_lr as args.
 
+    VideoEmbeddingPipeline(slt.models.VideoEmbeddingModel):
+        With optional multiprocessing, reads video files from paths, performs forward pass of a model on them and saves the output in specified format.
+
 Example usage:
     See the docstrings of individual functions and classes for usage examples.
 """
 
+from __future__ import annotations
 
-from typing import Callable, Iterable, List, Type
+__all__ = [
+    "top_p_top_k_indexes",
+    "FullyLambdaLR",
+    "plot_lr_scheduler",
+    "downwards_wave",
+    "set_layers_trainability_",
+    "VideoEmbeddingPipeline",
+]
+
+import multiprocessing
+from functools import partial
+from glob import glob
+from os import makedirs
+from os.path import basename, exists, join
+from typing import TYPE_CHECKING, Callable, Iterable, List, Type
+from warnings import warn
 
 import numpy
 import torch
+from numpy.typing import NDArray
+from tqdm.auto import tqdm
+
+from sign_language_translator.vision.utils import iter_frames_with_opencv
+
+if TYPE_CHECKING:
+    from sign_language_translator.models.video_embedding import VideoEmbeddingModel
 
 
 def top_p_top_k_indexes(
@@ -318,10 +344,124 @@ def set_layers_trainability_(
                 param.requires_grad = True
 
 
-__all__ = [
-    "top_p_top_k_indexes",
-    "FullyLambdaLR",
-    "plot_lr_scheduler",
-    "downwards_wave",
-    "set_layers_trainability_",
-]
+class VideoEmbeddingPipeline:
+    """
+    A class for processing and embedding video data using a slt.models.VideoEmbeddingModel.
+
+    Args:
+        model (VideoEmbeddingModel): An instance of the VideoEmbeddingModel class or its child class used for embedding.
+
+    Methods:
+        process_video(path, save_format="csv", overwrite=False, output_dir=".", **kwargs):
+            Load, embed, and save a video's embedding. kwargs are passed to model.embed().
+
+        process_videos_parallel(path_patterns, n_processes=multiprocessing.cpu_count(),
+                                save_format="csv", overwrite=False, output_dir=".", **kwargs):
+            Process multiple videos in parallel using multiprocessing. kwargs are passed to model.embed().
+
+    Attributes:
+        model (VideoEmbeddingModel): The VideoEmbeddingModel instance used for embedding.
+    """
+
+    def __init__(self, model: VideoEmbeddingModel):
+        self.model = model
+
+    def process_video(
+        self, path, save_format="csv", overwrite=False, output_dir=".", **kwargs
+    ):
+        """
+        Load a video, embed its frames, and save the embedding.
+
+        Args:
+            path (str): The path to the video file.
+            save_format (str, optional): Format for saving the embedding ("csv", "torch", "npy", "npz").
+            overwrite (bool, optional): Whether to overwrite existing embedding files.
+            output_dir (str, optional): Directory to save the embedding file.
+            **kwargs: Additional keyword arguments for embedding model.
+
+        Returns:
+            None
+        """
+
+        # TODO: handle batched data
+
+        video = self.__read_video(path)
+        embedding = self.__embed_video(video, **kwargs)
+        self.__save_embedding(
+            embedding,
+            basename(path),
+            output_dir=output_dir,
+            file_format=save_format,
+            overwrite=overwrite,
+        )
+
+    def process_videos_parallel(
+        self,
+        path_patterns: List[str],
+        n_processes=multiprocessing.cpu_count(),
+        save_format="csv",
+        overwrite=False,
+        output_dir=".",
+        **kwargs,
+    ):
+        """
+        Process multiple videos in parallel using multiprocessing, embedding their frames.
+
+        Args:
+            path_patterns (list): List of file path patterns to match videos e.g. ["dataset/*.mp4", "dataset/*.avi"].
+            n_processes (int, optional): Number of parallel processes. Defaults to multiprocessing.cpu_count().
+            save_format (str, optional): Format for saving the embeddings ("csv", "torch", "npy", "npz").
+            overwrite (bool, optional): Whether to overwrite existing embedding files.
+            output_dir (str, optional): Directory to save the embedding files.
+            **kwargs: Additional keyword arguments for embedding model.
+
+        Returns:
+            None
+        """
+
+        paths = [path for pattern in path_patterns for path in glob(pattern)]
+        n_processes = min(n_processes, len(paths), multiprocessing.cpu_count())
+        partial_process_video = partial(
+            self.process_video,
+            save_format=save_format,
+            overwrite=overwrite,
+            output_dir=output_dir,
+            **kwargs,
+        )
+
+        if len(paths) == 1:
+            list(tqdm(map(partial_process_video, paths), total=1))
+            return
+
+        with multiprocessing.Pool(processes=n_processes) as pool:
+            list(tqdm(pool.imap(partial_process_video, paths), total=len(paths)))
+
+    def __read_video(self, path) -> Iterable[NDArray[numpy.uint8]]:
+        return iter_frames_with_opencv(path)
+
+    def __embed_video(self, video, **kwargs):
+        return self.model.embed(video, **kwargs)
+
+    def __save_embedding(
+        self,
+        embedding: NDArray | torch.Tensor,
+        filename: str,
+        output_dir=".",
+        file_format="csv",
+        overwrite=False,
+    ):
+        target_path = join(output_dir, filename) + f".{file_format}"
+
+        makedirs(output_dir, exist_ok=True)
+        if exists(target_path) and not overwrite:
+            warn(f"File already exists at {target_path}")
+            return
+
+        if file_format.lower() == "csv":
+            numpy.savetxt(target_path, embedding, delimiter=",")
+        elif file_format.lower() in ("torch", "pt"):
+            torch.save(embedding, target_path)
+        elif file_format.lower() == "npy":
+            numpy.save(target_path, embedding)
+        elif file_format.lower() == "npz":
+            numpy.savez_compressed(target_path, **{filename: embedding})

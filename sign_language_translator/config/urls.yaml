@@ -9,8 +9,14 @@ datasets:
         url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/sign_recordings/recordings_labels.json
       - name: text_preprocessing.json
         url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/text_preprocessing.json
+      
       - name: language_to_token_to_id.json
         url: https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/language_to_token_to_id.json
+
+  - name: reference-clips
+    files:
+      - name: videos/wordless_wordless.mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/wordless_wordless.mp4
 
 models:
   - name: language-models
@@ -25,6 +31,17 @@ models:
         url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/ur-supported-token-unambiguous-mixed-ngram-w1-w6-lm.pkl
       - name: models/tlm_14.0M.pt
         url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/tlm_14.0M.pt
+
+  - name: video-embedding-models
+    files:
+      - name: models/mediapipe/pose_landmarker_lite.task
+        url: https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task
+      - name: models/mediapipe/pose_landmarker_full.task
+        url: https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task
+      - name: models/mediapipe/pose_landmarker_heavy.task
+        url: https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task
+      - name: models/mediapipe/hand_landmarker.task
+        url: https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task
 
   - name: text-to-sign
     files:
