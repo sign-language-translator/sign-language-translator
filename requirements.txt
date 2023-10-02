@@ -3,12 +3,8 @@ deep_translator==1.11.4
 opencv_contrib_python==4.8.0.74
 tqdm==4.65.0
 matplotlib==3.7.2
-mediapipe==0.9.1.0
-moviepy==1.0.3
+mediapipe==0.10.3
 numpy==1.25.1
-pandas==2.0.3
-Pillow==10.0.0
-scipy==1.11.1
-torch>=2.0.0, !=2.0.1
-scikit-image==0.21.0
-pytest==7.4.0
+torch>=2.0.0,!=2.0.1
+pyyaml==6.0.1
+click==8.1.6

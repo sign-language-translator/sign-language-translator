@@ -1,26 +1,20 @@
 [tool.poetry]
 name = "sign_language_translator"
-version = "0.6.2"
+version = "0.6.3"
 description = "Translate between spoken/text languages and sign language videos using AI."
 authors = ["Mudassar Iqbal <mdsriqb@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 packages = [{include = "sign_language_translator"}]
 repository = "https://github.com/sign-language-translator/sign-language-translator"
-keywords = ["sign", "translation", "pose", "pakistan", "deep-learning", "computer-vision", "nlp", "sign-language", "sign-language-translation"]
+keywords = ["sign-language", "sign-language-translation", "nlp", "computer-vision", "deep-learning", "ai", "translation", "translator", "sign-language-translator", "rule-based"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-pytest = "^7.0.0"
 matplotlib = "^3.7.2"
 mediapipe = "0.10.3"
-moviepy = "^1.0.3"
 numpy = "^1.25.1"
-pandas = "^2.0.3"
-pillow = "^10.0.0"
-scipy = "^1.11.1"
 torch = ">=2.0.0,<2.0.1 || >2.0.1"
-scikit-image = "^0.21.0"
 beautifulsoup4 = "^4.12.2"
 deep-translator = "^1.11.4"
 opencv-contrib-python = "^4.8.0.74"
@@ -36,6 +30,9 @@ build-backend = "poetry.core.masonry.api"
 addopts = "-vv "
 filterwarnings = [
     "ignore::DeprecationWarning",
+]
+testpaths = [
+    "tests",
 ]
 
 [tool.isort]

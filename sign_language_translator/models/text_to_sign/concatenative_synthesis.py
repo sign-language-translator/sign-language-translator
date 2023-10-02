@@ -20,14 +20,14 @@ class ConcatenativeSynthesis(TextToSignModel):
     Args:
         text_language (str | TextLanguage): (source) The text language or its identifier.
         sign_language (str | SignLanguage): (target) The sign language or its identifier.
-        sign_features (str): (format) The sign features used for mapping labels to sign features.
+        sign_format (str): (format) The sign features used for mapping labels to sign features.
     """
 
     def __init__(
         self,
         text_language: str | TextLanguage,
         sign_language: str | SignLanguage,
-        sign_features: str,
+        sign_format: str,
     ) -> None:
         self._text_language = (
             get_text_language(text_language)
@@ -39,7 +39,7 @@ class ConcatenativeSynthesis(TextToSignModel):
             if isinstance(sign_language, str)
             else sign_language
         )
-        self._sign_features = sign_features  # TODO: use feature loader
+        self._sign_features = sign_format  # TODO: use feature loader
 
     @property
     def text_language(self):
