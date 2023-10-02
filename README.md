@@ -2,7 +2,11 @@
 
 [![python](https://img.shields.io/pypi/pyversions/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator)](https://pypi.org/project/sign-language-translator/)
-[![Downloads](https://static.pepy.tech/personalized-badge/sign-language-translator?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/sign-language-translator)
+[![Downloads](https://static.pepy.tech/personalized-badge/sign-language-translator?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/sign-language-translator/)
+
+![Release Workflow Status](https://img.shields.io/github/actions/workflow/status/sign-language-translator/sign-language-translator/release.yml?branch=main)
+[![codecov](https://codecov.io/gh/sign-language-translator/sign-language-translator/branch/main/graph/badge.svg)](https://codecov.io/gh/sign-language-translator/sign-language-translator)
+[![Documentation Status](https://readthedocs.org/projects/sign-language-translator/badge/?version=latest)](https://sign-language-translator.readthedocs.io/en/latest/?badge=latest)
 
 1. [Overview](#overview)
    1. [Solution](#solution)
@@ -175,7 +179,7 @@ but here is the general API:
 
 ### Command Line
 
-You can use the following functionalities of the SLT package via CLI as well. A command entered without any arguments will show the help. *The useable model-codes are listed in help*.
+You can use the following functionalities of the SLT package via CLI as well. A command entered without any arguments will show the help. *The useable model-codes are listed in help*.<br>
 Note: Objects & models do not persist in memory across commands, so this is a quick but inefficient way to use this package. In production, create a server which uses the python interface.
 
 #### Download
@@ -266,15 +270,14 @@ print(list(slt.ModelCodes))  # slt.ModelCodeGroups
 t2s_model = slt.get_model(
     model_code = "concatenative-synthesis", # slt.ModelCodes.CONCATENATIVE_SYNTHESIS
     text_language = "urdu", # or object of any child of slt.languages.text.text_language.TextLanguage class
-    sign_language = "PakistanSignLanguage", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
-    sign_feature_model = "mediapipe_pose_v2_hand_v1",
+    sign_language = "pakistan-sign-language", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
+    sign_format = "video", # or object of any child of slt.vision.sign_wrappers.sign.Sign class
 )
 
 text = "HELLO دنیا!" # HELLO treated as an acronym
 sign_language_sentence = t2s_model(text)
 
-# slt_video_object = sign_language_sentence.video()
-# slt_video_object.ipython_display()
+# slt_video_object.show() # class: slt.vision.sign_wrappers.video.Video
 # slt_video_object.save(f"sentences/{text}.mp4")
 ```
 
@@ -296,9 +299,12 @@ deep_s2t_model = slt.get_model("gesture_mp_base-01") # pytorch
 
 # translate via individual steps
 features = deep_s2t_model.extract_features(video.iter_frames())
-logits = deep_s2t_model(features)
-tokens = deep_s2t_model.decode(logits)
-text = deep_s2t_model.detokenize(tokens)
+encoding = deep_s2t_model.encoder(features)
+# logits = deep_s2t_model.decoder(encoding, token_ids = [0])
+# logits = deep_s2t_model.decoder(encoding, token_ids = [0, logits.argmax(dim=-1)])
+# ...
+tokens = deep_s2t_model.decode(encoding) # uses beam search to generate a token sequence
+text = "".join(tokens) # deep_s2t_model.detokenize(tokens)
 
 print(features.shape)
 print(logits.shape)
@@ -318,7 +324,7 @@ ur_nlp = Urdu()
 text = "hello جاؤں COVID-19."
 
 normalized_text = ur_nlp.preprocess(text)
-# normalized_text = 'جاؤں COVID-19.'
+# normalized_text = 'جاؤں COVID-19.' # replace/remove unicode characters
 
 tokens = ur_nlp.tokenize(normalized_text)
 # tokens = ['جاؤں', ' ', 'COVID', '-', '19', '.']
@@ -343,7 +349,7 @@ from sign_language_translator.languages.sign import PakistanSignLanguage
 psl = PakistanSignLanguage()
 
 tokens = ["he", " ", "went", " ", "to", " ", "school", "."]
-tags = [Tags.WORD, Tags.SPACE] * 3 + [Tags.WORD, Tags.PUNCTUATION]
+tags = 3 * [Tags.WORD, Tags.SPACE] + [Tags.WORD, Tags.PUNCTUATION]
 tokens, tags, _ = psl.restructure_sentence(tokens, tags) # ["he", "school", "go"]
 signs  = psl.tokens_to_sign_dicts(tokens, tags)
 # signs = [
@@ -383,7 +389,7 @@ sign = sign.transform(slt.vision.transformations.ZoomLandmarks(1.1, 0.9, 1.0))
 
 # plot
 video_visualization = sign.video()
-image_visualization = sign.pil(steps=5)
+image_visualization = sign.image(steps=5)
 overlay_visualization = sign.overlay(video)
 
 # display
@@ -396,7 +402,7 @@ overlay_visualization.show()
 
 #### Language models
 
-<details open>
+<details>
 <summary>Simple statistical n-gram model:</summary>
 
 ```python
@@ -429,7 +435,7 @@ print(model.__dict__)
 
 </details>
 
-<details open>
+<details>
 <summary>Mash up multiple language models & complete generation through beam search:</summary>
 
 ```python
@@ -529,7 +535,7 @@ model.next_all(["میں", " ", "وزیراعظم", " ",])
 
 | Name                        | Architecture                                                                                                               | Description                                                                                                  | Input format                                         | Output format                       |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | ----------------------------------- |
-| [MediaPipe Landmarks<br>(Pose + Hands)](https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py) | CNN based pipelines. See Here: [Pose](https://arxiv.org/pdf/2006.10204.pdf), [Hands](https://arxiv.org/pdf/2006.10214.pdf) | Encodes videos into pose vectors (3D world or 2D image) depicting the movements of the performer. | List of numpy images<br/>(n_frames, width, height, channels) | torch.Tensor<br/>(n_frames, n_landmarks * 5) |
+| [MediaPipe Landmarks<br>(Pose + Hands)](https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py) | CNN based pipelines. See Here: [Pose](https://arxiv.org/pdf/2006.10204.pdf), [Hands](https://arxiv.org/pdf/2006.10214.pdf) | Encodes videos into pose vectors (3D world or 2D image) depicting the movements of the performer. | List of numpy images<br/>(n_frames, height, width, channels) | torch.Tensor<br/>(n_frames, n_landmarks * 5) |
 </details>
 
 <details>
@@ -613,7 +619,7 @@ Remember to contribute back to the community:
 ## Directory Tree
 
 <pre>
-<big><b>sign-language-translator</b></big>
+<b style="font-size:large;">sign-language-translator</b>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/MANIFEST.in">MANIFEST.in</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/README.md">README.md</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/poetry.lock">poetry.lock</a>
@@ -622,7 +628,7 @@ Remember to contribute back to the community:
 ├── <b>tests</b>
 │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/tests">*</a>
 │
-└── <big><b>sign_language_translator</b></big>
+└── <b style="font-size:large;">sign_language_translator</b>
     ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/cli.py">cli.py</a>
     ├── <b>config</b>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/enums.py">enums.py</a>
@@ -682,19 +688,12 @@ Remember to contribute back to the community:
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/utils.py">utils.py</a>
     │
     ├── <b>utils</b>
-    │   ├── <del>data_loader.py</del>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/download.py">download.py</a>
-    │   ├── <del>landmarks_info.py</del>
-    │   ├── <del>sign_data_attributes.py</del>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/tree.py">tree.py</a>
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/utils.py">utils.py</a>
     │
     └── <b>vision</b>
-        ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/concatenate.py">concatenate.py</a>
-        ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/embed.py">embed.py</a>
-        ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/transforms.py">transforms.py</a>
-        ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/utils.py">utils.py</a>
-        └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/visualization.py">visualization.py</a>
+        └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/utils.py">utils.py</a>
 </pre>
 
 ## How to Contribute
@@ -746,13 +745,14 @@ Stay Tuned!
 <summary>CLEAN_ARCHITECTURE_VISION: v0.7</summary>
 
 ```python
-# class according to feature type (pose/video/mesh)
-# video loader
-# feature extraction
-# feature augmentation
-# feature model names enums
+# class according to feature type:
+   # landmarks
+# video transformations
+# landmark augmentation
+# concatenative synthesis returns features
 # subtitles
-# 2D/3D avatars
+# clean-up needless dependencies & modules (pandas, pillow, moviepy, pytest, scikit-image, scipy)
+# make scraping dependencies optional (beautifulsoup4, deep_translator)
 ```
 
 </details>
@@ -812,12 +812,12 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-08-27.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-09-18.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
 
-- [Mudassar Iqbal](https://github.com/mdsrqbl) for leading and coding the project so far.
+- [Mudassar Iqbal](https://github.com/mdsrqbl) for coding the project so far.
 - Rabbia Arshad for help in initial R&D and web development.
 - Waqas Bin Abbas for assistance in initial video data collection process.
 - Kamran Malik for setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
@@ -830,7 +830,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9975** + Tests: **957**):
+Count total number of **lines of code** (Package: **7059** + Tests: **957**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

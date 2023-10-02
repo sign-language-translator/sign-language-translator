@@ -15,6 +15,7 @@ Commands:
     complete   Complete a sequence using Language Models.
     download   Download resource files.
     translate  Translate text into sign language or vice versa.
+    embed      Embed Videos Using Selected Model.
 """
 
 import click
