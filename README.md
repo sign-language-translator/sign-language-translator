@@ -751,8 +751,8 @@ Stay Tuned!
 # landmark augmentation
 # concatenative synthesis returns features
 # subtitles
-# clean-up needless dependencies & modules (pandas, pillow, moviepy, pytest, scikit-image, scipy)
 # make scraping dependencies optional (beautifulsoup4, deep_translator)
+# GUI with gradio
 ```
 
 </details>
