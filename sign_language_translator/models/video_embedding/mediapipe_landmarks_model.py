@@ -87,7 +87,7 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
         Embed a sequence of frames (video) into a sequence of pose & hand landmarks.
 
         Args:
-            frame_sequence (Iterable[torch.Tensor | NDArray[np.uint8]]): A sequence of video frames as 3D arrays (H, W, c).
+            frame_sequence (Iterable[torch.Tensor | NDArray[np.uint8]]): A sequence of video frames as 3D arrays (W, H, c).
             landmark_type (str): The type of landmarks to include in the embedding ("world", "image", "all").
 
         Returns:

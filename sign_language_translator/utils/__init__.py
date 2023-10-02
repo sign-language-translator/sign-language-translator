@@ -13,6 +13,8 @@ from sign_language_translator.utils.tree import tree
 from sign_language_translator.utils.utils import (
     sample_one_index,
     search_in_values_to_retrieve_key,
+    in_jupyter_notebook,
+    ArrayOps,
 )
 
 __all__ = [
@@ -21,4 +23,6 @@ __all__ = [
     "download_resource",
     "search_in_values_to_retrieve_key",
     "sample_one_index",
+    "in_jupyter_notebook",
+    "ArrayOps",
 ]
