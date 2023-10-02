@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "sign_language_translator"
-version = "0.6.2"
+version = "0.6.3"
 description = "Translate between spoken/text languages and sign language videos using AI."
 authors = ["Mudassar Iqbal <mdsriqb@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 packages = [{include = "sign_language_translator"}]
 repository = "https://github.com/sign-language-translator/sign-language-translator"
-keywords = ["sign", "translation", "pose", "pakistan", "deep-learning", "computer-vision", "nlp", "sign-language", "sign-language-translation"]
+keywords = ["sign-language", "sign-language-translation", "nlp", "computer-vision", "deep-learning", "ai", "translation", "translator", "sign-language-translator", "rule-based"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
