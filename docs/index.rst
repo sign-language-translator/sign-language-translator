@@ -21,11 +21,10 @@ Welcome to Sign Language Translator's documentation!
    sign_langauge_translator.utils
    sign_langauge_translator.data_collection
 
-
-
 Indices and tables
 ==================
 
 * :ref:`genindex`
+* :ref:`sign_langauge_translator`
 * :ref:`modindex`
 * :ref:`search`
