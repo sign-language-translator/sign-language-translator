@@ -12,6 +12,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('..'))
 
@@ -20,7 +21,7 @@ import sign_language_translator
 # -- Project information -----------------------------------------------------
 
 project = "Sign Language Translator"
-copyright = "2023, Sign Language Translator Team"
+copyright = "2023, Mudassar Iqbal"
 author = "Mudassar Iqbal"
 
 version = sign_language_translator.__version__
@@ -30,13 +31,17 @@ release = sign_language_translator.__version__
 # -- General configuration
 
 extensions = [
-    "sphinx.ext.duration",
-    "sphinx.ext.doctest",
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosectionlabel",
     "sphinx.ext.autosummary",
-    "sphinx.ext.intersphinx",
-    'sphinx.ext.viewcode',
+    "sphinx.ext.coverage",
+    "sphinx.ext.doctest",
+    "sphinx.ext.extlinks",
+    'sphinx.ext.inheritance_diagram',
+    'sphinx.ext.linkcode',
     'sphinx.ext.napoleon',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
 ]
 
 intersphinx_mapping = {
@@ -47,9 +52,6 @@ intersphinx_mapping = {
 intersphinx_disabled_domains = ["std"]
 
 templates_path = ["_templates"]
-
-# -- Options for EPUB output
-epub_show_urls = "footnote"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -62,6 +64,11 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+
+html_theme_options = {
+    # 'logo_only': True,
+}
+html_logo = 'https://avatars.githubusercontent.com/u/130464523'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
