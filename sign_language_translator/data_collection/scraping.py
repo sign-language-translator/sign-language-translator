@@ -10,7 +10,6 @@ from typing import Dict, List, Set, Union
 
 import requests
 from bs4 import BeautifulSoup
-from IPython.display import clear_output
 from tqdm.auto import tqdm
 
 captcha_waiting = False
@@ -130,7 +129,6 @@ def get_glosbe_texts(
             print("!!!!!!!CAPTCHA!!!!!!!", query)
             sleep(10)
         else:
-            clear_output()
             captcha_waiting = False
             break
     texts = extract_glosbe_texts(response, element=element, css_class=css_class)
