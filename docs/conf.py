@@ -43,6 +43,14 @@ extensions = [
     'sphinx.ext.viewcode',
 ]
 
+def linkcode_resolve(domain, info):
+    if domain != 'py':
+        return None
+    if not info['module']:
+        return None
+    filename = info['module'].replace('.', '/')
+    return f"https://github.com/sign-language-translator/sign-language-translator/{filename}.py"
+
 intersphinx_mapping = {
     "rtd": ("https://docs.readthedocs.io/en/stable/", None),
     "python": ("https://docs.python.org/3/", None),
