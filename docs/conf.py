@@ -24,11 +24,10 @@ project = "Sign Language Translator"
 copyright = "2023, Mudassar Iqbal"
 author = "Mudassar Iqbal"
 
-version = "0.6.3"
-release = "0.6.3"
+version = "0.6.3" # sign_language_translator.__version__
+release = "0.6.3" # sign_language_translator.__version__
 
 # -- General configuration ---------------------------------------------------
-# -- General configuration
 
 extensions = [
     "sphinx.ext.autodoc",
