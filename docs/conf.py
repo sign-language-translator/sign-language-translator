@@ -17,13 +17,12 @@ sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('..'))
 
 import sign_language_translator
-print(sign_language_translator.__version__)
 
 # -- Project information -----------------------------------------------------
 
 project = "Sign Language Translator"
-copyright = "2023, Mudassar Iqbal"
 author = "Mudassar Iqbal"
+copyright = f"2023, {author}"
 
 version = sign_language_translator.__version__
 release = sign_language_translator.__version__
