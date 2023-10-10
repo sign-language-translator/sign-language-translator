@@ -17,6 +17,12 @@ temp*
 dist/
 htmlcov
 .coverage.*
+docs/_build
+docs/make*
+docs/modules.rst
+docs/sign_language_translator.*.rst
+./*.rst
+./make*
 
 # auto-downloaded
 sign-language-resources

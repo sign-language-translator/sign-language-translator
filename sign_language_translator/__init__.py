@@ -1,65 +1,78 @@
-"""# [sign_language_translator](https://github.com/sign-language-translator/sign-language-translator)
+"""
+sign_language_translator
+========================
+Code: https://github.com/sign-language-translator/sign-language-translator
+Help: https://sign-language-translator.readthedocs.io
+
 This project is an effort to bridge the communication gap between the hearing and the hearing-impaired community using Artificial Intelligence.
 The goal is to provide a user friendly API to novel Sign Language Translation solutions that can easily adapt to any regional sign language.
 
-## Usage
+Usage
+-----
 
-```python
-import sign_language_translator as slt
+.. code-block:: python
 
-# download dataset or models (if you need them for personal use)
-# (by default, resources are auto-downloaded within the install directory)
-# slt.set_resource_dir("path/to/folder")  # Helps preventing duplication across environments or using cloud synced data
-# slt.utils.download_resource(".*.json")  # downloads into resource_dir
-# print(slt.Settings.FILE_TO_URL.keys())  # All downloadable resources
+    import sign_language_translator as slt
 
-print("All available models:")
-print(list(slt.ModelCodes))  # slt.ModelCodeGroups
-# print(list(slt.TextLanguageCodes))
-# print(list(slt.SignLanguageCodes))
-# print(list(slt.SignFormatCodes))
+    # download dataset or models (if you need them for personal use)
+    # (by default, resources are auto-downloaded within the install directory)
+    # slt.set_resource_dir("path/to/folder")  # Helps preventing duplication across environments or using cloud synced data
+    # slt.utils.download_resource(".*.json")  # downloads into resource_dir
+    # print(slt.Settings.FILE_TO_URL.keys())  # All downloadable resources
 
-# -------------------------- TRANSLATE: text to sign --------------------------
+    print("All available models:")
+    print(list(slt.ModelCodes))  # slt.ModelCodeGroups
+    # print(list(slt.TextLanguageCodes))
+    # print(list(slt.SignLanguageCodes))
+    # print(list(slt.SignFormatCodes))
 
-# Load text-to-sign model
-# deep_t2s_model = slt.get_model("t2s-flan-T5-base-01.pt") # pytorch
-# rule-based model (concatenates clips of each word)
-t2s_model = slt.get_model(
-    model_code = "concatenative-synthesis", # slt.ModelCodes.CONCATENATIVE_SYNTHESIS
-    text_language = "urdu", # or object of any child of slt.languages.text.text_language.TextLanguage class
-    sign_language = "PakistanSignLanguage", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
-    sign_feature_model = "mediapipe_pose_v2_hand_v1",
-)
+    # -------------------------- TRANSLATE: text to sign --------------------------
 
-text = "HELLO دنیا!" # HELLO treated as an acronym
-sign_language_sentence = t2s_model(text)
+    import sign_language_translator as slt
 
-# slt_video_object = sign_language_sentence.video()
-# slt_video_object.ipython_display()
-# slt_video_object.save(f"sentences/{text}.mp4")
+    # Load text-to-sign model
+    # deep_t2s_model = slt.get_model("t2s-flan-T5-base-01.pt") # pytorch
 
-# -------------------------- TRANSLATE: sign to text --------------------------
+    # rule-based model (concatenates clips of each word)
+    t2s_model = slt.models.ConcatenativeSynthesis(
+        text_language = "urdu", # or object of any child of slt.languages.text.text_language.TextLanguage class
+        sign_language = "pakistan-sign-language", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
+        sign_format = "video", # or object of any child of slt.vision.sign.Sign class
+    )
 
-# load sign
-video = slt.Video("video.mp4")
-# features = slt.extract_features(video, "mediapipe_pose_v2_hand_v1")
+    text = "HELLO دنیا!" # HELLO treated as an acronym
+    sign_language_sentence = t2s_model(text)
 
-# Load sign-to-text model
-deep_s2t_model = slt.get_model("gesture_mp_base-01") # pytorch
+    # slt_video_object.show() # class: slt.vision.sign.Sign
+    # slt_video_object.save(f"sentences/{text}.mp4")
 
-# translate via single call to pipeline
-# text = deep_s2t_model.translate(video)
+    # -------------------------- TRANSLATE: sign to text --------------------------
 
-# translate via individual steps
-features = deep_s2t_model.extract_features(video.iter_frames())
-logits = deep_s2t_model(features)
-tokens = deep_s2t_model.decode(logits)
-text = deep_s2t_model.detokenize(tokens)
+    import sign_language_translator as slt
 
-print(features.shape)
-print(logits.shape)
-print(text)
-```
+    # load sign
+    video = slt.Video("video.mp4")
+    # features = slt.extract_features(video, "mediapipe_pose_v2_hand_v1")
+
+    # Load sign-to-text model
+    # deep_s2t_model = slt.get_model(slt.ModelCodes.TRANSFORMER_S2T) # pytorch
+    deep_s2t_model = slt.get_model("gesture_mp_base-01") # pytorch
+
+    # translate via single call to pipeline
+    # text = deep_s2t_model.translate(video)
+
+    # translate via individual steps
+    features = deep_s2t_model.extract_features(video.iter_frames())
+    encoding = deep_s2t_model.encoder(features)
+    # logits = deep_s2t_model.decoder(encoding, token_ids = [0])
+    # logits = deep_s2t_model.decoder(encoding, token_ids = [0, logits.argmax(dim=-1)])
+    # ...
+    tokens = deep_s2t_model.decode(encoding) # uses beam search to generate a token sequence
+    text = "".join(tokens) # deep_s2t_model.detokenize(tokens)
+
+    print(features.shape)
+    print(logits.shape)
+    print(text)
 """
 
 from sign_language_translator import (
@@ -72,13 +85,10 @@ from sign_language_translator import (
     vision,
 )
 from sign_language_translator.config import enums
-from sign_language_translator.config.enums import (
-    ModelCodes,
-    ModelCodeGroups,
-    TextLanguages as TextLanguageCodes,
-    SignFormats as SignFormatCodes,
-    SignLanguages as SignLanguageCodes,
-)
+from sign_language_translator.config.enums import ModelCodeGroups, ModelCodes
+from sign_language_translator.config.enums import SignFormats as SignFormatCodes
+from sign_language_translator.config.enums import SignLanguages as SignLanguageCodes
+from sign_language_translator.config.enums import TextLanguages as TextLanguageCodes
 from sign_language_translator.config.settings import Settings, set_resources_dir
 from sign_language_translator.languages import get_sign_language, get_text_language
 from sign_language_translator.models import get_model
@@ -108,5 +118,5 @@ __all__ = [
     # object loaders
     "get_sign_language",
     "get_text_language",
-    "get_model"
+    "get_model",
 ]
