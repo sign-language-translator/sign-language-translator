@@ -13,18 +13,6 @@
    2. [Major Components and Goals](#major-components-and-goals)
 2. [How to install the package](#how-to-install-the-package)
 3. [Usage](#usage)
-   1. [Command Line](#command-line)
-      <!-- 1. [configure](#configure) -->
-      1. [$ slt download ...](#download)
-      2. [$ slt translate ...](#translate)
-      3. [$ slt complete ...](#complete)
-      4. [$ slt embed ...](#embed-videos)
-   2. [Python](#python)
-      1. [Translation](#basics)
-      2. [Text language processor](#text-language-processor)
-      3. [Sign language processor](#sign-language-processor)
-      4. [Video processing](#vision)
-      5. [Language models](#language-models)
 4. [Models](#models)
 5. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
 6. [Directory Tree](#directory-tree)
@@ -170,326 +158,49 @@ pip install -e .
 ```bash
 pip install -e git+https://github.com/sign-language-translator/sign-language-translator.git#egg=sign_language_translator
 ```
+
 </details>
 
 ## Usage
 
-See the [*test cases*](https://github.com/sign-language-translator/sign-language-translator/tree/main/tests) or [the *notebooks* repo](https://github.com/sign-language-translator/notebooks) for detailed use
-but here is the general API:
+Head over to [sign-language-translator.**readthedocs**.io](https://sign-language-translator.readthedocs.io) to see the detailed usage in Python, Command line and GUI.
 
-### Command Line
-
-You can use the following functionalities of the SLT package via CLI as well. A command entered without any arguments will show the help. *The useable model-codes are listed in help*.<br>
-Note: Objects & models do not persist in memory across commands, so this is a quick but inefficient way to use this package. In production, create a server which uses the python interface.
-
-#### Download
-
-Download dataset files or models if you need them. The parameters are regular expressions.
+See the [*test cases*](https://github.com/sign-language-translator/sign-language-translator/tree/main/tests) or [the *notebooks* repo](https://github.com/sign-language-translator/notebooks) to see the internal code in action.
 
 ```bash
-slt download --overwrite true '.*\.json' '.*\.mp4'
+$ slt
+
+Usage: slt [OPTIONS] COMMAND [ARGS]...
+   Sign Language Translator (SLT) command line interface.
+Options:
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+Commands:
+  complete   Complete a sequence using Language Models.
+  download   Download resource files with regex.
+  embed      Embed Videos Using Selected Model.
+  translate  Translate text into sign language or vice versa.
 ```
-
-```bash
-slt download --progress-bar true '.*/tlm_14.0M.pt'
-```
-
-By default, auto-download is enabled. Default download directory is `/install-directory/sign_language_translator/sign-language-resources/`. (See slt.config.settings.Settings)
-
-#### Translate
-
-Translate text to sign language using a rule-based model
-
-```bash
-slt translate \
---model-code "concatenative" \
---text-lang urdu --sign-lang psl \
---sign-format 'mediapipe-landmarks' \
-"وہ سکول گیا تھا۔" \
-'مجھے COVID نہیں ہے!'
-```
-
-#### Complete
-
-Auto complete a sentence using our language models. This model can write sentences composed of supported words only:
-
-```bash
-$ slt complete --end-token ">" --model-code urdu-mixed-ngram "<"
-('<', 'وہ', ' ', 'یہ', ' ', 'نہیں', ' ', 'چاہتا', ' ', 'تھا', '۔', '>')
-```
-
-<details>
-<summary>These models predict next characters until a specified token appears. (e.g. generating names using a mixture of models):</summary>
-
-```bash
-$ slt complete \
-    --model-code unigram-names --model-weight 1 \
-    --model-code bigram-names -w 2 \
-    -m trigram-names -w 3 \
-    --selection-strategy merge --beam-width 2.5 --end-token "]" \
-    "[s"
-[shazala]
-```
-
-</details>
-
-#### Embed Videos
-
-Embed videos into a sequence of vectors using selected embedding models.
-
-```bash
-slt embed videos/*.mp4 --model-code mediapipe-pose-2-hand-1 --embedding-type world --processes 4 --save-format csv
-```
-
-### Python
-
-#### Basics
 
 ```python
 import sign_language_translator as slt
 
-# download dataset or models (if you need them for personal use)
-# (by default, resources are auto-downloaded within the install directory)
-# slt.set_resource_dir("path/to/folder")  # Helps preventing duplication across environments or using cloud synced data
-# slt.utils.download_resource(".*.json")  # downloads into resource_dir
-# print(slt.Settings.FILE_TO_URL.keys())  # All downloadable resources
+print(slt.__version__)
+print(list(slt.ModelCodes))
 
-print("All available models:")
-print(list(slt.ModelCodes))  # slt.ModelCodeGroups
-# print(list(slt.TextLanguageCodes))
-# print(list(slt.SignLanguageCodes))
-# print(list(slt.SignFormatCodes))
+# Load any model
+# model = slt.get_model("...")
+
+# The core model of the project (rule-based text-to-sign translator)
+# which enables us to generate synthetic training datasets
+print(slt.models.ConcatenativeSynthesis.__doc__)
+
+# print(slt.languages.SignLanguage.__doc__)
+# print(slt.languages.text.Urdu.__doc__)
+# print(slt.Video.__doc__)
+# print(slt.models.MediaPipeLandmarksModel.__doc__)
+# print(slt.models.TransformerLanguageModel.__doc__)
 ```
-
-**Text to Sign Translation**:
-
-```python
-# Load text-to-sign model
-# deep_t2s_model = slt.get_model("t2s-flan-T5-base-01.pt") # pytorch
-# rule-based model (concatenates clips of each word)
-t2s_model = slt.get_model(
-    model_code = "concatenative-synthesis", # slt.ModelCodes.CONCATENATIVE_SYNTHESIS
-    text_language = "urdu", # or object of any child of slt.languages.text.text_language.TextLanguage class
-    sign_language = "pakistan-sign-language", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
-    sign_format = "video", # or object of any child of slt.vision.sign_wrappers.sign.Sign class
-)
-
-text = "HELLO دنیا!" # HELLO treated as an acronym
-sign_language_sentence = t2s_model(text)
-
-# slt_video_object.show() # class: slt.vision.sign_wrappers.video.Video
-# slt_video_object.save(f"sentences/{text}.mp4")
-```
-
-**Sign to Text Translation**
-
-<details>
-<summary>dummy code: (will be finalized in v0.8+)</summary>
-
-```python
-# load sign
-video = slt.Video("video.mp4")
-# features = slt.extract_features(video, "mediapipe_pose_v2_hand_v1")
-
-# Load sign-to-text model
-deep_s2t_model = slt.get_model("gesture_mp_base-01") # pytorch
-
-# translate via single call to pipeline
-# text = deep_s2t_model.translate(video)
-
-# translate via individual steps
-features = deep_s2t_model.extract_features(video.iter_frames())
-encoding = deep_s2t_model.encoder(features)
-# logits = deep_s2t_model.decoder(encoding, token_ids = [0])
-# logits = deep_s2t_model.decoder(encoding, token_ids = [0, logits.argmax(dim=-1)])
-# ...
-tokens = deep_s2t_model.decode(encoding) # uses beam search to generate a token sequence
-text = "".join(tokens) # deep_s2t_model.detokenize(tokens)
-
-print(features.shape)
-print(logits.shape)
-print(text)
-```
-
-</details>
-
-#### Text Language Processor
-
-Process text strings using language specific classes:
-
-```python
-from sign_language_translator.languages.text import Urdu
-ur_nlp = Urdu()
-
-text = "hello جاؤں COVID-19."
-
-normalized_text = ur_nlp.preprocess(text)
-# normalized_text = 'جاؤں COVID-19.' # replace/remove unicode characters
-
-tokens = ur_nlp.tokenize(normalized_text)
-# tokens = ['جاؤں', ' ', 'COVID', '-', '19', '.']
-
-# tagged = ur_nlp.tag(tokens)
-# tagged = [('جاؤں', Tags.SUPPORTED_WORD), (' ', Tags.SPACE), ...]
-
-tags = ur_nlp.get_tags(tokens)
-# tags = [Tags.SUPPORTED_WORD, Tags.SPACE, Tags.ACRONYM, ...]
-
-# word_senses = ur_nlp.get_word_senses("میں")
-# word_senses = [["میں(i)", "میں(in)"]]
-```
-
-#### Sign Language Processor
-
-This processes the text representation of sign language which mainly deals with the video file names. For video processing, see [vision](#vision) section.
-
-```python
-from sign_language_translator.languages.sign import PakistanSignLanguage
-
-psl = PakistanSignLanguage()
-
-tokens = ["he", " ", "went", " ", "to", " ", "school", "."]
-tags = 3 * [Tags.WORD, Tags.SPACE] + [Tags.WORD, Tags.PUNCTUATION]
-tokens, tags, _ = psl.restructure_sentence(tokens, tags) # ["he", "school", "go"]
-signs  = psl.tokens_to_sign_dicts(tokens, tags)
-# signs = [
-#   {'signs': [['pk-hfad-1_وہ']], 'weights': [1.0]},
-#   {'signs': [['pk-hfad-1_school']], 'weights': [1.0]},
-#   {'signs': [['pk-hfad-1_گیا']], 'weights': [1.0]}
-# ]
-```
-
-#### Vision
-
-<details>
-<summary>dummy code: (will be finalized in v0.7)</summary>
-
-```python
-import sign_language_translator as slt
-
-# load video
-video = slt.Video("sign.mp4")
-print(video.duration(), video.shape)
-
-# extract features
-# model = slt.get_model(slt.ModelCodes.MEDIAPIPE_POSE_V2_HAND_V1)
-model = slt.models.MediaPipeLandmarksModel()  # default args
-embedding = model.embed(video.frames(), landmark_type="world") # torch.Tensor
-print(embedding.shape)  # (n_frames, n_landmarks * 5)
-
-# embed dataset
-# slt.models.utils.VideoEmbeddingPipeline(model).process_videos_parallel(
-#     ["dataset/*.mp4"], n_processes=12, save_format="csv", ...
-# )
-
-# transform / augment data
-sign = slt.MediaPipeSign(embedding, landmark_type="world")
-sign = sign.rotate(60, 10, 90, degrees=True)
-sign = sign.transform(slt.vision.transformations.ZoomLandmarks(1.1, 0.9, 1.0))
-
-# plot
-video_visualization = sign.video()
-image_visualization = sign.image(steps=5)
-overlay_visualization = sign.overlay(video)
-
-# display
-video_visualization.show()
-image_visualization.show()
-overlay_visualization.show()
-```
-
-</details>
-
-#### Language models
-
-<details>
-<summary>Simple statistical n-gram model:</summary>
-
-```python
-from sign_language_translator.models.language_models import NgramLanguageModel
-
-names_data = [
-    '[abeera]', '[areej]',  '[farida]',  '[hiba]',    '[kinza]',
-    '[mishal]', '[nimra]',  '[rabbia]',  '[tehmina]', '[zoya]',
-    '[amjad]',  '[atif]',   '[farhan]',  '[huzaifa]', '[mudassar]',
-    '[nasir]',  '[rizwan]', '[shahzad]', '[tayyab]',  '[zain]',
-]
-
-# train an n-gram model (considers previous n tokens to predict)
-model = NgramLanguageModel(window_size=2, unknown_token="")
-model.fit(names_data)
-
-# inference loop
-name = '[r'
-for _ in range(10):
-    nxt, prob = model.next(name) # selects next token randomly from learnt probability distribution
-    name += nxt
-    if nxt in [']' , model.unknown_token]:
-        break
-print(name)
-# '[rabeej]'
-
-# see ngram model's implementation
-print(model.__dict__)
-```
-
-</details>
-
-<details>
-<summary>Mash up multiple language models & complete generation through beam search:</summary>
-
-```python
-from sign_language_translator.models.language_models import MixerLM, BeamSampling, NgramLanguageModel
-
-# using data from previous example
-names_data = [...] # or slt.languages.English().vocab.person_names # concat start/end symbols
-
-# train models
-SLMs = [
-    NgramLanguageModel(window_size=size, unknown_token="")
-    for size in range(1,4)
-]
-[lm.fit(names_data) for lm in SLMs]
-
-# randomly select a model and infer through it
-mixed_model = MixerLM(
-    models=SLMs,
-    selection_probabilities=[1,2,4],
-    unknown_token="",
-    model_selection_strategy = "choose", # "merge"
-)
-print(mixed_model)
-# Mixer LM: unk_tok=""[3]
-# ├── Ngram LM: unk_tok="", window=1, params=85 | prob=14.3%
-# ├── Ngram LM: unk_tok="", window=2, params=113 | prob=28.6%
-# └── Ngram LM: unk_tok="", window=3, params=96 | prob=57.1%
-
-# use Beam Search to find high likelihood names
-sampler = BeamSampling(mixed_model, beam_width=3) #, scoring_function = ...)
-name = sampler.complete('[')
-print(name)
-# [rabbia]
-```
-
-</details>
-
-<details open>
-<summary>Write sentences composed of only those words for which sign videos are available so that the rule-based text-to-sign model can generate training examples for a deep learning model:</summary>
-
-```python
-from sign_language_translator.models.language_models import TransformerLanguageModel
-
-# model = slt.get_model("ur-supported-gpt")
-model = TransformerLanguageModel.load("models/tlm_14.0M.pt")
-# sampler = BeamSampling(model, ...)
-# sampler.complete(["<"])
-
-# see probabilities of all tokens
-model.next_all(["میں", " ", "وزیراعظم", " ",])
-# (["سے", "عمران", ...], [0.1415926535, 0.7182818284, ...])
-```
-
-</details>
 
 ## Models
 
@@ -723,7 +434,7 @@ Remember to contribute back to the community:
 
 - Optimize the codebase by implementing techniques like parallel processing and batching.
 - Strengthen the project's documentation with clear docstrings, illustrative usage scenarios, and robust test coverage.
-- Contribute to the documentation for [sign-language-translator.readthedocs.io](https://sign-language-translator.readthedocs.io) to empower users with comprehensive insights.
+- Contribute to the documentation for [sign-language-translator readthedocs](https://github.com/sign-language-translator/sign-language-translator/blob/main/docs/index.rst) to empower users with comprehensive insights.
 
 </details>
 
@@ -752,6 +463,7 @@ Stay Tuned!
 # concatenative synthesis returns features
 # subtitles
 # make scraping dependencies optional (beautifulsoup4, deep_translator)
+# change all "import ..." to "from ... import ..."
 # GUI with gradio
 ```
 
@@ -764,7 +476,6 @@ Stay Tuned!
 # clean demonstration notebooks
 # expand reference clip data by scraping everything
 # data info table
-# https://sign-language-translator.readthedocs.io/en/latest/
 # sequence diagram for creating a translator
 ```
 

@@ -7,6 +7,7 @@ license = "Apache-2.0"
 readme = "README.md"
 packages = [{include = "sign_language_translator"}]
 repository = "https://github.com/sign-language-translator/sign-language-translator"
+documentation = "https://sign-language-translator.readthedocs.io/en/latest/"
 keywords = ["sign-language", "sign-language-translation", "nlp", "computer-vision", "deep-learning", "ai", "translation", "translator", "sign-language-translator", "rule-based"]
 
 [tool.poetry.dependencies]
