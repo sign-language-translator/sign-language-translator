@@ -12,7 +12,7 @@
    1. [Solution](#solution)
    2. [Major Components and Goals](#major-components-and-goals)
 2. [How to install the package](#how-to-install-the-package)
-3. <b style="font-size:large;">[Usage](#usage)</b>
+3. [<b style="font-size:large;">Usage</b>](#usage)
 4. [Models](#models)
 5. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
 6. [Directory Tree](#directory-tree)
@@ -196,17 +196,17 @@ print(list(slt.ModelCodes))
 # Load any model
 # model = slt.get_model("...")
 
-print(slt.__doc__)
+help(slt)
 
 # The core model of the project (rule-based text-to-sign translator)
 # which enables us to generate synthetic training datasets
 print(slt.models.ConcatenativeSynthesis.__doc__)
 
-# print(slt.languages.SignLanguage.__doc__)
-# print(slt.languages.text.Urdu.__doc__)
-# print(slt.Video.__doc__)
-# print(slt.models.MediaPipeLandmarksModel.__doc__)
-# print(slt.models.TransformerLanguageModel.__doc__)
+# help(slt.languages.SignLanguage)
+# help(slt.languages.text.Urdu)
+# help(slt.Video)
+# help(slt.models.MediaPipeLandmarksModel)
+# help(slt.models.TransformerLanguageModel)
 ```
 
 ## Models
@@ -566,7 +566,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **7378** + Tests: **1171**):
+Count total number of **lines of code** (Package: **8868** + Tests: **1244**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
