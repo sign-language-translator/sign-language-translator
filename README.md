@@ -6,13 +6,13 @@
 
 ![Release Workflow Status](https://img.shields.io/github/actions/workflow/status/sign-language-translator/sign-language-translator/release.yml?branch=main)
 [![codecov](https://codecov.io/gh/sign-language-translator/sign-language-translator/branch/main/graph/badge.svg)](https://codecov.io/gh/sign-language-translator/sign-language-translator)
-[![Documentation Status](https://readthedocs.org/projects/sign-language-translator/badge/?version=latest)](https://sign-language-translator.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/sign-language-translator/badge/?version=latest)](https://sign-language-translator.readthedocs.io/)
 
 1. [Overview](#overview)
    1. [Solution](#solution)
    2. [Major Components and Goals](#major-components-and-goals)
 2. [How to install the package](#how-to-install-the-package)
-3. [Usage](#usage)
+3. <b style="font-size:large;">[Usage](#usage)</b>
 4. [Models](#models)
 5. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
 6. [Directory Tree](#directory-tree)
@@ -35,9 +35,9 @@ A bigger hurdle is the lack of datasets and frameworks that deep learning engine
 
 ### Solution
 
-We've have built an *extensible rule-based* text-to-sign translation system that can be used to generate training data for *Deep Learning* models for both sign to text & text to sign translation.
+I've have built an *extensible rule-based* text-to-sign translation system that can be used to generate training data for *Deep Learning* models for both sign to text & text to sign translation.
 
-To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. To write sample texts of supported words, you can use our language models. Then, you can use that system to fine-tune our AI models.
+To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. To write sample texts of supported words, you can use our language models. Then, you can use that system to fine-tune our AI models. See the [documentation](https://sign-language-translator.readthedocs.io) for more.
 
 ### Major Components and Goals
 
@@ -163,15 +163,18 @@ pip install -e git+https://github.com/sign-language-translator/sign-language-tra
 
 ## Usage
 
-Head over to [sign-language-translator.**readthedocs**.io](https://sign-language-translator.readthedocs.io) to see the detailed usage in Python, Command line and GUI.
+Head over to <span style="font-size:large;">[sign-language-translator.**readthedocs**.io](https://sign-language-translator.readthedocs.io)</span> to see the detailed usage in Python, Command line and GUI.
 
-See the [*test cases*](https://github.com/sign-language-translator/sign-language-translator/tree/main/tests) or [the *notebooks* repo](https://github.com/sign-language-translator/notebooks) to see the internal code in action.
+See the [*test cases*](https://github.com/sign-language-translator/sign-language-translator/blob/main/tests) or the [*notebooks* repo](https://github.com/sign-language-translator/notebooks) to see the internal code in action.
+
+Also see [How to build a custom sign language translator](#how-to-build-a-translator-for-sign-language).
 
 ```bash
 $ slt
 
 Usage: slt [OPTIONS] COMMAND [ARGS]...
    Sign Language Translator (SLT) command line interface.
+   Documentation: https://sign-language-translator.readthedocs.io
 Options:
   --version  Show the version and exit.
   --help     Show this message and exit.
@@ -183,6 +186,8 @@ Commands:
 ```
 
 ```python
+# Documentation: https://sign-language-translator.readthedocs.io
+
 import sign_language_translator as slt
 
 print(slt.__version__)
@@ -190,6 +195,8 @@ print(list(slt.ModelCodes))
 
 # Load any model
 # model = slt.get_model("...")
+
+print(slt.__doc__)
 
 # The core model of the project (rule-based text-to-sign translator)
 # which enables us to generate synthetic training datasets
@@ -246,7 +253,7 @@ print(slt.models.ConcatenativeSynthesis.__doc__)
 
 | Name                        | Architecture                                                                                                               | Description                                                                                                  | Input format                                         | Output format                       |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | ----------------------------------- |
-| [MediaPipe Landmarks<br>(Pose + Hands)](https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py) | CNN based pipelines. See Here: [Pose](https://arxiv.org/pdf/2006.10204.pdf), [Hands](https://arxiv.org/pdf/2006.10214.pdf) | Encodes videos into pose vectors (3D world or 2D image) depicting the movements of the performer. | List of numpy images<br/>(n_frames, height, width, channels) | torch.Tensor<br/>(n_frames, n_landmarks * 5) |
+| [MediaPipe Landmarks<br>(Pose + Hands)](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py) | CNN based pipelines. See Here: [Pose](https://arxiv.org/pdf/2006.10204.pdf), [Hands](https://arxiv.org/pdf/2006.10214.pdf) | Encodes videos into pose vectors (3D world or 2D image) depicting the movements of the performer. | List of numpy images<br/>(n_frames, height, width, channels) | torch.Tensor<br/>(n_frames, n_landmarks * 5) |
 </details>
 
 <details>
@@ -256,8 +263,8 @@ print(slt.models.ConcatenativeSynthesis.__doc__)
 
 | Name                           | Architecture                    | Description                                                                  | Input format                                                 | Output format                                                        |
 | ------------------------------ | ------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------- |
-| [N-Gram Langauge Model](https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/ngram_language_model.py)      | Hash Tables                     | Predicts the next token based on learned statistics about previous N tokens. | List of tokens                                               | (token, probability)                                                 |
-| [Transformer Language Model](https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/transformer_language_model/model.py) | Decoder-only Transformers (GPT) | Predicts next token using query-key-value attention, linear transformations and soft probabilities.   | torch.Tensor<br/>(batch, token_ids)<br/><br/>List of tokens | torch.Tensor<br/>(batch, token_ids, vocab_size)<br/><br/>(token, probability) |
+| [N-Gram Langauge Model](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/ngram_language_model.py)      | Hash Tables                     | Predicts the next token based on learned statistics about previous N tokens. | List of tokens                                               | (token, probability)                                                 |
+| [Transformer Language Model](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/model.py) | Decoder-only Transformers (GPT) | Predicts next token using query-key-value attention, linear transformations and soft probabilities.   | torch.Tensor<br/>(batch, token_ids)<br/><br/>List of tokens | torch.Tensor<br/>(batch, token_ids, vocab_size)<br/><br/>(token, probability) |
 </details>
 
 <!--
@@ -327,17 +334,22 @@ Remember to contribute back to the community:
 - Share your data, code, and models by creating a pull request (PR), allowing others to benefit from your efforts.
 - Create your own sign language translator (e.g. as your university thesis) and contribute to a more inclusive and accessible world.
 
+See more at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators)
+
 ## Directory Tree
 
 <pre>
 <b style="font-size:large;">sign-language-translator</b>
+├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/.readthedocs.yaml">.readthedocs.yaml</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/MANIFEST.in">MANIFEST.in</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/README.md">README.md</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/poetry.lock">poetry.lock</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/pyproject.toml">pyproject.toml</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/requirements.txt">requirements.txt</a>
+├── <b>docs</b>
+│   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/docs">*</a>
 ├── <b>tests</b>
-│   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/tests">*</a>
+│   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/tests">*</a>
 │
 └── <b style="font-size:large;">sign_language_translator</b>
     ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/cli.py">cli.py</a>
@@ -348,63 +360,73 @@ Remember to contribute back to the community:
     │   └── <i><a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/urls.yaml">urls.yaml</a></i>
     │
     ├── <b>data_collection</b>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/data_collection/completeness.py">completeness.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/data_collection/scraping.py">scraping.py</a>
-    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/data_collection/synonyms.py">synonyms.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/data_collection/completeness.py">completeness.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/data_collection/scraping.py">scraping.py</a>
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/data_collection/synonyms.py">synonyms.py</a>
     │
     ├── <b>languages</b>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/utils.py">utils.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/vocab.p">vocab.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/utils.py">utils.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/vocab.p">vocab.py</a>
     │   ├── sign
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/sign/mapping_rules.py">mapping_rules.py</a>
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/sign/pakistan_sign_language.py">pakistan_sign_language.py</a>
-    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/sign/sign_language.py">sign_language.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/mapping_rules.py">mapping_rules.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py">pakistan_sign_language.py</a>
+    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/sign_language.py">sign_language.py</a>
     │   │
     │   └── text
-    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/text/english.py">english.py</a>
-    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/text/text_language.py">text_language.py</a>
-    │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/languages/text/urdu.py">urdu.py</a>
+    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/english.py">english.py</a>
+    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/text_language.py">text_language.py</a>
+    │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/urdu.py">urdu.py</a>
     │
     ├── <b>models</b>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/_utils.py">_utils.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/utils.py">utils.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/_utils.py">_utils.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/utils.py">utils.py</a>
     │   ├── language_models
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/abstract_language_model.py">abstract_language_model.py</a>
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/beam_sampling.py">beam_sampling.py</a>
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/mixer.py">mixer.py</a>
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/ngram_language_model.py">ngram_language_model.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/abstract_language_model.py">abstract_language_model.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/beam_sampling.py">beam_sampling.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/mixer.py">mixer.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/ngram_language_model.py">ngram_language_model.py</a>
     │   │   └── transformer_language_model
-    │   │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/transformer_language_model/layers.py">layers.py</a>
-    │   │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/transformer_language_model/model.py">model.py</a>
-    │   │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/language_models/transformer_language_model/train.py">train.py</a>
+    │   │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/layers.py">layers.py</a>
+    │   │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/model.py">model.py</a>
+    │   │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/train.py">train.py</a>
     │   │
     │   ├── sign_to_text
     │   ├── text_to_sign
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py">concatenative_synthesis.py</a>
-    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/text_to_sign/t2s_model.py">t2s_model.py</a>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py">concatenative_synthesis.py</a>
+    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/t2s_model.py">t2s_model.py</a>
     │   │
     │   └── video_embedding
-    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py">mediapipe_landmarks_model.py</a>
-    │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/video_embedding/video_embedding_model.py">video_embedding_model.py</a>
+    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py">mediapipe_landmarks_model.py</a>
+    │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/video_embedding_model.py">video_embedding_model.py</a>
     │
     ├── <i><b>sign-language-resources</b></i> (auto-downloaded)
     │   └── <a href="https://github.com/sign-language-translator/sign-language-datasets">*</a>
     │
     ├── <b>text</b>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/metrics.py">metrics.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/preprocess.py">preprocess.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/subtitles.py">subtitles.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/tagger.py">tagger.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/tokenizer.py">tokenizer.py</a>
-    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/text/utils.py">utils.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/metrics.py">metrics.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/preprocess.py">preprocess.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/subtitles.py">subtitles.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/tagger.py">tagger.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/tokenizer.py">tokenizer.py</a>
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/utils.py">utils.py</a>
     │
     ├── <b>utils</b>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/download.py">download.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/tree.py">tree.py</a>
-    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/utils/utils.py">utils.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/arrays.py">arrays.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/download.py">download.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/tree.py">tree.py</a>
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/utils.py">utils.py</a>
     │
     └── <b>vision</b>
-        └── <a href="https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/vision/utils.py">utils.py</a>
+        ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/utils.py">utils.py</a>
+        ├── landmarks
+        ├── sign
+        │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/sign/sign.py">sign.py</a>
+        │
+        └── video
+            ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/video_iterators.py">video_iterators.py</a>
+            ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/display.py">display.py</a>
+            ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/transformations.py">transformations.py</a>
+            └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/video.py">video.py</a>
 </pre>
 
 ## How to Contribute
@@ -434,7 +456,7 @@ Remember to contribute back to the community:
 
 - Optimize the codebase by implementing techniques like parallel processing and batching.
 - Strengthen the project's documentation with clear docstrings, illustrative usage scenarios, and robust test coverage.
-- Contribute to the documentation for [sign-language-translator readthedocs](https://github.com/sign-language-translator/sign-language-translator/blob/main/docs/index.rst) to empower users with comprehensive insights.
+- Contribute to the documentation for [sign-language-translator ReadTheDocs](https://github.com/sign-language-translator/sign-language-translator/blob/main/docs/index.rst) to empower users with comprehensive insights. Currently it needs a template for auto-generated pages.
 
 </details>
 
@@ -456,15 +478,14 @@ Stay Tuned!
 <summary>CLEAN_ARCHITECTURE_VISION: v0.7</summary>
 
 ```python
+# concatenative synthesis returns videos
+# video transformations
 # class according to feature type:
    # landmarks
-# video transformations
 # landmark augmentation
-# concatenative synthesis returns features
 # subtitles
-# make scraping dependencies optional (beautifulsoup4, deep_translator)
-# change all "import ..." to "from ... import ..."
-# GUI with gradio
+# trim signs before concatenation
+# stabilize video batch using landmarks
 ```
 
 </details>
@@ -477,6 +498,8 @@ Stay Tuned!
 # expand reference clip data by scraping everything
 # data info table
 # sequence diagram for creating a translator
+# GUI with gradio
+# make scraping dependencies optional (beautifulsoup4, deep_translator) (pyyaml -> json). remove overly specific scrapping functions
 ```
 
 </details>
@@ -485,14 +508,16 @@ Stay Tuned!
 <summary>DEEP_TRANSLATION: v0.8-v1.x</summary>
 
 ```python
+# host video dataset online, descriptive filenames, zip extraction
+# parallel text corpus
+# sign to text with custom seq2seq transformer
 # sign to text with fine-tuned whisper
 # pose vector generation with fine-tuned flan-T5
 # motion transfer
 # pose2video: stable diffusion or GAN?
 # speech to text
 # text to speech
-# LanguageModel: experiment by dropping space tokens
-# parallel text corpus
+# LanguageModel: experiment by dropping space tokens & bidirectional prediction
 ```
 
 </details>
@@ -523,7 +548,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-09-18.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-11-01.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -532,7 +557,7 @@ This project started in October 2021 as a BS Computer Science final year project
 - Rabbia Arshad for help in initial R&D and web development.
 - Waqas Bin Abbas for assistance in initial video data collection process.
 - Kamran Malik for setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
-- [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing for collaboration and providing the reference clips, hearing-impaired performers for data creation, and creating the text2gloss dataset.
+- [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing to collaborate and providing the reference clips, hearing-impaired performers for data creation, and creating the text2gloss dataset.
 - [UrduHack](https://github.com/urduhack/urduhack) (espacially Ikram Ali) for their work on Urdu character normalization.
 
 - [Telha Bilal](https://github.com/TelhaBilal) for help in designing the architecture of some modules.
@@ -541,7 +566,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **7059** + Tests: **957**):
+Count total number of **lines of code** (Package: **7378** + Tests: **1171**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

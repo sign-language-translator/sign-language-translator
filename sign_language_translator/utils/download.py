@@ -40,6 +40,8 @@ def download(
         overwrite (bool, optional): If False, skips downloading if the file already exists. Defaults to False.
         progress_bar (bool, optional): If True, displays a progress bar during the download. Defaults to False.
         timeout (int, optional): The maximum number of seconds to wait for a server response. Defaults to 20.0.
+        leave (bool, optional): Wether to leave the progress bar behind after the download. Defaults to True.
+        chunk_size (int, optional): The number of bytes to fetch in each step. Defaults to 65536.
 
     Returns:
         bool: True if the file is downloaded successfully, False otherwise.
@@ -49,12 +51,13 @@ def download(
     """
 
     # TODO: resume failed download
+    # TODO: separate threads for download and writing (implement queue(s))
 
     if os.path.exists(file_path) and not overwrite:
         raise FileExistsError(f"There is already a file at {file_path}")
 
     try:
-        response = requests.get(url, stream=True, timeout=timeout)
+        response = requests.get(url, stream=True, timeout=timeout, allow_redirects=True)
         response.raise_for_status()
 
         if os.path.dirname(file_path):
@@ -111,6 +114,8 @@ def download_resource(
         overwrite (bool, optional): If False, skips downloading if the resource file already exists. Defaults to False.
         progress_bar (bool, optional): If True, displays a progress bar during the download. Defaults to False.
         timeout (float, optional): The maximum number of seconds to wait for a server response. Defaults to 20.0.
+        leave (bool, optional): Wether to leave the progress bar behind after the download. Defaults to True.
+        chunk_size (int, optional): The number of bytes to fetch in each step. Defaults to 65536.
 
     Returns:
         bool: True if all resources are downloaded successfully or already exist, False otherwise.

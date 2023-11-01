@@ -110,7 +110,7 @@ def test_recordings_labels():
         return
 
     filepaths = glob(os.path.join(ref_clips_path, "**", "*.mp4"))
-    # :TODO: [-1][:-4] after files renamed to sign-collection_label_person_camera.mp4
+    # TODO: [-1][:-4] after files renamed to sign-collection_label_person_camera.mp4
     file_labels = [
         (Settings.FILENAME_SEPARATOR.join(p.split(os.sep)[-2:]))[:-4] for p in filepaths
     ]

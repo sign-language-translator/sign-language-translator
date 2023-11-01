@@ -386,7 +386,7 @@ class VideoEmbeddingPipeline:
         # TODO: handle batched data
 
         video = self.__read_video(path)
-        embedding = self.__embed_video(video, **kwargs)
+        embedding = self.__embed_video(video, **kwargs) # TODO: frames progress callback
         self.__save_embedding(
             embedding,
             basename(path),

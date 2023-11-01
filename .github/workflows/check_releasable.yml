@@ -39,12 +39,16 @@ jobs:
       - name: Install dependencies and the Package
         run: |
           python -m pip install --upgrade pip
-          pip install twine "pytest==7.4.0"
+          pip install "twine==4.0.2" "pytest==7.4.0"
           poetry install
 
       - name: Run tests
         run: |
           poetry run pytest -vv
+
+      - name: Append Build Number to version
+        run: |
+          poetry version "$(poetry version -s).$(date +%Y%m%d%H%M%S)"
 
       - name: Build
         run: |

@@ -3,7 +3,8 @@ Sign Language Translator (SLT) Command Line Interface
 
 This module provides a command line interface (CLI) for the Sign Language Translator (SLT) library.
 It allows you to perform various operations such as translating text to sign language or vice versa,
-downloading resource files & completing text sequences using Language Models.
+downloading resource files, completing text sequences using Language Models & embedding videos into
+sequences of vectors.
 
 Usage:
     slt [OPTIONS] COMMAND [ARGS]...
@@ -28,7 +29,10 @@ from sign_language_translator import __version__
 @click.group()
 @click.version_option(__version__)
 def slt():
-    """Sign Language Translator (SLT) command line interface."""
+    """
+    Sign Language Translator (SLT) command line interface.
+    Documentation: https://sign-language-translator.readthedocs.io
+    """
 
 
 # @slt.command()

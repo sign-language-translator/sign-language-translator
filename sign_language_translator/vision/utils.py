@@ -2,11 +2,11 @@
 """
 
 from mimetypes import guess_type
-from typing import Generator, List
+from typing import Generator, List, Sequence, Tuple
 
 import cv2
-from numpy.typing import NDArray
 from numpy import uint8
+from numpy.typing import NDArray
 
 __all__ = [
     "read_frames_with_opencv",
@@ -45,7 +45,7 @@ def iter_frames_with_opencv(path: str) -> Generator[NDArray[uint8], None, None]:
         path (str): The path to the video or image file.
 
     Returns:
-        Generator[NDArray, None, None]: numpy array representing a frame from the video. Sends None. Returns None.
+        Generator[NDArray, None, None]: yields numpy arrays representing frames from the video (W, H, C).
 
     Raises:
         FileNotFoundError: If the video file is not found or cannot be opened.
@@ -56,17 +56,63 @@ def iter_frames_with_opencv(path: str) -> Generator[NDArray[uint8], None, None]:
         raise ValueError(f"unknown file type: {file_type}")
 
     if file_type.startswith("image"):
-        yield cv2.imread(path)[..., ::-1]  # pylint: disable = no-member
+        frame = cv2.imread(path)
+        yield cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # type: ignore
 
     elif file_type.startswith("video"):
-        capture = cv2.VideoCapture(path)  # pylint: disable = no-member
-        for _ in range(
-            int(capture.get(cv2.CAP_PROP_FRAME_COUNT))  # pylint: disable = no-member
-        ):
+        capture = cv2.VideoCapture(path)
+        for _ in range(int(capture.get(cv2.CAP_PROP_FRAME_COUNT))):
             ret, frame = capture.read()
             if not ret:
                 break
 
-            yield frame[..., ::-1]
+            yield cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # type: ignore
 
         capture.release()
+
+
+def _normalize_args_index_and_timestamp(
+    timestamp: float | None, index: int | None, max_duration: float, max_index: int
+) -> Tuple[float, int]:
+    if (timestamp is not None) and index is None:
+        if not 0 <= timestamp <= max_duration:
+            raise ValueError(
+                f"timestamp must be between 0 and {max_duration}, but got {timestamp}"
+            )
+
+        return timestamp, round(
+            (timestamp / max_duration if max_duration else 1) * max_index
+        )
+
+    elif (index is not None) and timestamp is None:
+        if not 0 <= index <= max_index:
+            raise ValueError(
+                f"index must be between 0 and {max_index}, but got {index}."
+            )
+
+        return index / (max_index or 1) * max_duration, index
+
+    else:
+        raise ValueError("provide either timestamp or index.")
+
+
+def _validate_and_normalize_slices(
+    keys: int | slice | Sequence[int | slice], max_n_dims: int = 4
+) -> Tuple[slice, ...]:
+    if not isinstance(keys, Sequence):
+        keys = [keys]
+
+    slices = []
+    for i, key in enumerate(keys):
+        if key is Ellipsis:
+            slices += [slice(None)] * (max_n_dims - len(keys) + 1)
+        elif isinstance(key, int):
+            slices.append(slice(key, key + 1))
+        elif isinstance(key, slice):
+            slices.append(key)
+        else:
+            raise ValueError(
+                f"Invalid argument: {key} at index {i}. Provide either an integer, slice or ellipsis."
+            )
+
+    return tuple(slices)

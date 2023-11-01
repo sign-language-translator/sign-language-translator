@@ -92,3 +92,35 @@ def test_pakistan_token_to_sign():
     expected_signs_2[1]["signs"] = expected_signs_2[1]["signs"][::-1]
 
     assert signs in [expected_signs_1, expected_signs_2]
+
+    assert [
+        {"signs": [["pk-hfad-1_10"]], "weights": [1.0]}
+    ] == psl.tokens_to_sign_dicts("10")
+
+    try:
+        psl.tokens_to_sign_dicts("2u14ujvdfhrfhvbh12")
+    except ValueError:
+        pass
+    try:
+        psl.tokens_to_sign_dicts(["i"], [Tags.AMBIGUOUS])
+    except ValueError:
+        pass
+
+
+def test_psl():
+    psl = get_pakistan_sl_object()
+
+    if psl is None:
+        warnings.warn(
+            "Pakistan Sign Language object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
+        )
+        return
+
+    psl.STOPWORDS.add("the")
+    signs = psl(["1,010", "the", "102"], [Tags.NUMBER, Tags.WORD, Tags.NUMBER])  # type: ignore
+    assert signs == [
+        {"signs": [["pk-hfad-1_10"]], "weights": [1.0]},
+        {"signs": [["pk-hfad-1_10"]], "weights": [1.0]},
+        {"signs": [["pk-hfad-1_10"]], "weights": [1.0]},
+        {"signs": [["pk-hfad-1_v(single-handed-letter)"]], "weights": [1.0]},
+    ]

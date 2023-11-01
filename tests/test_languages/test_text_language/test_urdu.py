@@ -1,4 +1,5 @@
 import os
+import re
 import warnings
 
 from sign_language_translator import Settings
@@ -32,7 +33,24 @@ def test_urdu_preprocessor():
     ]
     processes_texts = list(map(ur_nlp.preprocess, raw_texts))
 
+    assert ur_nlp.remove_diacritics("اُن کا۔") == "ان کا۔"
+    assert (
+        re.sub(
+            f"[{''.join(map(re.escape, ur_nlp.allowed_characters()))}]",
+            "",
+            "اُن four کا۔",
+        )
+        == "four"
+    )
+
     assert processes_texts == expected_texts
+
+    # english: today my heart says: "hello world!".
+    # Urdu: ہم آج کل یہ
+
+    assert ur_nlp.poetry_preprocessor("آج مرا دل کر رہا ہے۔") == "آج میرا دل کر رہا ہے۔"
+    assert ur_nlp.passage_preprocessor(" دل کر   رہا ہے۔") == "دل کر رہا ہے۔"
+    assert ur_nlp.wikipedia_preprocessor(" دل کر   رہا ہے۔...\n") == "دل کر   رہا ہے۔"
 
 
 def test_urdu_tokenizer():
@@ -48,7 +66,7 @@ def test_urdu_tokenizer():
         "hello world!",
         "صبح ۸ بجے، اور شام ۹:۳۰پر",
         "سبحان(نام) اسلام آباد جا رہا ہے۔",  # "اسلام آباد سے وہ آئے"
-        # :TODO: ["word(word-sense)", "word"]
+        # TODO: ["word(word-sense)", "word"]
     ]
     expected_tokenized = [
         ["hello", " ", "world", "!"],
@@ -57,6 +75,10 @@ def test_urdu_tokenizer():
     ]
     tokenized = list(map(ur_nlp.tokenize, raw_texts))
     assert tokenized == expected_tokenized
+    assert raw_texts[0] == ur_nlp.detokenize(tokenized[0])
+
+    assert ur_nlp.tag("COVID") == [("COVID", Tags.ACRONYM)]
+    assert ur_nlp.get_tags("COVID") == [Tags.ACRONYM]
 
 
 def test_urdu_sentence_tokenizer():
@@ -109,6 +131,8 @@ def test_urdu_tagger():
     ]
     tags = list(map(ur_nlp.get_tags, tokens))
     assert tags == expected_tags
+
+    assert repr(Tags.ACRONYM) == "Tags.ACRONYM"
 
 
 def test_word_senses():

@@ -45,7 +45,8 @@ def set_resources_dir(path: str) -> None:
         AssertionError: If the provided path is not a directory.
     """
 
-    assert isdir(path), f"the provided path is not a directory. Path: {path}"
+    if not isdir(path):
+        raise ValueError(f"the provided path is not a directory. Path: {path}")
 
     Settings.RESOURCES_ROOT_DIRECTORY = path
     # ? trigger an event
