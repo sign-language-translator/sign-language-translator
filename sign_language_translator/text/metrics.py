@@ -4,8 +4,6 @@
 from math import log2
 from typing import Any, Iterable, Set
 
-import numpy
-
 
 class Perplexity:
     """
@@ -57,44 +55,44 @@ class Perplexity:
         return perplexity
 
 
-def cosine_similiarity(text1, text2):
-    # word_embedding = word2embd[word]
-    # similarities   = cosine_similarity( word_embedding.reshape(1,-1),
-    #                                     supported_words_embeddings    ).flatten()
-    # smilarities.argsort()[-top_n:] # get indexes of top 5 values in array
-    # top_n_thresh_indexes = to
+# def cosine_similiarity(text1, text2):
+#     # word_embedding = word2embd[word]
+#     # similarities   = cosine_similarity( word_embedding.reshape(1,-1),
+#     #                                     supported_words_embeddings    ).flatten()
+#     # smilarities.argsort()[-top_n:] # get indexes of top 5 values in array
+#     # top_n_thresh_indexes = to
 
-    return 1.0
-
-
-def word_error_rate(reference, candidate):
-    # pip install jiwer
-    return 1.0
+#     return 1.0
 
 
-def rouge(reference, candidate):
-    # use counters
-    ref = set(reference)
-    return len(set(candidate) & ref) / len(ref)
+# def word_error_rate(reference, candidate):
+#     # pip install jiwer
+#     return 1.0
 
 
-def bleu(reference, candidate):
-    # use counters
-    can = set(candidate)
-    return len(set(reference) & can) / len(can)
+# def rouge(reference, candidate):
+#     # use counters
+#     ref = set(reference)
+#     return len(set(candidate) & ref) / len(ref)
 
 
-def f1_score(reference, candidate):
-    bleu_score = bleu(reference, candidate)
-    rogue_score = rouge(reference, candidate)
+# def bleu(reference, candidate):
+#     # use counters
+#     can = set(candidate)
+#     return len(set(reference) & can) / len(can)
 
-    return 2 * bleu_score * rogue_score / ((bleu_score + rogue_score) or 1)
+
+# def f1_score(reference, candidate):
+#     bleu_score = bleu(reference, candidate)
+#     rogue_score = rouge(reference, candidate)
+
+#     return 2 * bleu_score * rogue_score / ((bleu_score + rogue_score) or 1)
 
 
-def normpdf(x: float, mean: float, std: float):
-    denominator = std * ((2.0 * numpy.pi) ** 0.5)
-    numerator = numpy.exp(-0.5 * ((x - mean) / std) ** 2)
-    return numerator / denominator
+# def normpdf(x: float, mean: float, std: float):
+#     denominator = std * ((2.0 * numpy.pi) ** 0.5)
+#     numerator = numpy.exp(-0.5 * ((x - mean) / std) ** 2)
+#     return numerator / denominator
 
 
 __all__ = [

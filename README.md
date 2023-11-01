@@ -12,7 +12,7 @@
    1. [Solution](#solution)
    2. [Major Components and Goals](#major-components-and-goals)
 2. [How to install the package](#how-to-install-the-package)
-3. [<b style="font-size:large;">Usage</b>](#usage)
+3. [**Usage**](#usage)
 4. [Models](#models)
 5. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
 6. [Directory Tree](#directory-tree)

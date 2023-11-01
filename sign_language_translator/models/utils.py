@@ -87,7 +87,7 @@ def top_p_top_k_indexes(
     """
 
     if top_p is None and top_k is None:
-        return list(range(len(probabilities)))  # type: ignore
+        return sorted(range(len(probabilities)), key=lambda i: probabilities[i], reverse=True)  # type: ignore
 
     probs = torch.Tensor(probabilities)
 

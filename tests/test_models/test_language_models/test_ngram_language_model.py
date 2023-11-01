@@ -24,3 +24,12 @@ def test_ngram_language_model():
     for _ in range(5):
         generation, _ = sampler.complete("[")
         assert match(r"\[ab+c?\]?", generation)  # type: ignore
+
+
+    mix.strategy = "choose"
+    tokens, probs = mix.next_all("[")
+    assert abs(sum(probs) - 1) < 0.0001
+    assert set(tokens) <= {"a", "b", "c", "[", "]"}
+
+    assert str(mix) is not None
+    

@@ -17,4 +17,5 @@ def test_set_resource_dir():
     except ValueError:
         pass
 
+    os.makedirs(default, exist_ok=True)
     slt.set_resources_dir(default)
