@@ -197,7 +197,7 @@ model = slt.models.ConcatenativeSynthesis(
 )
 text = "سیب اچھا ہے"
 sign = model.translate(text) # tokenize, map, download & concatenate
-sign.show(inline_player="html5")
+sign.show(inline_player="html5") # jupyter notebook
 sign.save(f"{text}.mp4")
 
 # # Load any model
@@ -216,7 +216,7 @@ sign.save(f"{text}.mp4")
 # help(slt.models.TransformerLanguageModel)
 ```
 
-![apple-is-good](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/eb7f0b15-919c-4cc5-8bd0-73386dc02c3e)
+https://github.com/sign-language-translator/sign-language-translator/assets/118578823/b5da28ef-d04d-44c0-9ed8-1343ac004255
 
 ## Models
 
