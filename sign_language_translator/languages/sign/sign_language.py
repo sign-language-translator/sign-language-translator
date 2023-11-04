@@ -13,6 +13,7 @@ class SignLanguage(ABC):
         Keys (enum.Enum): Enumerates all keys that are used in a sign dict.
 
     Methods:
+        name: Returns the name of the sign language.
         tokens_to_sign_dicts: Converts tokens to signs based on rules and returns a list of sign dictionaries.
         restructure_sentence: Restructures a sentence by adjusting grammar, dropping meaningless words, and normalizing synonyms.
         _make_equal_weight_sign_dict: Creates a sign dictionary with equal weights for the provided signs.
@@ -28,6 +29,11 @@ class SignLanguage(ABC):
 
         SIGNS = "signs"
         WEIGHTS = "weights"
+
+    @staticmethod
+    @abstractmethod
+    def name() -> str:
+        """Returns the name of the sign language."""
 
     @abstractmethod
     def tokens_to_sign_dicts(

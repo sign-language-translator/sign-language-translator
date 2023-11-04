@@ -187,27 +187,36 @@ Commands:
 
 ```python
 # Documentation: https://sign-language-translator.readthedocs.io
-
 import sign_language_translator as slt
-
-print(slt.__version__)
-print(list(slt.ModelCodes))
-
-# Load any model
-# model = slt.get_model("...")
-
 help(slt)
 
 # The core model of the project (rule-based text-to-sign translator)
 # which enables us to generate synthetic training datasets
-print(slt.models.ConcatenativeSynthesis.__doc__)
+model = slt.models.ConcatenativeSynthesis(
+   text_language="urdu", sign_language="psl", sign_format="video"
+)
+text = "سیب اچھا ہے"
+sign = model.translate(text) # tokenize, map, download & concatenate
+sign.show(inline_player="html5")
+sign.save(f"{text}.mp4")
 
+# # Load any model
+# # print(list(slt.ModelCodes))
+# model = slt.get_model(slt.ModelCodes.Gesture) # sign-to-text (pytorch)
+# sign = slt.Video("video.mp4")
+# text = model.translate(sign)
+# print(text)
+# # sign.show()
+
+# # DocStrings
 # help(slt.languages.SignLanguage)
 # help(slt.languages.text.Urdu)
 # help(slt.Video)
 # help(slt.models.MediaPipeLandmarksModel)
 # help(slt.models.TransformerLanguageModel)
 ```
+
+![output](https://raw.githubusercontent.com/sign-language-translator/notebooks/main/vision/outputs/%D8%B3%DB%8C%D8%A8%20%D8%A7%DA%86%DA%BE%D8%A7%20%DB%81%DB%92.mp4)
 
 ## Models
 
@@ -218,7 +227,7 @@ print(slt.models.ConcatenativeSynthesis.__doc__)
 
 | Name                                                                                                                                                                              | Architecture        | Description                                                                                                                                         | Input                                                           | Output                              |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------- |
-| [Concatenative Synthesis](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py) | Rules + Hash Tables | The Core Rule-Based translator mainly used to synthesize translation dataset.<br/>Initialize it using TextLanguage, SignLanguage & SignFormat objects. | string                                                          | slt.SignFile                        |
+| [Concatenative Synthesis](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py) | Rules + Hash Tables | The Core Rule-Based translator mainly used to synthesize translation dataset.<br/>Initialize it using TextLanguage, SignLanguage & SignFormat objects. | string                                                          | slt.Sign                        |
 
 <!--                                                                                                                                                                              | [pose-gen]()        | Encoder-Decoder Transformers (Seq2Seq)                                                                                                              | Generates a sequence of pose vectors conditioned on input text. | torch.Tensor<br/>(batch, token_ids) | torch.Tensor<br/>(batch, n_frames, n_landmarks*3) | -->
 
@@ -417,6 +426,7 @@ See more at [Build Custom Translator section in ReadTheDocs](https://sign-langua
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/utils.py">utils.py</a>
     │
     └── <b>vision</b>
+        ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/_utils.py">_utils.py</a>
         ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/utils.py">utils.py</a>
         ├── landmarks
         ├── sign
@@ -478,14 +488,30 @@ Stay Tuned!
 <summary>CLEAN_ARCHITECTURE_VISION: v0.7</summary>
 
 ```python
-# concatenative synthesis returns videos
+# urls.json, extra-urls.json
+
+# bugfix: inaccurate num_frames in video file metadata
+# improvement: video wrapper class uses list of sources instead of linked list of videos
 # video transformations
-# class according to feature type:
-   # landmarks
+
+# landmarks wrapper class
 # landmark augmentation
+
 # subtitles
 # trim signs before concatenation
+
 # stabilize video batch using landmarks
+```
+
+</details>
+
+<details>
+<summary>LANGUAGES: v0.8</summary>
+
+```python
+# implement NLP classes for English & Hindi
+# Improve vocab class
+# expand reference clip data by scraping everything
 ```
 
 </details>
@@ -495,20 +521,19 @@ Stay Tuned!
 
 ```python
 # clean demonstration notebooks
-# expand reference clip data by scraping everything
-# data info table
+# host video dataset online, descriptive filenames, zip extraction
+# dataset info table
 # sequence diagram for creating a translator
-# GUI with gradio
 # make scraping dependencies optional (beautifulsoup4, deep_translator) (pyyaml -> json). remove overly specific scrapping functions
+# GUI with gradio
 ```
 
 </details>
 
 <details>
-<summary>DEEP_TRANSLATION: v0.8-v1.x</summary>
+<summary>DEEP_TRANSLATION: v0.9-v1.x</summary>
 
 ```python
-# host video dataset online, descriptive filenames, zip extraction
 # parallel text corpus
 # sign to text with custom seq2seq transformer
 # sign to text with fine-tuned whisper
@@ -548,7 +573,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-11-01.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-11-04.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -566,7 +591,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **8868** + Tests: **1244**):
+Count total number of **lines of code** (Package: **9054** + Tests: **1316**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

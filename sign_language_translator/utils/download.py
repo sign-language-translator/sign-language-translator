@@ -86,7 +86,9 @@ def download(
 
                 # display download speed
                 if progress_bar:
-                    speed = (len(chunk)/(1024**2)/(time() - start_time) + speed)/2
+                    speed = (
+                        len(chunk) / (1024**2) / (time() - start_time) + speed
+                    ) / 2
                     stream.set_postfix_str(  # type:ignore
                         f"{speed:.3f}MB/s"
                     )
@@ -101,7 +103,7 @@ def download(
 def download_resource(
     filename_regex: str,
     overwrite=False,
-    progress_bar=False,
+    progress_bar: bool | None = None,
     timeout: float = 20.0,
     leave=True,
     chunk_size=65536,
@@ -112,7 +114,7 @@ def download_resource(
     Args:
         filename_regex (str): Regular expression pattern to match the desired filenames.
         overwrite (bool, optional): If False, skips downloading if the resource file already exists. Defaults to False.
-        progress_bar (bool, optional): If True, displays a progress bar during the download. Defaults to False.
+        progress_bar (bool, optional): If True, displays a progress bar during the download. If None, uses the value in slt.Settings.SHOW_DOWNLOAD_PROGRESS. Defaults to None.
         timeout (float, optional): The maximum number of seconds to wait for a server response. Defaults to 20.0.
         leave (bool, optional): Wether to leave the progress bar behind after the download. Defaults to True.
         chunk_size (int, optional): The number of bytes to fetch in each step. Defaults to 65536.
@@ -120,6 +122,10 @@ def download_resource(
     Returns:
         bool: True if all resources are downloaded successfully or already exist, False otherwise.
     """
+
+    if progress_bar is None:
+        progress_bar = Settings.SHOW_DOWNLOAD_PROGRESS
+        leave = False
 
     matching_filenames_to_url = {
         key: val

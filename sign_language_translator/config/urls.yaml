@@ -17,6 +17,26 @@ datasets:
     files:
       - name: videos/wordless_wordless.mp4
         url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/wordless_wordless.mp4
+      - name: videos/pk-hfad-1_سیب.mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_apple.mp4
+      - name: videos/pk-hfad-1_اچھا.mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_good.mp4
+      - name: videos/pk-hfad-1_ہے.mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_hai.mp4
+      - name: videos/pk-hfad-1_f(single-handed-letter).mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_f.single-handed-letter.mp4
+      - name: videos/pk-hfad-1_1.mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_1.mp4
+      - name: videos/pk-hfad-1_chips(fries).mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_chips.fries.mp4
+      - name: videos/pk-hfad-1_february.mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_february.mp4
+      - name: videos/pk-hfad-1_india.mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_india.mp4
+      - name: videos/pk-hfad-1_strawberry.mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_strawberry.mp4
+      - name: videos/pk-hfad-1_washroom.mp4
+        url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_washroom.mp4
 
 models:
   - name: language-models

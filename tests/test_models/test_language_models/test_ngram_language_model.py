@@ -32,4 +32,12 @@ def test_ngram_language_model():
     assert set(tokens) <= {"a", "b", "c", "[", "]"}
 
     assert str(mix) is not None
-    
+
+    sampler.return_log_of_probability = False
+    generation, prob = sampler()
+    assert match(r"\[ab+c?\]?", "".join(generation))
+    assert 0 <= prob <= 1
+
+    generation, prob = sampler.complete("x")
+    assert generation == "x" # unknown token is not appended
+    assert prob == 1 # 2**0

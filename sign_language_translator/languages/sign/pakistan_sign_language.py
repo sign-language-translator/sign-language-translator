@@ -4,6 +4,7 @@ import random
 import re
 from typing import Any, Dict, Iterable, List, Tuple
 
+from sign_language_translator.config.enums import SignLanguages
 from sign_language_translator.config.settings import Settings
 from sign_language_translator.languages.sign.mapping_rules import (
     CharacterByCharacterMappingRule,
@@ -26,6 +27,10 @@ class PakistanSignLanguage(SignLanguage):
     """
 
     STOPWORDS = {"is", "am", "are"}
+
+    @staticmethod
+    def name() -> str:
+        return SignLanguages.PAKISTAN_SIGN_LANGUAGE.value
 
     def __init__(self) -> None:
         # load word maps and info from dataset files

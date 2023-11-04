@@ -5,7 +5,7 @@ Module Structure:
 - set_resources_dir(path: str) -> None: Sets the resources(dataset/models) directory path in Settings.
 """
 
-from os.path import dirname, isdir, join
+from os.path import abspath, dirname, isdir, join
 
 from sign_language_translator.config.helpers import prepare_filename_url_dict
 
@@ -14,8 +14,8 @@ class Settings:
     """Class containing settings and configuration parameters
     for the sign language translator library."""
 
-    RESOURCES_ROOT_DIRECTORY: str = join(
-        dirname(dirname(__file__)), "sign-language-resources"
+    RESOURCES_ROOT_DIRECTORY: str = abspath(
+        join(dirname(dirname(__file__)), "sign-language-resources")
     )
     """The root directory path where the sign language datasets & models are stored."""
 
@@ -25,13 +25,14 @@ class Settings:
     FILENAME_CONNECTOR = "-"
     """The connector used in filenames to join parts of same attribute."""
 
-    FILE_TO_URLS = prepare_filename_url_dict(
-        join(dirname(__file__), "urls.yaml")
-    )
+    FILE_TO_URLS = prepare_filename_url_dict(join(dirname(__file__), "urls.yaml"))
     """A dictionary mapping filenames to their corresponding URLs, based on the package version."""
 
     AUTO_DOWNLOAD = True
     """A flag indicating whether automatic downloading of missing dataset files is enabled."""
+
+    SHOW_DOWNLOAD_PROGRESS = True
+    """A flag indicating whether the download progress should be shown by default."""
 
 
 def set_resources_dir(path: str) -> None:
@@ -48,7 +49,7 @@ def set_resources_dir(path: str) -> None:
     if not isdir(path):
         raise ValueError(f"the provided path is not a directory. Path: {path}")
 
-    Settings.RESOURCES_ROOT_DIRECTORY = path
+    Settings.RESOURCES_ROOT_DIRECTORY = abspath(path)
     # ? trigger an event
 
 

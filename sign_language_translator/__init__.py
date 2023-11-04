@@ -43,8 +43,8 @@ Usage
     text = "HELLO دنیا!" # HELLO treated as an acronym
     sign_language_sentence = t2s_model(text)
 
-    # slt_video_object.show() # class: slt.vision.sign.Sign
-    # slt_video_object.save(f"sentences/{text}.mp4")
+    # sign_language_sentence.show() # class: slt.vision.sign.Sign or its child
+    # sign_language_sentence.save(f"sentences/{text}.mp4")
 
     # -------------------------- TRANSLATE: sign to text --------------------------
 
@@ -93,6 +93,7 @@ from sign_language_translator.config.settings import Settings, set_resources_dir
 from sign_language_translator.languages import get_sign_language, get_text_language
 from sign_language_translator.models import get_model
 from sign_language_translator.vision.video.video import Video
+from sign_language_translator.vision._utils import get_sign_wrapper_class
 
 __version__ = config.helpers.get_package_version()
 
@@ -122,4 +123,5 @@ __all__ = [
     "get_sign_language",
     "get_text_language",
     "get_model",
+    "get_sign_wrapper_class",
 ]

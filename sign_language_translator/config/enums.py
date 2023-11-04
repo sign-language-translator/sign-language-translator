@@ -91,16 +91,22 @@ class SignLanguages(Enum):
 
 class SignFormats(Enum):
     """
-    Enumeration of video feature models with their corresponding short codes.
+    Enumeration of available sign formats with their corresponding short codes.
+    For example, sign language can be a sequence of frames (video) or a sequence of pose vectors (landmarks) etc.
 
     Attributes:
+        - VIDEO (str): Short code for raw video.
         - MEDIAPIPE_LANDMARKS (str): Short code for MediaPipe Pose & Hand landmarks.
         ...
     """
 
+    # raw video
+    VIDEO = "video"
+    """sequence of numpy frames (num_frames, height, width, num_channels)"""
+
     # Body Landmarks
-    # 3d world coordinates (x,y,z,[visibility, presence])
     MEDIAPIPE_LANDMARKS = "mediapipe-landmarks"
+    """3d world coordinates (x,y,z,[visibility, presence]) and/or 2d image coordinates (x,y,depth,[visibility, presence])"""
 
     # Body Mesh Grid
 
@@ -122,7 +128,7 @@ class ModelCodes(Enum):
         - MIXER_LM_NGRAM_URDU (str): Short code for a mix of ngram models trained on urdu words of window size 1 to 6.
         - TRANSFORMER_LM_UR_SUPPORTED (str): Short code for a transformer-based language model trained on ur supported tokens.
 
-        - MEDIAPIPE_POSE_V2_HAND_V1 (str): Short code for a video embedding model which uses 
+        - MEDIAPIPE_POSE_V2_HAND_V1 (str): Short code for a video embedding model which uses
         - MEDIAPIPE_POSE_V1_HAND_V1 (str):
         - MEDIAPIPE_POSE_V0_HAND_V1 (str):
         ...
@@ -223,6 +229,11 @@ def normalize_short_code(short_code: str | Enum) -> str:
             "pakistan-sign-language",
             "pakistansignlanguage",
             "pakistan_sign_language",
+        },
+        SignFormats.VIDEO.value: {
+            "vid",
+            "videos",
+            "vids",
         },
         ModelCodes.NGRAM_LM_UNIGRAM_NAMES.value: {
             "unigram-names",

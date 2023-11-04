@@ -1,23 +1,26 @@
-from abc import ABC, abstractmethod, abstractproperty
-from typing import Any, Union, Iterable
+from abc import ABC, abstractmethod
+from typing import Any, Iterable, Union
 
 
 class TextToSignModel(ABC):
-    @abstractproperty
+    @property
+    @abstractmethod
     def sign_language(self):
-        pass
+        """The target sign language of the model."""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def text_language(self):
-        pass
+        "The source text language of the model."
 
-    @abstractproperty
-    def sign_features(self):
-        pass
+    @property
+    @abstractmethod
+    def sign_format(self):
+        """The format of the sign language (e.g. slt.Vision.sign.sign.Sign)."""
 
     @abstractmethod
-    def translate(self, text: Union[str, Iterable[str]]) -> Any: # -> VideoFeatures
-        pass
+    def translate(self, text: Union[str, Iterable[str]], *args, **kwargs) -> Any:  # -> VideoFeatures
+        """Translate the text to sign language."""
 
-    def __call__(self, text: Union[str, Iterable[str]]) -> Any:
-        return self.translate(text)
+    def __call__(self, text: Union[str, Iterable[str]], *args, **kwargs) -> Any:
+        return self.translate(text, *args, **kwargs)

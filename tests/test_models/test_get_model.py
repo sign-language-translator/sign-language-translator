@@ -1,27 +1,38 @@
-from sign_language_translator.models._utils import get_model
 from sign_language_translator import ModelCodes
+from sign_language_translator.models import (
+    ConcatenativeSynthesis,
+    MediaPipeLandmarksModel,
+    MixerLM,
+    NgramLanguageModel,
+    TransformerLanguageModel,
+)
+from sign_language_translator.models._utils import get_model
 
 
 def test_get_model():
     # translators
-    assert (
+    assert isinstance(
         get_model(
             ModelCodes.CONCATENATIVE_SYNTHESIS,
             text_language="urdu",
             sign_language="psl",
-            sign_format="mediapipe",
-        )
-        is not None
+            sign_format="video",
+        ),
+        ConcatenativeSynthesis,
     )
 
     # language models
-    assert get_model(ModelCodes.MIXER_LM_NGRAM_URDU.value) is not None
-    assert get_model(ModelCodes.TRANSFORMER_LM_UR_SUPPORTED.value) is not None
-    assert get_model(ModelCodes.NGRAM_LM_BIGRAM_NAMES.value) is not None
+    assert isinstance(get_model(ModelCodes.MIXER_LM_NGRAM_URDU.value), MixerLM)
+    assert isinstance(
+        get_model(ModelCodes.TRANSFORMER_LM_UR_SUPPORTED.value),
+        TransformerLanguageModel,
+    )
+    assert isinstance(
+        get_model(ModelCodes.NGRAM_LM_BIGRAM_NAMES.value), NgramLanguageModel
+    )
 
     # video embedding models
-    assert get_model("mediapipe") is not None
+    assert isinstance(get_model("mediapipe"), MediaPipeLandmarksModel)
 
     # non-existent model
     assert get_model("non-existent-model-code-should-return-None") is None
-    

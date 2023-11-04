@@ -7,7 +7,8 @@ __all__ = [
 import struct
 from copy import copy, deepcopy
 from mimetypes import guess_type
-from os.path import abspath, isfile, join
+from os import makedirs
+from os.path import abspath, dirname, isfile, join
 from typing import Callable, Generator, Iterable, List, Sequence, Tuple
 
 import cv2  # TODO: Compile OpenCV with GPU
@@ -16,6 +17,7 @@ import torch
 from numpy.typing import NDArray
 from tqdm.auto import tqdm
 
+from sign_language_translator.config.enums import SignFormats
 from sign_language_translator.config.settings import Settings
 from sign_language_translator.utils import download_resource, in_jupyter_notebook
 from sign_language_translator.vision.sign.sign import Sign
@@ -52,7 +54,8 @@ class Video(Sign, VideoFrames):
         # play
         self._source_start_index: int = 0
         self._source_end_index: int
-        self._default_step_size: int = 1  # TODO: handle len & end_index for ||step|| > 1
+        # TODO: handle len & end_index for ||step|| > 1
+        self._default_step_size: int = 1
         self.transformations: List[Callable] = []
 
         # properties
@@ -68,6 +71,10 @@ class Video(Sign, VideoFrames):
 
         # TODO: self.gpu_frame = cv2.cuda_GpuMat()
         self.__idx = 0
+
+    @staticmethod
+    def name() -> str:
+        return SignFormats.VIDEO.value
 
     # ------------------- #
     # Iterate / get frame #
@@ -274,10 +281,16 @@ class Video(Sign, VideoFrames):
         if (
             in_jupyter_notebook()
             and self._path is not None
+            and self.__next is None
             and inline_player == "html5"
             and not self.transformations
         ):
             VideoDisplay.display_ipython_video_in_jupyter(self._path)
+        elif in_jupyter_notebook() and inline_player == "html5":
+            temp_filename = abspath(join(".", "__temp__.mp4"))
+            self.save(temp_filename, overwrite=True, codec="avc1")
+            VideoDisplay.display_ipython_video_in_jupyter(temp_filename)
+
         else:
             VideoDisplay.display_frames(
                 self, fps=self.fps or 30.0, inline_player=inline_player
@@ -291,7 +304,9 @@ class Video(Sign, VideoFrames):
         if frame is not None:
             VideoDisplay.display_frames([frame], inline_player="jshtml")
 
-    def frames_grid(self, rows=2, columns=3):
+    def frames_grid(
+        self, rows=2, columns=3, width: int | None = None, height: int | None = None
+    ):
         grid = np.concatenate(
             [
                 np.concatenate([self.get_frame(index=id) for id in ids_in_row], axis=1)
@@ -303,24 +318,24 @@ class Video(Sign, VideoFrames):
             axis=0,
         )
 
+        if width or height:
+            # calculate height or width of grid by maintaining aspect ratio of cell
+            aspect_ratio = (self.width * columns) / (self.height * rows)
+
+            if width and not height:
+                height = int(width / aspect_ratio)
+            elif height and not width:
+                width = int(height * aspect_ratio)
+
+            grid = cv2.resize(grid, (width, height))  # type: ignore
+
         return grid
 
     def show_frames_grid(
         self, rows=2, columns=3, width: int | None = 800, height: int | None = None
     ):
-        grid = self.frames_grid(rows=rows, columns=columns)
+        grid = self.frames_grid(rows=rows, columns=columns, width=width, height=height)
 
-        # calculate height or width of grid by maintaining aspect ratio of cell
-        aspect_ratio = (self.width * columns) / (self.height * rows)
-
-        if width and not height:
-            height = int(width / aspect_ratio)
-        elif height and not width:
-            width = int(height * aspect_ratio)
-        elif not width and not height:
-            raise ValueError("Specify either width or height.")
-
-        grid = cv2.resize(grid, (width, height))  # type: ignore
         VideoDisplay.display_frames([grid], inline_player="jshtml")
 
     # ----------- #
@@ -497,8 +512,12 @@ class Video(Sign, VideoFrames):
         total_frames: int | None = None,
         **kwargs,
     ) -> None:
+        path = abspath(path)
         if isfile(path) and not overwrite:
-            raise FileExistsError(f"File '{path}' already exists. Use overwrite=True to overwrite.")
+            raise FileExistsError(
+                f"File '{path}' already exists. Use overwrite=True to overwrite."
+            )
+        makedirs(dirname(path), exist_ok=True)
 
         _frames_iterable = iter(
             frames_iterable
@@ -560,7 +579,11 @@ class Video(Sign, VideoFrames):
         )
 
     def save_frame(
-        self, path: str, timestamp: float | None = None, index: int | None = None, overwrite=False
+        self,
+        path: str,
+        timestamp: float | None = None,
+        index: int | None = None,
+        overwrite=False,
     ) -> None:
         """
         Saves a single frame from the video object to the specified path.
@@ -574,12 +597,36 @@ class Video(Sign, VideoFrames):
             RuntimeError: If there is an error reading the frame.
         """
 
+        path = abspath(path)
         if isfile(path) and not overwrite:
-            raise FileExistsError(f"File '{path}' already exists. Use overwrite=True to overwrite.")
+            raise FileExistsError(
+                f"File '{path}' already exists. Use overwrite=True to overwrite."
+            )
+        makedirs(dirname(path), exist_ok=True)
 
         frame = self.get_frame(timestamp=timestamp, index=index)
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         cv2.imwrite(path, frame)
+
+    def save_frames_grid(
+        self,
+        path: str,
+        rows: int = 2,
+        columns: int = 3,
+        width: int | None = 1024,
+        height: int | None = None,
+        overwrite=False,
+    ) -> None:
+        path = abspath(path)
+        if isfile(path) and not overwrite:
+            raise FileExistsError(
+                f"File '{path}' already exists. Use overwrite=True to overwrite."
+            )
+        makedirs(dirname(path), exist_ok=True)
+
+        grid = self.frames_grid(rows=rows, columns=columns, width=width, height=height)
+        grid = cv2.cvtColor(grid, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(path, grid)
 
     # ----------------------- #
     # Initialize Video object #
@@ -604,7 +651,7 @@ class Video(Sign, VideoFrames):
             if isfile(sign):
                 self._from_path(sign, **kwargs)
             elif sign in Settings.FILE_TO_URLS:
-                download_resource(sign)
+                download_resource(sign, leave=False)
                 self._from_path(join(Settings.RESOURCES_ROOT_DIRECTORY, sign), **kwargs)
             else:
                 raise ValueError(

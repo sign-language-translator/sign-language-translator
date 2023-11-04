@@ -12,8 +12,16 @@ from torch import Tensor
 
 
 class Sign(ABC):
+    def __init__(self, sign, *args, **kwargs) -> None:
+        """initialize the sign"""
+
+    @staticmethod
     @abstractmethod
-    def show(self) -> None:
+    def name() -> str:
+        """return the name of the sign format"""
+
+    @abstractmethod
+    def show(self, *args, **kwargs) -> None:
         """display the sign"""
 
     @abstractmethod
@@ -42,3 +50,7 @@ class Sign(ABC):
     @abstractmethod
     def transform(self, transformation: Callable):
         """apply some transformation to the sign to change its appearance"""
+
+    @abstractmethod
+    def save(self, path: str, *args, **kwargs) -> None:
+        """save the sign to a path"""
