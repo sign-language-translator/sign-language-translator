@@ -216,7 +216,7 @@ sign.save(f"{text}.mp4")
 # help(slt.models.TransformerLanguageModel)
 ```
 
-![output](https://raw.githubusercontent.com/sign-language-translator/notebooks/main/vision/outputs/%D8%B3%DB%8C%D8%A8%20%D8%A7%DA%86%DA%BE%D8%A7%20%DB%81%DB%92.mp4)
+![apple-is-good](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/eb7f0b15-919c-4cc5-8bd0-73386dc02c3e)
 
 ## Models
 
