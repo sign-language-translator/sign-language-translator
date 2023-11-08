@@ -25,7 +25,7 @@ class Settings:
     FILENAME_CONNECTOR = "-"
     """The connector used in filenames to join parts of same attribute."""
 
-    FILE_TO_URLS = prepare_filename_url_dict(join(dirname(__file__), "urls.yaml"))
+    FILE_TO_URLS = prepare_filename_url_dict(join(dirname(__file__), "urls.json"))
     """A dictionary mapping filenames to their corresponding URLs, based on the package version."""
 
     AUTO_DOWNLOAD = True

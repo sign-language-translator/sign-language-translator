@@ -6,13 +6,13 @@ Module Structure:
 - get_package_version() -> str: Retrieves the version of the package.
 """
 
+import json
 from typing import Dict
 
 from pkg_resources import get_distribution
-from yaml import safe_load
 
 
-def prepare_filename_url_dict(yaml_file_path: str) -> Dict[str, str]:
+def prepare_filename_url_dict(file_path: str, encoding="utf-8") -> Dict[str, str]:
     """
     Prepares a dictionary mapping filenames to their corresponding URLs.
 
@@ -26,18 +26,27 @@ def prepare_filename_url_dict(yaml_file_path: str) -> Dict[str, str]:
     # TODO: ? Download all and call without arg ?
     # move download() to a separate file to end circular import
 
-    with open(yaml_file_path, "r", encoding="utf-8") as f:
-        data = safe_load(f)
+    with open(file_path, "r", encoding=encoding) as f:
+        data = json.load(f)
 
     filename_url_dict = {}
 
     # Find the files and update filename url dict
-    for resource_key in ["datasets", "models", "others"]:
-        for resource in data[resource_key]:
-            for file in resource["files"]:
-                filename = file["name"]
-                url = file["url"]
-                filename_url_dict[filename] = url
+    def extract_urls(data: Dict, results: Dict):
+        for key in data:
+            if key == "file_to_url":
+                results.update(data[key])
+            elif key == "files":
+                for item in data[key]:
+                    results[item["name"]] = item["url"]
+            elif isinstance(data[key], dict):
+                extract_urls(data[key], results)
+            elif isinstance(data[key], list):
+                for item in data[key]:
+                    if isinstance(item, dict):
+                        extract_urls(item, results)
+
+    extract_urls(data, filename_url_dict)
 
     # TODO: download extra_urls.yaml
     # when lookup videos in filename_url_dict

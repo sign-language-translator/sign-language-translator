@@ -111,10 +111,10 @@ def download(filenames, overwrite, progress_bar, timeout, chunk_size):
 @click.option("--sign-lang", help="Name of the sign language.")
 @click.option(
     "--sign-format",
-    help="the sign features to be used e.g. pixels, mediapipe-landmarks etc.",
+    help="the sign features to be used e.g. video, mediapipe-landmarks etc.",
 )
 @click.option(
-    "--target-dir", default=".", help="Output directory for generated translations."
+    "--output-dir", default=".", help="Output directory for generated translations."
 )
 @click.option(
     "--overwrite",
@@ -122,8 +122,21 @@ def download(filenames, overwrite, progress_bar, timeout, chunk_size):
     default=False,
     help="Whether to overwrite the target file if it already exists. Defaults to False.",
 )
+@click.option(
+    "--display",
+    "-d",
+    default=True,
+    help="Whether to show the output video. Defaults to True.",
+)
 def translate(
-    inputs, model_code, text_lang, sign_lang, sign_format, target_dir, overwrite
+    inputs,
+    model_code,
+    text_lang,
+    sign_lang,
+    sign_format,
+    output_dir,
+    overwrite,
+    display,
 ):
     """
     Translate text into sign language or vice versa.
@@ -147,9 +160,10 @@ def translate(
     if model and isinstance(model, TextToSignModel):  # TODO: , SignToTextModel):
         for text in inputs:
             sign = model.translate(text)
-            path = os.path.join(target_dir, f"{text}.mp4")
+            path = os.path.join(output_dir, f"{text}.mp4")
             sign.save(path, overwrite=overwrite, leave=True)
-            get_sign_wrapper_class(sign.name())(path).show()
+            if display:
+                get_sign_wrapper_class(sign.name())(path).show()
 
     else:
         click.echo("This type of translation is not yet supported!")

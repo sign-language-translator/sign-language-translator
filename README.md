@@ -366,7 +366,7 @@ See more at [Build Custom Translator section in ReadTheDocs](https://sign-langua
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/enums.py">enums.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/helpers.py">helpers.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/settings.py">settings.py</a>
-    │   └── <i><a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/urls.yaml">urls.yaml</a></i>
+    │   └── <i><a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/urls.json">urls.json</a></i>
     │
     ├── <b>data_collection</b>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/data_collection/completeness.py">completeness.py</a>
@@ -524,7 +524,7 @@ Stay Tuned!
 # host video dataset online, descriptive filenames, zip extraction
 # dataset info table
 # sequence diagram for creating a translator
-# make scraping dependencies optional (beautifulsoup4, deep_translator) (pyyaml -> json). remove overly specific scrapping functions
+# make scraping dependencies optional (beautifulsoup4, deep_translator). remove overly specific scrapping functions
 # GUI with gradio
 ```
 
@@ -591,7 +591,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9054** + Tests: **1316**):
+Count total number of **lines of code** (Package: **9081** + Tests: **1427**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

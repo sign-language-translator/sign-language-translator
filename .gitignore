@@ -26,4 +26,5 @@ docs/sign_language_translator.*.rst
 
 # auto-downloaded
 sign-language-resources
-extra_urls.yaml
+extra_urls.json
+assets/*

@@ -21,7 +21,7 @@ class Sign(ABC):
         """return the name of the sign format"""
 
     @abstractmethod
-    def show(self, *args, **kwargs) -> None:
+    def show(self, **kwargs) -> None:
         """display the sign"""
 
     @abstractmethod

@@ -1,1 +1,1 @@
-include config/urls.yaml
+include config/urls.json

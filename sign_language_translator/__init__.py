@@ -92,8 +92,8 @@ from sign_language_translator.config.enums import TextLanguages as TextLanguageC
 from sign_language_translator.config.settings import Settings, set_resources_dir
 from sign_language_translator.languages import get_sign_language, get_text_language
 from sign_language_translator.models import get_model
-from sign_language_translator.vision.video.video import Video
 from sign_language_translator.vision._utils import get_sign_wrapper_class
+from sign_language_translator.vision.video.video import Video
 
 __version__ = config.helpers.get_package_version()
 
