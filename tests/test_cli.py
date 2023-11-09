@@ -40,7 +40,7 @@ def test_slt_translate():
             "temp",
             "--display",
             "false",
-            "--save_format",
+            "--save-format",
             "mkv",
         ],
     )
