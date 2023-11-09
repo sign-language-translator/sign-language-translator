@@ -128,6 +128,11 @@ def download(filenames, overwrite, progress_bar, timeout, chunk_size):
     default=True,
     help="Whether to show the output video. Defaults to True.",
 )
+@click.option(
+    "--save-format",
+    default="mp4",
+    help="The output file extension. Defaults to 'mp4'.",
+)
 def translate(
     inputs,
     model_code,
@@ -137,6 +142,7 @@ def translate(
     output_dir,
     overwrite,
     display,
+    save_format,
 ):
     """
     Translate text into sign language or vice versa.
@@ -160,7 +166,7 @@ def translate(
     if model and isinstance(model, TextToSignModel):  # TODO: , SignToTextModel):
         for text in inputs:
             sign = model.translate(text)
-            path = os.path.join(output_dir, f"{text}.mp4")
+            path = os.path.join(output_dir, f"{text}.{save_format}")
             sign.save(path, overwrite=overwrite, leave=True)
             if display:
                 get_sign_wrapper_class(sign.name())(path).show()

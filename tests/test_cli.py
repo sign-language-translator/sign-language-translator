@@ -4,6 +4,7 @@ from click.testing import CliRunner
 
 from sign_language_translator.cli import slt
 from sign_language_translator.config.settings import Settings
+from sign_language_translator.utils import download_resource
 
 
 def test_slt():
@@ -39,15 +40,18 @@ def test_slt_translate():
             "temp",
             "--display",
             "false",
+            "--save_format",
+            "mkv",
         ],
     )
     assert result.exit_code == 0
-    assert os.path.exists(f"temp/{text}.mp4")
+    assert os.path.exists(f"temp/{text}.mkv")
 
 
 def test_slt_embed():
     runner = CliRunner()
 
+    download_resource("videos/wordless_wordless.mp4")
     source_filepath = os.path.join(
         Settings.RESOURCES_ROOT_DIRECTORY, "videos", "wordless_wordless.mp4"
     )
@@ -76,7 +80,7 @@ def test_slt_complete():
 
     result = runner.invoke(slt, ["complete", "[m", "--model-code", "bigram-names"])
     assert result.exit_code == 0
-    assert result.output.startswith("[m")
+    assert result.output.split()[-1].startswith("[m")  # ignore progress bar
 
 
 def test_slt_download():

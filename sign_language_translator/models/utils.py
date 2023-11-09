@@ -495,7 +495,7 @@ class VideoEmbeddingPipeline:
         file_format="csv",
         overwrite=False,
     ):
-        target_path = join(output_dir, filename) + f".{file_format}"
+        target_path = abspath(join(output_dir, filename) + f".{file_format}")
 
         makedirs(output_dir, exist_ok=True)
         if exists(target_path) and not overwrite:

@@ -277,7 +277,7 @@ class Video(Sign, VideoFrames):
     # Display / show frame #
     # -------------------- #
 
-    def show(self, inline_player="jshtml" or "html5") -> None:
+    def show(self, inline_player="html5" or "jshtml", **kwargs) -> None:
         if (
             in_jupyter_notebook()
             and self._path is not None
@@ -286,7 +286,7 @@ class Video(Sign, VideoFrames):
             and not self.transformations
         ):
             VideoDisplay.display_ipython_video_in_jupyter(self._path)
-        elif in_jupyter_notebook() and inline_player == "html5":
+        elif in_jupyter_notebook() and inline_player == "html5" and len(self) > 1:
             temp_filename = abspath(join(".", "__temp__.mp4"))
             self.save(temp_filename, overwrite=True, codec="avc1")
             VideoDisplay.display_ipython_video_in_jupyter(temp_filename)
@@ -393,7 +393,7 @@ class Video(Sign, VideoFrames):
                     [v.get_frame(index=i) for v in videos], axis=dim - 1
                 )
 
-        return Video(stacked_frames(videos), fps=videos[0].fps)  # TODO: shape okay?
+        return Video(stacked_frames(videos), fps=videos[0].fps)
 
     def append(self, other: Video):
         """
@@ -493,6 +493,10 @@ class Video(Sign, VideoFrames):
             raise RuntimeError("FPS is not set. Can not get duration without fps.")
 
         return len(self) / self.fps if self.fps else float("inf")
+
+    @property
+    def length(self) -> int:
+        return len(self)
 
     # ------------ #
     # Save to disk #
