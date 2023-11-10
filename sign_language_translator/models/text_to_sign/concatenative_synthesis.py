@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Type
 
+from sign_language_translator.config.enums import SignFormats
 from sign_language_translator.languages import get_sign_language, get_text_language
 from sign_language_translator.models.text_to_sign.t2s_model import TextToSignModel
+from sign_language_translator.vision._utils import get_sign_wrapper_class
 
 if TYPE_CHECKING:
     from sign_language_translator.languages.sign import SignLanguage
     from sign_language_translator.languages.text import TextLanguage
+    from sign_language_translator.vision.sign.sign import Sign
 
 
 class ConcatenativeSynthesis(TextToSignModel):
@@ -27,7 +30,7 @@ class ConcatenativeSynthesis(TextToSignModel):
         self,
         text_language: str | TextLanguage,
         sign_language: str | SignLanguage,
-        sign_format: str,
+        sign_format: str | Type[Sign],
     ) -> None:
         self._text_language = (
             get_text_language(text_language)
@@ -39,21 +42,33 @@ class ConcatenativeSynthesis(TextToSignModel):
             if isinstance(sign_language, str)
             else sign_language
         )
-        self._sign_features = sign_format  # TODO: use feature loader
+        self._sign_format = (
+            get_sign_wrapper_class(sign_format)
+            if isinstance(sign_format, str)
+            else sign_format
+        )
 
     @property
     def text_language(self):
+        """An object of TextLanguage class or its child that defines preprocessing, tokenization & other NLP functions."""
         return self._text_language
 
     @property
     def sign_language(self):
+        """An object of SignLanguage class or its child that defines the mapping rules & grammar."""
         return self._sign_language
 
     @property
-    def sign_features(self):
-        return self._sign_features
+    def sign_format(self):
+        """
+        The format of the sign language (e.g. slt.Vision.sign.sign.Sign).
 
-    def translate(self, text: str):
+        Class that wraps the sign language features e.g. videos or images. This class can load the signs from dataset and concatenate its objects
+        """
+
+        return self._sign_format
+
+    def translate(self, text: str) -> Sign:
         """
         Translate text to sign language.
 
@@ -93,7 +108,28 @@ class ConcatenativeSynthesis(TextToSignModel):
                 ]
             )
 
-        # TODO: map labels to sign features and concatenate
-        sign_language_sentence = video_labels
+        signs = self._map_labels_to_sign(video_labels)
+        # TODO: Trim signs where hand is just being raised from or lowered to the resting position
+        sign_language_sentence = self.sign_format.concatenate(signs)
 
         return sign_language_sentence
+
+    def _map_labels_to_sign(self, labels: List[str]) -> List[Sign]:
+        return [
+            self.sign_format(self._prepare_resource_name(label)) for label in labels
+        ]
+
+    def _prepare_resource_name(self, label, person=None, camera=None, sep="_"):
+        if person is not None:
+            label = f"{label}{sep}{person}"
+        if camera is not None:
+            label = f"{label}{sep}{camera}"
+
+        directory = (
+            "videos"
+            if self.sign_format.name() == SignFormats.VIDEO.value
+            else "landmarks"
+        )
+        name = f"{directory}/{label}.mp4"
+
+        return name

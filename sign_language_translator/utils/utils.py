@@ -1,9 +1,12 @@
 from random import choices
-from typing import Any, Dict, Iterable, List, Set
+from typing import Any, Dict, List, Set
 
-import numpy as np
-from torch import Tensor, long as torch_long
-from numpy.typing import NDArray
+__all__ = [
+    "search_in_values_to_retrieve_key",
+    "sample_one_index",
+    "in_jupyter_notebook",
+    "extract_recursive",
+]
 
 
 def search_in_values_to_retrieve_key(
@@ -58,55 +61,41 @@ def in_jupyter_notebook():
         return False
 
 
-class ArrayOps:
-    @staticmethod
-    def floor(array: NDArray | Tensor) -> NDArray | Tensor:
-        if isinstance(array, np.ndarray):
-            return np.floor(array)
-        elif isinstance(array, Tensor):
-            return array.floor()
-        else:
-            raise TypeError(f"Invalid type for flooring: {type(array)}")
+def extract_recursive(data: Dict[str, Any], key: str) -> List[Any]:
+    """
+    Recursively extracts values associated with a specified key from a nested dictionary.
 
-    @staticmethod
-    def ceil(array: NDArray | Tensor) -> NDArray | Tensor:
-        if isinstance(array, np.ndarray):
-            return np.ceil(array)
-        elif isinstance(array, Tensor):
-            return array.ceil()
-        else:
-            raise TypeError(f"Invalid type for ceiling: {type(array)}")
+    Args:
+        data (Dict[str, Any]): The input dictionary containing nested structures.
+        key (str): The key for which values need to be extracted.
 
-    @staticmethod
-    def take(
-        array: NDArray | Tensor, index: NDArray | Tensor | List, dim: int = 0
-    ) -> NDArray | Tensor:
-        if isinstance(array, np.ndarray):
-            if not isinstance(index, np.ndarray):
-                index = np.array(index)
-            return np.take(array, index.astype(int), axis=dim)
-        elif isinstance(array, Tensor):
-            if not isinstance(index, Tensor):
-                index = Tensor(index)
-            return array.index_select(dim, index.type(torch_long))
-        else:
-            raise TypeError(f"Invalid type for taking: {type(array)}")
+    Returns:
+        List[Any]: A list containing all values associated with the specified key, extracted
+                   recursively from the input dictionary.
 
-    @staticmethod
-    def cast(
-        x: NDArray | Tensor | List | Iterable, data_type
-    ) -> NDArray | Tensor:
-        if data_type == np.ndarray:
-            return np.array(x)
-        elif data_type == Tensor:
-            return Tensor(x)
-        else:
-            raise TypeError(f"Invalid type for array casting: {data_type(x)}")
+    Examples:
+        >>> data = {'a': 1, 'b': {'c': 2, 'd': {'e': 3, 'f': 4}}, 'g': [5, {'h': 6, 'e': 7}]}
+        >>> extract_recursive(data, 'e')
+        [3, 7]
+        >>> extract_recursive(data, 'h')
+        [6]
+        >>> extract_recursive(data, 'x')
+        []  # Key not found, returns an empty list.
+    """
 
+    extracted_values = []
 
-__all__ = [
-    "search_in_values_to_retrieve_key",
-    "sample_one_index",
-    "in_jupyter_notebook",
-    "ArrayOps",
-]
+    def extract(data: Dict, results: List):
+        for k in data:
+            if k == key:
+                results.append(data[k])
+            elif isinstance(data[k], dict):
+                extract(data[k], results)
+            elif isinstance(data[k], list):
+                for item in data[k]:
+                    if isinstance(item, dict):
+                        extract(item, results)
+
+    extract(data, extracted_values)
+
+    return extracted_values

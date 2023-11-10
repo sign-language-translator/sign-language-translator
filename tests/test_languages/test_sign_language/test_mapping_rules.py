@@ -21,6 +21,7 @@ def test_lambda_mapping_rule():
     assert rule.is_applicable("a")
 
     assert rule.apply("b") == 103
+    assert rule.priority == 1
 
 
 def test_direct_mapping_rule():

@@ -1,9 +1,12 @@
+import random
 from re import match
 
 from sign_language_translator.models import BeamSampling, MixerLM, NgramLanguageModel
 
 
 def test_ngram_language_model():
+    random.seed(0)
+
     lm1 = NgramLanguageModel(window_size=1, unknown_token=".")
     lm1.fit(["[abbb]", "[abc]", "[abbc]"])
 
@@ -21,6 +24,23 @@ def test_ngram_language_model():
         max_length=20,
     )
 
-    for _ in range(5):
+    for _ in range(10):
         generation, _ = sampler.complete("[")
         assert match(r"\[ab+c?\]?", generation)  # type: ignore
+
+    mix.strategy = "choose"
+    for _ in range(20):
+        tokens, probs = mix.next_all("[")
+        assert abs(sum(probs) - 1) < 0.0001
+        assert set(tokens) <= {"a", "b", "c", "[", "]"}
+
+    assert str(mix) is not None
+
+    sampler.return_log_of_probability = False
+    generation, prob = sampler()
+    assert match(r"\[ab+c?\]?", "".join(generation))
+    assert 0 <= prob <= 1
+
+    generation, prob = sampler.complete("x")
+    assert generation == "x" # unknown token is not appended
+    assert prob == 1 # 2**0

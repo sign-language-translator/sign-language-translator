@@ -13,16 +13,14 @@ __all__ = [
     "get_model",
 ]
 
-from os.path import join
 from typing import TYPE_CHECKING
 
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import (
     ModelCodeGroups,
     ModelCodes,
     normalize_short_code,
 )
-from sign_language_translator.config.settings import Settings
-from sign_language_translator.utils import download_resource
 
 if TYPE_CHECKING:
     from enum import Enum
@@ -51,34 +49,31 @@ def get_model(model_code: str | Enum, *args, **kwargs):
         # TODO: validate arg types
         return ConcatenativeSynthesis(*args, **kwargs)
 
-    elif model_code in ModelCodeGroups.ALL_NGRAM_LANGUAGE_MODELS.value:
+    if model_code in ModelCodeGroups.ALL_NGRAM_LANGUAGE_MODELS.value:
         from sign_language_translator.models import NgramLanguageModel
 
-        download_resource(
+        Assets.download(
             f"models/{model_code}", progress_bar=True, leave=False, chunk_size=1048576
         )
-        return NgramLanguageModel.load(
-            join(Settings.RESOURCES_ROOT_DIRECTORY, "models", model_code)
-        )
-    elif model_code in ModelCodeGroups.ALL_MIXER_LANGUAGE_MODELS.value:
+        return NgramLanguageModel.load(Assets.get_path(f"models/{model_code}")[0])
+
+    if model_code in ModelCodeGroups.ALL_MIXER_LANGUAGE_MODELS.value:
         from sign_language_translator.models import MixerLM
 
-        download_resource(
+        Assets.download(
             f"models/{model_code}", progress_bar=True, leave=False, chunk_size=1048576
         )
-        return MixerLM.load(
-            join(Settings.RESOURCES_ROOT_DIRECTORY, "models", model_code)
-        )
-    elif model_code in ModelCodeGroups.ALL_TRANSFORMER_LANGUAGE_MODELS.value:
+        return MixerLM.load(Assets.get_path(f"models/{model_code}")[0])
+
+    if model_code in ModelCodeGroups.ALL_TRANSFORMER_LANGUAGE_MODELS.value:
         from sign_language_translator.models import TransformerLanguageModel
 
-        download_resource(
+        Assets.download(
             f"models/{model_code}", progress_bar=True, leave=False, chunk_size=1048576
         )
-        return TransformerLanguageModel.load(
-            join(Settings.RESOURCES_ROOT_DIRECTORY, "models", model_code)
-        )
-    elif model_code in ModelCodeGroups.ALL_MEDIAPIPE_EMBEDDING_MODELS.value:
+        return TransformerLanguageModel.load(Assets.get_path(f"models/{model_code}")[0])
+
+    if model_code in ModelCodeGroups.ALL_MEDIAPIPE_EMBEDDING_MODELS.value:
         from sign_language_translator.models import MediaPipeLandmarksModel
 
         parts = model_code.split("-")

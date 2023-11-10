@@ -41,8 +41,8 @@ import multiprocessing
 from functools import partial
 from glob import glob
 from os import makedirs
-from os.path import basename, exists, join
-from typing import TYPE_CHECKING, Callable, Iterable, List, Type
+from os.path import abspath, basename, exists, join
+from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Type
 from warnings import warn
 
 import numpy
@@ -87,7 +87,7 @@ def top_p_top_k_indexes(
     """
 
     if top_p is None and top_k is None:
-        return list(range(len(probabilities)))  # type: ignore
+        return sorted(range(len(probabilities)), key=lambda i: probabilities[i], reverse=True)  # type: ignore
 
     probs = torch.Tensor(probabilities)
 
@@ -182,6 +182,8 @@ def plot_lr_scheduler(
     initial_lr: float = 1e-3,
     n_steps: int = 20,
     parameter_group_number: int = 0,
+    save_fig: bool = False,
+    fig_name: str | None = None,
     **kwargs,
 ):
     """Plot the learning rate of a specific parameter group across training steps.
@@ -199,6 +201,8 @@ def plot_lr_scheduler(
             needed in case lr_scheduler_object is None. Defaults to 1e-3.
         n_steps (int, optional): The number of epochs/steps to visualize the learning rate changes. Defaults to 20.
         parameter_group_number (int, optional): The index for the optimizer's parameter group to plot the learning rate for. Defaults to 0.
+        save_fig (bool, optional): Whether to save the plot instead of showing. Defaults to False.
+        fig_name (str, optional): The name of the file to save the plot to. Defaults to None (the class name of the lr_scheduler_class).
         *args: Additional arguments to pass to the lr_scheduler_class when creating a new scheduler.
         **kwargs: Additional keyword arguments to pass to the lr_scheduler_class when creating a new scheduler.
 
@@ -253,7 +257,10 @@ def plot_lr_scheduler(
     )
     plt.xlabel("steps")
     plt.legend()
-    plt.show()
+    if save_fig:
+        plt.savefig(fig_name or f"{lr_scheduler_object.__class__.__name__}.png")
+    else:
+        plt.show()
     plt.close()
 
 
@@ -387,6 +394,7 @@ class VideoEmbeddingPipeline:
 
         video = self.__read_video(path)
         embedding = self.__embed_video(video, **kwargs)
+        # TODO: frames progress callback
         self.__save_embedding(
             embedding,
             basename(path),
@@ -419,7 +427,44 @@ class VideoEmbeddingPipeline:
             None
         """
 
-        paths = [path for pattern in path_patterns for path in glob(pattern)]
+        paths = {abspath(path) for pattern in path_patterns for path in glob(pattern)}
+
+        # warn if multiple paths have the same base name
+        base_to_paths: Dict[str, List[str]] = {}
+        for path in paths:
+            if (base := basename(path)) not in base_to_paths:
+                base_to_paths[base] = []
+            base_to_paths[base].append(path)
+
+        clashing_paths = [
+            path for paths in base_to_paths.values() for path in paths if len(paths) > 1
+        ]
+        if clashing_paths:
+            warn(
+                "Found multiple paths with the same base name"
+                + f" (overwrite=True will prevent skipping). {clashing_paths = }"
+            )
+
+        # optionally skip over existing targets
+        if not overwrite:
+            existing_targets = [
+                (join(output_dir, basename(path)) + f".{save_format}") for path in paths
+            ]
+            existing_targets = {path for path in existing_targets if exists(path)}
+            for path in existing_targets:
+                warn(
+                    f"Target file already exists at {path}. Use overwrite=True to prevent skipping."
+                )
+            existing_sources = {
+                basename(path)[: -len(save_format) - 1] for path in existing_targets
+            }
+            paths = {path for path in paths if basename(path) not in existing_sources}
+
+        paths = sorted(paths)
+        if len(paths) < 1:
+            return
+
+        # process
         n_processes = min(n_processes, len(paths), multiprocessing.cpu_count())
         partial_process_video = partial(
             self.process_video,
@@ -450,7 +495,7 @@ class VideoEmbeddingPipeline:
         file_format="csv",
         overwrite=False,
     ):
-        target_path = join(output_dir, filename) + f".{file_format}"
+        target_path = abspath(join(output_dir, filename) + f".{file_format}")
 
         makedirs(output_dir, exist_ok=True)
         if exists(target_path) and not overwrite:

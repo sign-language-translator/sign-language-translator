@@ -26,13 +26,11 @@ import mediapipe
 import numpy as np
 import torch
 from numpy.typing import NDArray
-from tqdm.auto import tqdm
 
-from sign_language_translator.config.settings import Settings
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.models.video_embedding.video_embedding_model import (
     VideoEmbeddingModel,
 )
-from sign_language_translator.utils import download_resource
 
 
 class MediaPipeLandmarksModel(VideoEmbeddingModel):
@@ -123,6 +121,7 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
                 frame_embedding = self._create_frame_embedding(persons, landmark_type)
 
                 embeddings.append(frame_embedding)
+                # TODO: progress callback (update description of tqdm bar)
 
         return torch.Tensor(embeddings)
 
@@ -200,10 +199,10 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
         return embedding
 
     def __download_and_get_model_path(self, model_local_path: str):
-        download_resource(
+        Assets.download(
             model_local_path,
             progress_bar=True,
             leave=False,
             chunk_size=1048576,
         )
-        return join(Settings.RESOURCES_ROOT_DIRECTORY, model_local_path)
+        return join(Assets.ROOT_DIR, model_local_path)
