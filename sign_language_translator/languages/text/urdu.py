@@ -2,8 +2,8 @@ import re
 from string import ascii_uppercase, digits
 from typing import Any, Dict, Iterable, List, Set, Union
 
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import TextLanguages
-from sign_language_translator.config.settings import Settings
 from sign_language_translator.languages.text.text_language import TextLanguage
 from sign_language_translator.languages.vocab import Vocab
 from sign_language_translator.text.preprocess import (
@@ -35,7 +35,7 @@ class Urdu(TextLanguage):
         self.vocab = Vocab(
             language=self.name(),
             sign_collections=[r".*"],
-            data_root_dir=Settings.RESOURCES_ROOT_DIRECTORY,
+            data_root_dir=Assets.ROOT_DIR,
             arg_is_regex=True,
         )
 

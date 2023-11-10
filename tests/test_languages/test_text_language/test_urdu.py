@@ -2,12 +2,12 @@ import os
 import re
 import warnings
 
-from sign_language_translator import Settings
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.languages.text.urdu import Tags, Urdu
 
 
 def get_urdu_processor_object():
-    return Urdu() if os.path.exists(Settings.RESOURCES_ROOT_DIRECTORY) else None
+    return Urdu() if os.path.exists(Assets.ROOT_DIR) else None
 
 
 def test_urdu_preprocessor():
@@ -15,7 +15,7 @@ def test_urdu_preprocessor():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Assets.ROOT_DIR)"
         )
         return
 
@@ -58,7 +58,7 @@ def test_urdu_tokenizer():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Assets.ROOT_DIR)"
         )
         return
 
@@ -86,7 +86,7 @@ def test_urdu_sentence_tokenizer():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Assets.ROOT_DIR)"
         )
         return
 
@@ -115,7 +115,7 @@ def test_urdu_tagger():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Assets.ROOT_DIR)"
         )
         return
 
@@ -140,7 +140,7 @@ def test_word_senses():
 
     if ur_nlp is None:
         warnings.warn(
-            "urdu text processor object could not be initialized (check slt.Settings.RESOURCES_ROOT_DIRECTORY)"
+            "urdu text processor object could not be initialized (check slt.Assets.ROOT_DIR)"
         )
         return
 

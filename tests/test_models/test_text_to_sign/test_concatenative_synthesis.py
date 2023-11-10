@@ -13,6 +13,7 @@ def test_concatenative_synthesis_model():
     assert model.sign_language.name() == "pakistan-sign-language"
     assert model.sign_format.name() == "video"
 
-    text = "سیب اچھا ہے"
+    text = "ایک سیب اچھا ہے"
     sign_language_sentence = model.translate(text)
-    sign_language_sentence.save(f"temp/{text}.mp4", overwrite=True) # type: ignore
+    sign_language_sentence.save(f"temp/{text}.mp4", overwrite=True)  # type: ignore
+    # TODO: assert os.path.exists(f"temp/{text}.mp4"), os.listdir("temp")

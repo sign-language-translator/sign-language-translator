@@ -52,8 +52,8 @@ def threaded_map(
 
     threads = []
     tqdm_bar = tqdm(args_list, desc="Launching threads") if progress_bar else None
-    for args in tqdm_bar or args_list:
-        thread = threading.Thread(target=target_function, args=args)
+    for n, args in enumerate(tqdm_bar or args_list):
+        thread = threading.Thread(target=target_function, args=args, name=f"{n}_{args}")
         thread.start()
         threads.append(thread)
         sleep(time_delay)

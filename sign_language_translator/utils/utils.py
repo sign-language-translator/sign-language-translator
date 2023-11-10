@@ -5,6 +5,7 @@ __all__ = [
     "search_in_values_to_retrieve_key",
     "sample_one_index",
     "in_jupyter_notebook",
+    "extract_recursive",
 ]
 
 
@@ -59,3 +60,42 @@ def in_jupyter_notebook():
     except:  # pylint: disable = bare-except
         return False
 
+
+def extract_recursive(data: Dict[str, Any], key: str) -> List[Any]:
+    """
+    Recursively extracts values associated with a specified key from a nested dictionary.
+
+    Args:
+        data (Dict[str, Any]): The input dictionary containing nested structures.
+        key (str): The key for which values need to be extracted.
+
+    Returns:
+        List[Any]: A list containing all values associated with the specified key, extracted
+                   recursively from the input dictionary.
+
+    Examples:
+        >>> data = {'a': 1, 'b': {'c': 2, 'd': {'e': 3, 'f': 4}}, 'g': [5, {'h': 6, 'e': 7}]}
+        >>> extract_recursive(data, 'e')
+        [3, 7]
+        >>> extract_recursive(data, 'h')
+        [6]
+        >>> extract_recursive(data, 'x')
+        []  # Key not found, returns an empty list.
+    """
+
+    extracted_values = []
+
+    def extract(data: Dict, results: List):
+        for k in data:
+            if k == key:
+                results.append(data[k])
+            elif isinstance(data[k], dict):
+                extract(data[k], results)
+            elif isinstance(data[k], list):
+                for item in data[k]:
+                    if isinstance(item, dict):
+                        extract(item, results)
+
+    extract(data, extracted_values)
+
+    return extracted_values

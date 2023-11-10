@@ -2,7 +2,6 @@
 
 Functions:
 - download: A function for downloading files from urls.
-- download_resource: A function for downloading resource files based on filename regex.
 - tree: A function for printing a directory tree.
 - sample_one_index: Select an index based on the given probability distribution.
 - search_in_values_to_retrieve_key: search inside every dict value and return the key on match.
@@ -15,7 +14,7 @@ Classes:
 """
 
 from sign_language_translator.utils.arrays import ArrayOps, linear_interpolation
-from sign_language_translator.utils.download import download, download_resource
+from sign_language_translator.utils.download import download
 from sign_language_translator.utils.parallel import threaded_map
 from sign_language_translator.utils.tree import tree
 from sign_language_translator.utils.utils import (
@@ -28,7 +27,6 @@ __all__ = [
     # functions
     "tree",
     "download",
-    "download_resource",
     "search_in_values_to_retrieve_key",
     "sample_one_index",
     "in_jupyter_notebook",

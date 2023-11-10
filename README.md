@@ -13,14 +13,15 @@
    2. [Major Components and Goals](#major-components-and-goals)
 2. [How to install the package](#how-to-install-the-package)
 3. [**Usage**](#usage)
-4. [Models](#models)
-5. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
-6. [Directory Tree](#directory-tree)
-7. [How to Contribute](#how-to-contribute)
-8. [Research Papers & Citation](#research-papers--citation)
-9. [Upcoming/Roadmap](#upcomingroadmap)
-10. [Credits and Gratitude](#credits-and-gratitude)
-11. [Bonus](#bonus)
+4. [Languages](#languages)
+5. [Models](#models)
+6. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
+7. [Directory Tree](#directory-tree)
+8. [How to Contribute](#how-to-contribute)
+9. [Research Papers & Citation](#research-papers--citation)
+10. [Upcoming/Roadmap](#upcomingroadmap)
+11. [Credits and Gratitude](#credits-and-gratitude)
+12. [Bonus](#bonus)
     1. Number of lines of code
     2. :)
 
@@ -218,6 +219,39 @@ sign.save(f"{text}.mp4")
 
 https://github.com/sign-language-translator/sign-language-translator/assets/118578823/b5da28ef-d04d-44c0-9ed8-1343ac004255
 
+## Languages
+
+<details>
+<summary style="font-weight:bold;">Text Languages</summary>
+
+Available Functions:
+
+- Text Normalization
+- Tokenization (word, phrase & sentence)
+- Token Classification (Tagging)
+- Word Sense Disambiguation
+
+| Name                                                                                                                                   | Vocabulary         | Ambiguous tokens | Signs |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | --------------- | ----- |
+| [Urdu](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/urdu.py) | 2090 words+phrases | 227              | 790   |
+
+</details>
+
+<details>
+<summary style="font-weight:bold;">Sign Languages</summary>
+
+Available Functions:
+
+- Word & phrase mapping to signs
+- Sentence restructuring according to grammar
+- Sentence simplification (drop stopwords)
+
+| Name                                                                                                                                                                       | Vocabulary | Dataset | Parallel Corpus |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------- | --- |
+| [Pakistan Sign Language](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py) | 789        | 3 hours | n transcribed sentences with translations in m text languages |
+
+</details>
+
 ## Models
 
 <details>
@@ -225,9 +259,9 @@ https://github.com/sign-language-translator/sign-language-translator/assets/1185
 
 <!-- [Available Trained models]() -->
 
-| Name                                                                                                                                                                              | Architecture        | Description                                                                                                                                         | Input                                                           | Output                              |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------- |
-| [Concatenative Synthesis](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py) | Rules + Hash Tables | The Core Rule-Based translator mainly used to synthesize translation dataset.<br/>Initialize it using TextLanguage, SignLanguage & SignFormat objects. | string                                                          | slt.Sign                        |
+| Name                                                                                                                                                                              | Architecture        | Description                                                                                                                                            | Input  | Output   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | -------- |
+| [Concatenative Synthesis](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py) | Rules + Hash Tables | The Core Rule-Based translator mainly used to synthesize translation dataset.<br/>Initialize it using TextLanguage, SignLanguage & SignFormat objects. | string | slt.Sign |
 
 <!--                                                                                                                                                                              | [pose-gen]()        | Encoder-Decoder Transformers (Seq2Seq)                                                                                                              | Generates a sequence of pose vectors conditioned on input text. | torch.Tensor<br/>(batch, token_ids) | torch.Tensor<br/>(batch, n_frames, n_landmarks*3) | -->
 
@@ -238,8 +272,8 @@ https://github.com/sign-language-translator/sign-language-translator/assets/1185
 
 [Available Trained models]()
 
-| Name        | Architecture                                | Description                                                                                                  | Input format                                         | Output format                       |
-| ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | ----------------------------------- |
+| Name        | Architecture                                | Description                                                                                                  | Input format                                             | Output format                       |
+| ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- | ----------------------------------- |
 | [gesture]() | CNN+Encoder - Decoder Transformer (seq2seq) | Encodes the pose vectors depicting sign language sentence and generates text conditioned on those encodings. | torch.Tensor<br/>(batch, n_frames=1000, n_landmarks * 3) | torch.Tensor<br/>(batch, token_ids) |
 </details> -->
 
@@ -249,8 +283,8 @@ https://github.com/sign-language-translator/sign-language-translator/assets/1185
 
 [Available Trained models]()
 
-| Name        | Architecture                                | Description                                                                                                  | Input format                                         | Output format                       |
-| ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | ----------------------------------- |
+| Name        | Architecture                                | Description                                                                                                  | Input format                                             | Output format                       |
+| ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- | ----------------------------------- |
 | [gesture]() | CNN+Encoder - Decoder Transformer (seq2seq) | Encodes the pose vectors depicting sign language sentence and generates text conditioned on those encodings. | torch.Tensor<br/>(batch, n_frames=1000, n_landmarks * 3) | torch.Tensor<br/>(batch, token_ids) |
 </details>
 -->
@@ -260,8 +294,8 @@ https://github.com/sign-language-translator/sign-language-translator/assets/1185
 
 <!-- [Available Trained models]() -->
 
-| Name                        | Architecture                                                                                                               | Description                                                                                                  | Input format                                         | Output format                       |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | ----------------------------------- |
+| Name                                                                                                                                                                                                 | Architecture                                                                                                               | Description                                                                                       | Input format                                                 | Output format                                |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------- |
 | [MediaPipe Landmarks<br>(Pose + Hands)](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py) | CNN based pipelines. See Here: [Pose](https://arxiv.org/pdf/2006.10204.pdf), [Hands](https://arxiv.org/pdf/2006.10214.pdf) | Encodes videos into pose vectors (3D world or 2D image) depicting the movements of the performer. | List of numpy images<br/>(n_frames, height, width, channels) | torch.Tensor<br/>(n_frames, n_landmarks * 5) |
 </details>
 
@@ -270,10 +304,10 @@ https://github.com/sign-language-translator/sign-language-translator/assets/1185
 
 [Available Trained models](https://github.com/sign-language-translator/sign-language-datasets/releases/tag/v0.0.1)
 
-| Name                           | Architecture                    | Description                                                                  | Input format                                                 | Output format                                                        |
-| ------------------------------ | ------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------- |
-| [N-Gram Langauge Model](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/ngram_language_model.py)      | Hash Tables                     | Predicts the next token based on learned statistics about previous N tokens. | List of tokens                                               | (token, probability)                                                 |
-| [Transformer Language Model](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/model.py) | Decoder-only Transformers (GPT) | Predicts next token using query-key-value attention, linear transformations and soft probabilities.   | torch.Tensor<br/>(batch, token_ids)<br/><br/>List of tokens | torch.Tensor<br/>(batch, token_ids, vocab_size)<br/><br/>(token, probability) |
+| Name                                                                                                                                                                                             | Architecture                    | Description                                                                                         | Input format                                                | Output format                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [N-Gram Langauge Model](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/ngram_language_model.py)                  | Hash Tables                     | Predicts the next token based on learned statistics about previous N tokens.                        | List of tokens                                              | (token, probability)                                                          |
+| [Transformer Language Model](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/model.py) | Decoder-only Transformers (GPT) | Predicts next token using query-key-value attention, linear transformations and soft probabilities. | torch.Tensor<br/>(batch, token_ids)<br/><br/>List of tokens | torch.Tensor<br/>(batch, token_ids, vocab_size)<br/><br/>(token, probability) |
 </details>
 
 <!--
@@ -343,7 +377,8 @@ Remember to contribute back to the community:
 - Share your data, code, and models by creating a pull request (PR), allowing others to benefit from your efforts.
 - Create your own sign language translator (e.g. as your university thesis) and contribute to a more inclusive and accessible world.
 
-See more at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators)
+See more at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators) or in this [notebook](https://github.com/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb).
+<!-- TODO: rename this notebook ^ -->
 
 ## Directory Tree
 
@@ -362,11 +397,15 @@ See more at [Build Custom Translator section in ReadTheDocs](https://sign-langua
 │
 └── <b style="font-size:large;">sign_language_translator</b>
     ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/cli.py">cli.py</a>
+    ├── <i><b>assets</b></i> (auto-downloaded)
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-datasets">*</a>
+    │
     ├── <b>config</b>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/assets.py">assets.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/enums.py">enums.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/helpers.py">helpers.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/settings.py">settings.py</a>
-    │   └── <i><a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/urls.json">urls.json</a></i>
+    │   ├── <i><a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/urls.json">urls.json</a></i>
+    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/utils.py">utils.py</a>
     │
     ├── <b>data_collection</b>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/data_collection/completeness.py">completeness.py</a>
@@ -407,9 +446,6 @@ See more at [Build Custom Translator section in ReadTheDocs](https://sign-langua
     │   └── video_embedding
     │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py">mediapipe_landmarks_model.py</a>
     │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/video_embedding_model.py">video_embedding_model.py</a>
-    │
-    ├── <i><b>sign-language-resources</b></i> (auto-downloaded)
-    │   └── <a href="https://github.com/sign-language-translator/sign-language-datasets">*</a>
     │
     ├── <b>text</b>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/metrics.py">metrics.py</a>
@@ -573,7 +609,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-11-04.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-11-10.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -591,7 +627,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9081** + Tests: **1427**):
+Count total number of **lines of code** (Package: **9287** + Tests: **1419**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

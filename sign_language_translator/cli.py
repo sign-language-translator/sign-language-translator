@@ -81,11 +81,11 @@ def download(filenames, overwrite, progress_bar, timeout, chunk_size):
         $ slt download '.*.json' --overwrite true
     """
 
-    from sign_language_translator.utils import download_resource
+    from sign_language_translator.config.assets import Assets
 
     # Download the specified files
     for filename in filenames:
-        success = download_resource(
+        success = Assets.download(
             filename,
             overwrite=overwrite,
             progress_bar=progress_bar,

@@ -59,8 +59,8 @@ Translation
 
    # download dataset or models (if you need them for personal use)
    # (by default, resources are auto-downloaded within the install directory)
-   # slt.set_resource_dir("path/to/folder")  # Helps preventing duplication across environments or using cloud synced data
-   # slt.utils.download_resource(".*.json")  # downloads into resource_dir
+   # slt.Assets.set_root_dir("path/to/folder")  # Helps preventing duplication across environments or using cloud synced data
+   # slt.Assets.download(".*.json")  # downloads into resource_dir
    # print(slt.Settings.FILE_TO_URL.keys())  # All downloadable resources
 
    print("All available models:")
@@ -135,7 +135,7 @@ First gather sign language video dictionaries for various regions of the world t
 Label the videos with all the text language words that have the same meaning as the sign. If there are multiple signs in the video, make sure that the words in text phrase have 1:1 correspondence with the signs in the video.
 
 .. code-block:: json
-   :caption: sign-language-resources/sign_recordings/collection_to_label_to_language_to_words.json
+   :caption: assets/sign_recordings/collection_to_label_to_language_to_words.json
       {
       "country-organization-number": {
          "1": {

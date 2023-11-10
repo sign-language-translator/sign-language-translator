@@ -4,8 +4,8 @@ import random
 import re
 from typing import Any, Dict, Iterable, List, Tuple
 
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import SignLanguages
-from sign_language_translator.config.settings import Settings
 from sign_language_translator.languages.sign.mapping_rules import (
     CharacterByCharacterMappingRule,
     DirectMappingRule,
@@ -37,7 +37,7 @@ class PakistanSignLanguage(SignLanguage):
         self.vocab = Vocab(
             language=r"^(?!.*\bcomponents\b).*$",  # r".*",
             sign_collections=[r"pk-hfad(-\d+)?"],  # [r"pk-.+"]
-            data_root_dir=Settings.RESOURCES_ROOT_DIRECTORY,
+            data_root_dir=Assets.ROOT_DIR,
             arg_is_regex=True,
         )
         # restructure dict values

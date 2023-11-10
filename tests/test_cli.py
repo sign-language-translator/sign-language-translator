@@ -3,8 +3,7 @@ import os
 from click.testing import CliRunner
 
 from sign_language_translator.cli import slt
-from sign_language_translator.config.settings import Settings
-from sign_language_translator.utils import download_resource
+from sign_language_translator.config.assets import Assets
 
 
 def test_slt():
@@ -17,7 +16,8 @@ def test_slt():
 
 
 # def test_slt_translate():
-#     # TODO: global cap_ffmpeg_impl.hpp:3018 open Could not find encoder for codec_id=27, error: Encoder not found
+#     # BUG: ffmpeg error while writing video (only via CliRunner on ubuntu workflow).
+#     # global cap_ffmpeg_impl.hpp:3018 open Could not find encoder for codec_id=27, error: Encoder not found
 #     # [ERROR:0@6.347] global cap_ffmpeg_impl.hpp:3093 open VIDEOIO/FFMPEG: Failed to initialize VideoWriter
 
 #     runner = CliRunner()
@@ -54,10 +54,9 @@ def test_slt():
 def test_slt_embed():
     runner = CliRunner()
 
-    download_resource("videos/wordless_wordless.mp4")
-    source_filepath = os.path.join(
-        Settings.RESOURCES_ROOT_DIRECTORY, "videos", "wordless_wordless.mp4"
-    )
+    video_id = "videos/wordless_wordless.mp4"
+    Assets.download(video_id, overwrite=False)
+    source_filepath = Assets.get_path(video_id)[0]
 
     result = runner.invoke(
         slt,
@@ -93,6 +92,4 @@ def test_slt_download():
         slt, ["download", "text_preprocessing.json", "--overwrite", "true"]
     )
     assert result.exit_code == 0
-    assert os.path.exists(
-        os.path.join(Settings.RESOURCES_ROOT_DIRECTORY, "text_preprocessing.json")
-    )
+    assert os.path.exists(Assets.get_path("text_preprocessing.json")[0])

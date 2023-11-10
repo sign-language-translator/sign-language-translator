@@ -54,7 +54,7 @@
     {
       "description": "extra-url-files",
       "file_to_url": {
-        "extra_urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d7d77ed8b7120f6d2db41b4e2b316935f8536d6a/extra_urls.json"
+        "extra_urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/ce70a4214e8203cfe52262242f8705fb0d0d6912/extra_urls.json"
       }
     }
   ]

@@ -13,13 +13,14 @@ Functions:
 """
 
 import os
-import re
 from time import time
 
 import requests
 from tqdm.auto import tqdm
 
-from sign_language_translator.config.settings import Settings
+__all__ = [
+    "download",
+]
 
 
 def download(
@@ -98,64 +99,3 @@ def download(
 
     except requests.exceptions.RequestException:
         return False
-
-
-def download_resource(
-    filename_regex: str,
-    overwrite=False,
-    progress_bar: bool | None = None,
-    timeout: float = 20.0,
-    leave=True,
-    chunk_size=65536,
-) -> bool:
-    """
-    Downloads package resources matching the given filename regex and saves them to the appropriate file paths.
-
-    Args:
-        filename_regex (str): Regular expression pattern to match the desired filenames.
-        overwrite (bool, optional): If False, skips downloading if the resource file already exists. Defaults to False.
-        progress_bar (bool, optional): If True, displays a progress bar during the download. If None, uses the value in slt.Settings.SHOW_DOWNLOAD_PROGRESS. Defaults to None.
-        timeout (float, optional): The maximum number of seconds to wait for a server response. Defaults to 20.0.
-        leave (bool, optional): Wether to leave the progress bar behind after the download. Defaults to True.
-        chunk_size (int, optional): The number of bytes to fetch in each step. Defaults to 65536.
-
-    Returns:
-        bool: True if all resources are downloaded successfully or already exist, False otherwise.
-    """
-
-    if progress_bar is None:
-        progress_bar = Settings.SHOW_DOWNLOAD_PROGRESS
-        leave = False
-
-    matching_filenames_to_url = {
-        key: val
-        for key, val in Settings.FILE_TO_URLS.items()
-        if re.match(filename_regex, key)
-    }
-    statuses = []
-    for filename, url in matching_filenames_to_url.items():
-        # Make sure that the file/directory exists
-        file_path = os.path.join(Settings.RESOURCES_ROOT_DIRECTORY, filename)
-        if os.path.exists(file_path) and not overwrite:
-            continue
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
-        # Download the file from the URL
-        status = download(
-            file_path,
-            url,
-            progress_bar=progress_bar,
-            timeout=timeout,
-            overwrite=overwrite,
-            leave=leave,
-            chunk_size=chunk_size,
-        )
-        statuses.append(status)
-
-    return all(statuses or [False])
-
-
-__all__ = [
-    "download",
-    "download_resource",
-]

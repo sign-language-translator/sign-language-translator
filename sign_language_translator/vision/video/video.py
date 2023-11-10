@@ -17,9 +17,9 @@ import torch
 from numpy.typing import NDArray
 from tqdm.auto import tqdm
 
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import SignFormats
-from sign_language_translator.config.settings import Settings
-from sign_language_translator.utils import download_resource, in_jupyter_notebook
+from sign_language_translator.utils import in_jupyter_notebook
 from sign_language_translator.vision.sign.sign import Sign
 from sign_language_translator.vision.utils import (
     _normalize_args_index_and_timestamp,
@@ -66,6 +66,7 @@ class Video(Sign, VideoFrames):
         self._n_channels: int
 
         self.__initialize_from_arguments(sign, **kwargs)
+        # TODO: from URL
         self._source_end_index = len(self.source) - 1
         self.__update_shape_components()
 
@@ -76,9 +77,9 @@ class Video(Sign, VideoFrames):
     def name() -> str:
         return SignFormats.VIDEO.value
 
-    # ------------------- #
-    # Iterate / get frame #
-    # ------------------- #
+    # ========================= #
+    #    Iterate / get frame    #
+    # ========================= #
 
     def get_frame(
         self, timestamp: float | None = None, index: int | None = None
@@ -232,9 +233,9 @@ class Video(Sign, VideoFrames):
 
         return new
 
-    # ------------------- #
-    # Typecast / get data #
-    # ------------------- #
+    # ========================= #
+    #    Typecast / get data    #
+    # ========================= #
 
     def numpy(self, *args, **kwargs):
         """
@@ -273,9 +274,9 @@ class Video(Sign, VideoFrames):
             return torch.tensor(self.numpy(), dtype=dtype, *args, **kwargs)  # type: ignore
         return NotImplemented
 
-    # -------------------- #
-    # Display / show frame #
-    # -------------------- #
+    # ========================== #
+    #    Display / show frame    #
+    # ========================== #
 
     def show(self, inline_player="html5" or "jshtml", **kwargs) -> None:
         if (
@@ -338,9 +339,9 @@ class Video(Sign, VideoFrames):
 
         VideoDisplay.display_frames([grid], inline_player="jshtml")
 
-    # ----------- #
-    # Concatenate #
-    # ----------- #
+    # ================= #
+    #    Concatenate    #
+    # ================= #
 
     @staticmethod
     def concatenate(objects: Iterable[Video]) -> Video:
@@ -426,9 +427,9 @@ class Video(Sign, VideoFrames):
 
         return new
 
-    # --------- #
-    # Transform #
-    # --------- #
+    # =============== #
+    #    Transform    #
+    # =============== #
 
     def transform(
         self, transformation: Callable[[NDArray[np.uint8]], NDArray[np.uint8]]
@@ -457,9 +458,9 @@ class Video(Sign, VideoFrames):
 
         self.__update_shape_components()
 
-    # ------------ #
-    # Size / Shape #
-    # ------------ #
+    # ================ #
+    #    Dimensions    #
+    # ================ #
 
     def __len__(self) -> int:
         # TODO: handle steps e.g. video[::3, ...]
@@ -498,9 +499,9 @@ class Video(Sign, VideoFrames):
     def length(self) -> int:
         return len(self)
 
-    # ------------ #
-    # Save to disk #
-    # ------------ #
+    # ================== #
+    #    Save to disk    #
+    # ================== #
 
     @staticmethod
     def save_(  # TODO: overload save to be static and instance method simultaneously
@@ -632,9 +633,9 @@ class Video(Sign, VideoFrames):
         grid = cv2.cvtColor(grid, cv2.COLOR_RGB2BGR)
         cv2.imwrite(path, grid)
 
-    # ----------------------- #
-    # Initialize Video object #
-    # ----------------------- #
+    # ============================= #
+    #    Initialize Video object    #
+    # ============================= #
 
     @staticmethod
     def load(path: str, **kwargs) -> Video:
@@ -652,11 +653,11 @@ class Video(Sign, VideoFrames):
 
     def __initialize_from_arguments(self, sign, **kwargs):
         if isinstance(sign, str):
-            if isfile(sign):
+            if isfile(sign) and not kwargs.get("is_asset", False):
                 self._from_path(sign, **kwargs)
-            elif sign in Settings.FILE_TO_URLS:
-                download_resource(sign, leave=False)
-                self._from_path(join(Settings.RESOURCES_ROOT_DIRECTORY, sign), **kwargs)
+            elif Assets.get_id(sign):
+                Assets.download(sign, leave=False, overwrite=False)
+                self._from_path(Assets.get_path(sign)[0], **kwargs)
             else:
                 raise ValueError(
                     f"Invalid argument: {sign}. provide path to a video or relative path to a video resource from dataset."
@@ -736,9 +737,9 @@ class Video(Sign, VideoFrames):
         self.source = IterableFrames(frames_iterable, total_frames, **kwargs)
         self.__extract_properties_from_source(self.source)
 
-    # ----------------------- #
-    # Cleaning / with _ as _: #
-    # ----------------------- #
+    # ============================= #
+    #    Cleaning / with _ as _:    #
+    # ============================= #
 
     def __enter__(self):
         return self

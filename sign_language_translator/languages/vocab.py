@@ -5,8 +5,8 @@ import os
 import re
 from typing import Any, Dict, Iterable, List, Set
 
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.settings import Settings
-from sign_language_translator.utils import download_resource
 
 
 class Vocab:
@@ -16,7 +16,7 @@ class Vocab:
         self,
         language: str = r"$.",
         sign_collections: Iterable[str] = (r"$.",),
-        data_root_dir: str = Settings.RESOURCES_ROOT_DIRECTORY,
+        data_root_dir: str = Assets.ROOT_DIR,
         arg_is_regex: bool = True,
     ) -> None:
         # save arguments
@@ -305,14 +305,14 @@ class Vocab:
         return ambiguous_2_unambiguous
 
     def _download_resource(self, full_path: str):
-        if not Settings.AUTO_DOWNLOAD:
-            return
-        if os.path.exists(full_path):
-            return
-        if full_path.startswith(Settings.RESOURCES_ROOT_DIRECTORY):
-            filename = full_path[len(Settings.RESOURCES_ROOT_DIRECTORY) :]
+        if (
+            Settings.AUTO_DOWNLOAD
+            and not os.path.exists(full_path)
+            and full_path.startswith(Assets.ROOT_DIR)
+        ):
+            filename = full_path[len(Assets.ROOT_DIR) :]
             filename = re.escape(filename.strip(os.path.sep))
-            download_resource(filename, overwrite=False)
+            Assets.download(filename, overwrite=False)
 
     # load sign video/features
 
