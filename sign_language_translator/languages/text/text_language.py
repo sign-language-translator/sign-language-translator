@@ -1,47 +1,50 @@
-from abc import ABC, abstractmethod, abstractstaticmethod
+from abc import ABC, abstractmethod
 from typing import Any, Iterable, List, Set, Tuple, Union
 
 
 class TextLanguage(ABC):
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def name() -> str:
-        pass
+        """Returns the name of the language used everywhere else in datasets."""
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def word_regex() -> str:
-        pass
+        """Returns a regular expression that matches words in this language."""
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def allowed_characters() -> Set[str]:
-        pass
+        """Returns a set of all allowed characters in the language."""
 
     @abstractmethod
     def preprocess(self, text: str) -> str:
-        pass
+        """Preprocesses text before tokenization"""
 
     @abstractmethod
     def tokenize(self, text: str) -> List[str]:
-        pass
+        """Break apart text into words or phrases"""
 
     @abstractmethod
     def sentence_tokenize(self, text: str) -> List[str]:
-        pass
+        """Break text into sentences."""
 
     @abstractmethod
     def detokenize(self, tokens: Iterable[str]) -> str:
-        pass
+        """Joins tokens back into text."""
 
     @abstractmethod
     def tag(self, tokens: Union[str, Iterable[str]]) -> List[Tuple[str, Any]]:
-        pass
+        """Classify the tokens and mark them with appropriate tags."""
 
     @abstractmethod
     def get_tags(self, tokens: Union[str, Iterable[str]]) -> List[Any]:
-        pass
+        """Get the classifications of all tokens in the form of a sequence of tags"""
 
     @abstractmethod
     def get_word_senses(self, tokens: Union[str, Iterable[str]]) -> List[List[str]]:
-        pass
+        """Get all known meanings of the ambiguous word."""
 
     # embed/similar
     # all_tags

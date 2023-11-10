@@ -2,44 +2,40 @@ import json
 import os
 import re
 import warnings
-from glob import glob
+from collections import Counter
 from typing import Dict, List
 
 from sign_language_translator import Settings
-from sign_language_translator.utils import download_resource
+from sign_language_translator.config.assets import Assets
 
 
-def load_data(data_filename):
-    download_resource(data_filename, overwrite=False)
+def load_data(file_id):
+    Assets.download(file_id, overwrite=False)
 
-    data = None
-    data_path = os.path.join(
-        Settings.RESOURCES_ROOT_DIRECTORY,
-        data_filename,
-    )
-    data_path = os.path.realpath(data_path)
+    data_path = Assets.get_path(file_id)[0]
     if os.path.exists(data_path):
-        with open(data_path) as f:
+        with open(data_path, "r") as f:
             data = json.load(f)
+    else:
+        data = None
 
     return data
 
 
 def load_recordings_labels() -> List[str]:
-    json_data = load_data(
-        os.path.join(
-            "sign_recordings",
-            "recordings_labels.json",
-        )
+    json_data: Dict[str, List[str]] | None = load_data(
+        "sign_recordings/recordings_labels.json"
     )
-    if not json_data:
-        return []
 
-    flattened_data = [
-        Settings.FILENAME_SEPARATOR.join((sign_collection, label))
-        for sign_collection, label_list in json_data.items()
-        for label in label_list
-    ]
+    flattened_data = (
+        [
+            Settings.FILENAME_SEPARATOR.join((sign_collection, label))
+            for sign_collection, label_list in json_data.items()
+            for label in label_list
+        ]
+        if json_data
+        else []
+    )
 
     return flattened_data
 
@@ -89,39 +85,17 @@ def validate_word_dict(word_dict: Dict[str, List[str]], sign_labels=set()):
 
 
 def test_recordings_labels():
-    # TODO: clean up this commented code:
-    # from sign_language_translator import set_resources_dir
-
-    # set_resources_dir(
-    #     "/Users/mudassar.iqbal/Library/CloudStorage/GoogleDrive-mdsriqb@gmail.com/My Drive/sign-language-translator/sign-language-datasets"
-    # )
-
-    json_data = load_recordings_labels()
-    if not json_data:
+    labels = load_recordings_labels()
+    if not labels:
         warnings.warn("'recordings_labels' json file from dataset could not be loaded")
         return
 
-    ref_clips_path = os.path.join(
-        Settings.RESOURCES_ROOT_DIRECTORY, "sign_recordings", "reference_clips"
-    )
+    repeated = {lab: count for lab, count in Counter(labels).most_common() if count > 1}
+    assert not repeated, f"repetition in reference_labels.json, {repeated}"
 
-    if not os.path.exists(ref_clips_path):
-        warnings.warn("'reference_clips' from dataset could not be loaded")
-        return
-
-    filepaths = glob(os.path.join(ref_clips_path, "**", "*.mp4"))
-    # :TODO: [-1][:-4] after files renamed to sign-collection_label_person_camera.mp4
-    file_labels = [
-        (Settings.FILENAME_SEPARATOR.join(p.split(os.sep)[-2:]))[:-4] for p in filepaths
-    ]
-
-    assert len(file_labels) == len(
-        set(file_labels)
-    ), "repetition in reference clip filenames"
-    assert len(json_data) == len(set(json_data)), "repetition in reference_labels.json"
-    assert set(json_data) == set(
-        file_labels
-    ), f"reference clips filenames not equal reference_labels.json {set(file_labels).symmetric_difference(set(json_data))}"
+    # Assets.get_url(f".*/{re.escape(label)}.mp4"))
+    not_linked = [lab for lab in labels if not Assets.get_url(f"videos/{lab}.mp4")]
+    assert not not_linked, f"{len(not_linked)} labels not linked: {not_linked}"
 
 
 def test_constructable_words():

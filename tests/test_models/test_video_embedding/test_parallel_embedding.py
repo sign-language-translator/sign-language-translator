@@ -2,16 +2,15 @@ import os
 
 import numpy as np
 
-from sign_language_translator import Settings
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.models.utils import VideoEmbeddingPipeline
 from sign_language_translator.models.video_embedding import VideoEmbeddingModel
-from sign_language_translator.utils import download_resource
 
 
 class DummyVideoEmbeddingModel(VideoEmbeddingModel):
     def embed(self, frame_sequence, **kwargs):
         # Dummy embedding function for testing
-        return np.random.rand(len(list(frame_sequence)), 100)
+        return np.random.rand(len(list(frame_sequence)), 10)
 
 
 def get_dummy_model():
@@ -19,11 +18,12 @@ def get_dummy_model():
 
 
 def test_process_videos_parallel():
-    download_resource("videos/wordless_wordless.mp4")
-    source_video_path = os.path.join(
-        Settings.RESOURCES_ROOT_DIRECTORY, "videos", "wordless_wordless.mp4"
-    )
-    video_paths = [source_video_path] * 10
+    video_paths = []
+    for filename in ["wordless_wordless.mp4", "pk-hfad-2_hour.mp4"]:
+        Assets.download(f"videos/{filename}")
+        video_paths.append(Assets.get_path(f"videos/{filename}")[0])
+
+    video_paths = video_paths * 10
     temp_dir = "temp"
 
     pipeline = VideoEmbeddingPipeline(get_dummy_model())

@@ -16,8 +16,8 @@ Usage
 
     # download dataset or models (if you need them for personal use)
     # (by default, resources are auto-downloaded within the install directory)
-    # slt.set_resource_dir("path/to/folder")  # Helps preventing duplication across environments or using cloud synced data
-    # slt.utils.download_resource(".*.json")  # downloads into resource_dir
+    # slt.Assets.set_root_dir("path/to/folder")  # Helps preventing duplication across environments or using cloud synced data
+    # slt.Assets.download(".*.json")  # downloads into resource_dir
     # print(slt.Settings.FILE_TO_URL.keys())  # All downloadable resources
 
     print("All available models:")
@@ -43,8 +43,8 @@ Usage
     text = "HELLO دنیا!" # HELLO treated as an acronym
     sign_language_sentence = t2s_model(text)
 
-    # slt_video_object.show() # class: slt.vision.sign.Sign
-    # slt_video_object.save(f"sentences/{text}.mp4")
+    # sign_language_sentence.show() # class: slt.vision.sign.Sign or its child
+    # sign_language_sentence.save(f"sentences/{text}.mp4")
 
     # -------------------------- TRANSLATE: sign to text --------------------------
 
@@ -85,19 +85,22 @@ from sign_language_translator import (
     vision,
 )
 from sign_language_translator.config import enums
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import ModelCodeGroups, ModelCodes
 from sign_language_translator.config.enums import SignFormats as SignFormatCodes
 from sign_language_translator.config.enums import SignLanguages as SignLanguageCodes
 from sign_language_translator.config.enums import TextLanguages as TextLanguageCodes
-from sign_language_translator.config.settings import Settings, set_resources_dir
+from sign_language_translator.config.settings import Settings
 from sign_language_translator.languages import get_sign_language, get_text_language
 from sign_language_translator.models import get_model
+from sign_language_translator.vision._utils import get_sign_wrapper_class
+from sign_language_translator.vision.video.video import Video
 
-__version__ = config.helpers.get_package_version()
+__version__ = config.utils.get_package_version()
 
 __all__ = [
     # config
-    "set_resources_dir",
+    "Assets",
     "Settings",
     "__version__",
     # modules
@@ -115,8 +118,13 @@ __all__ = [
     "SignLanguageCodes",
     "SignFormatCodes",
     "ModelCodeGroups",
+    # classes (wrappers)
+    "Video",
     # object loaders
     "get_sign_language",
     "get_text_language",
     "get_model",
+    "get_sign_wrapper_class",
 ]
+
+# TODO: Assets.delete_all_out_of_date_assets()

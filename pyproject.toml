@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "sign_language_translator"
-version = "0.6.3"
-description = "Translate between spoken/text languages and sign language videos using AI."
+version = "0.6.4"
+description = "Build Translators and Translate between text languages & sign language videos with AI."
 authors = ["Mudassar Iqbal <mdsriqb@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
@@ -20,7 +20,6 @@ beautifulsoup4 = "^4.12.2"
 deep-translator = "^1.11.4"
 opencv-contrib-python = "^4.8.0.74"
 tqdm = "^4.65.0"
-pyyaml = "^6.0"
 click = "^8.1.4"
 
 [build-system]

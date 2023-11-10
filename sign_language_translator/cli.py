@@ -3,7 +3,8 @@ Sign Language Translator (SLT) Command Line Interface
 
 This module provides a command line interface (CLI) for the Sign Language Translator (SLT) library.
 It allows you to perform various operations such as translating text to sign language or vice versa,
-downloading resource files & completing text sequences using Language Models.
+downloading resource files, completing text sequences using Language Models & embedding videos into
+sequences of vectors.
 
 Usage:
     slt [OPTIONS] COMMAND [ARGS]...
@@ -18,6 +19,8 @@ Commands:
     embed      Embed Videos Using Selected Model.
 """
 
+import os
+
 import click
 
 from sign_language_translator import __version__
@@ -28,7 +31,10 @@ from sign_language_translator import __version__
 @click.group()
 @click.version_option(__version__)
 def slt():
-    """Sign Language Translator (SLT) command line interface."""
+    """
+    Sign Language Translator (SLT) command line interface.
+    Documentation: https://sign-language-translator.readthedocs.io
+    """
 
 
 # @slt.command()
@@ -45,11 +51,13 @@ def slt():
 @click.argument("filenames", nargs=-1, required=True)
 @click.option(
     "--overwrite",
+    "-o",
     default=False,
     help="Overwrite existing files. Defaults to False.",
 )
 @click.option(
     "--progress-bar",
+    "-p",
     default=True,
     help="Show progress bar for kilobytes downloaded. Defaults to True.",
 )
@@ -73,11 +81,11 @@ def download(filenames, overwrite, progress_bar, timeout, chunk_size):
         $ slt download '.*.json' --overwrite true
     """
 
-    from sign_language_translator.utils import download_resource
+    from sign_language_translator.config.assets import Assets
 
     # Download the specified files
     for filename in filenames:
-        success = download_resource(
+        success = Assets.download(
             filename,
             overwrite=overwrite,
             progress_bar=progress_bar,
@@ -94,18 +102,48 @@ def download(filenames, overwrite, progress_bar, timeout, chunk_size):
 @slt.command(no_args_is_help=True)
 @click.argument("inputs", nargs=-1, required=True)
 @click.option(
-    "--model-code", required=True, help="Short code to identify the translation model."
+    "--model-code",
+    "-m",
+    required=True,
+    help="Short code to identify the translation model.",
 )
 @click.option("--text-lang", help="Name of the text language.")
 @click.option("--sign-lang", help="Name of the sign language.")
 @click.option(
     "--sign-format",
-    help="the sign features to be used e.g. pixels, mediapipe-landmarks etc.",
+    help="the sign features to be used e.g. video, mediapipe-landmarks etc.",
 )
 @click.option(
-    "--target-path", default=".", help="Output directory for generated translations."
+    "--output-dir", default=".", help="Output directory for generated translations."
 )
-def translate(inputs, model_code, text_lang, sign_lang, sign_format, target_path):
+@click.option(
+    "--overwrite",
+    "-o",
+    default=False,
+    help="Whether to overwrite the target file if it already exists. Defaults to False.",
+)
+@click.option(
+    "--display",
+    "-d",
+    default=True,
+    help="Whether to show the output video. Defaults to True.",
+)
+@click.option(
+    "--save-format",
+    default="mp4",
+    help="The output file extension. Defaults to 'mp4'.",
+)
+def translate(
+    inputs,
+    model_code,
+    text_lang,
+    sign_lang,
+    sign_format,
+    output_dir,
+    overwrite,
+    display,
+    save_format,
+):
     """
     Translate text into sign language or vice versa.
 
@@ -113,10 +151,10 @@ def translate(inputs, model_code, text_lang, sign_lang, sign_format, target_path
     Currently following model-codes are supported:\n
     1. "concatenative-synthesis" or "rule-based"\n
     Examples:\n
-        $ slt translate --model-code rule-based --text-lang urdu --sign-lang pakistan-sign-language --sign-format mediapipe-landmarks "وہ سکول گیا تھا۔"
+        $ slt translate --model-code rule-based --text-lang urdu --sign-lang psl --sign-format video "ایک سیب اچھا ہے۔"
     """
 
-    from sign_language_translator import get_model
+    from sign_language_translator import get_model, get_sign_wrapper_class
     from sign_language_translator.models import TextToSignModel
 
     model = get_model(
@@ -126,8 +164,13 @@ def translate(inputs, model_code, text_lang, sign_lang, sign_format, target_path
         sign_format=sign_format,
     )
     if model and isinstance(model, TextToSignModel):  # TODO: , SignToTextModel):
-        for inp in inputs:
-            click.echo(model.translate(inp))
+        for text in inputs:
+            sign = model.translate(text)
+            path = os.path.join(output_dir, f"{text}.{save_format}")
+            sign.save(path, overwrite=overwrite, leave=True)
+            if display:
+                get_sign_wrapper_class(sign.name())(path).show()
+
     else:
         click.echo("This type of translation is not yet supported!")
 

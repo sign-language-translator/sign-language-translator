@@ -2,7 +2,8 @@ import re
 from string import ascii_uppercase, digits
 from typing import Any, Dict, Iterable, List, Set, Union
 
-from sign_language_translator.config.settings import Settings
+from sign_language_translator.config.assets import Assets
+from sign_language_translator.config.enums import TextLanguages
 from sign_language_translator.languages.text.text_language import TextLanguage
 from sign_language_translator.languages.vocab import Vocab
 from sign_language_translator.text.preprocess import (
@@ -12,11 +13,15 @@ from sign_language_translator.text.preprocess import (
 from sign_language_translator.text.tagger import Rule, Tagger, Tags
 from sign_language_translator.text.tokenizer import SignTokenizer
 
+__all__ = [
+    "Urdu",
+]
+
 
 class Urdu(TextLanguage):
     @staticmethod
     def name() -> str:
-        return "urdu"
+        return TextLanguages.URDU.value
 
     @classmethod
     def word_regex(cls) -> str:
@@ -30,7 +35,7 @@ class Urdu(TextLanguage):
         self.vocab = Vocab(
             language=self.name(),
             sign_collections=[r".*"],
-            data_root_dir=Settings.RESOURCES_ROOT_DIRECTORY,
+            data_root_dir=Assets.ROOT_DIR,
             arg_is_regex=True,
         )
 
@@ -114,7 +119,6 @@ class Urdu(TextLanguage):
         )
 
     def preprocess(self, text: str) -> str:
-
         # TODO: optimize (especially regex)
         text = self.character_normalize(text)
 
@@ -189,7 +193,8 @@ class Urdu(TextLanguage):
 
     PUNCTUATION_REGEX = r"[" + "".join([re.escape(punc) for punc in PUNCTUATION]) + r"]"
     URDU_DIACRITICS = " ٍ ً ٰ َ ُ ِ ".split()
-    URDU_WORD_REGEX = r"[\w" + "".join(URDU_DIACRITICS) + r"]+"  # TODO: r"[[^\W\d_]"+ "".join(URDU_DIACRITICS) + r"]+"
+    URDU_WORD_REGEX = r"[\w" + "".join(URDU_DIACRITICS) + r"]+"
+    # TODO: r"[[^\W\d_]"+ "".join(URDU_DIACRITICS) + r"]+"
 
     NUMBER_REGEX = r"\d+(?:[\.:]\d+)*"
 
@@ -369,11 +374,8 @@ class Urdu(TextLanguage):
         | set(SYMBOLS)
         | set(ascii_uppercase)  # acronyms
         | set(digits)
-        | set("()!.,?/[]{} ")
+        | set("()!.,?/[]{} ؑ ")
     )
     UNALLOWED_CHARACTERS_REGEX = (
         "[^" + "".join(map(re.escape, ALLOWED_CHARACTERS)) + "]"
     )
-
-
-__all__ = ["Urdu"]
