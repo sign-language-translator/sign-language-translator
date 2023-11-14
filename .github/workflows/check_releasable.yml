@@ -48,7 +48,8 @@ jobs:
 
       - name: Append Build Number to version
         run: |
-          poetry version "$(poetry version -s).$(date +%Y%m%d%H%M%S)"
+          PACKAGE_VERSION="$(poetry version -s).$(date +%Y%m%d%H%M%S)"
+          poetry version $PACKAGE_VERSION
 
       - name: Build
         run: |
@@ -58,3 +59,13 @@ jobs:
         if: success()
         run: |
           python -m twine upload --repository testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }} dist/*
+
+      - name: Install published package in a new virtual environment
+        run: |
+          python -m venv venv2
+          source venv2/bin/activate
+          pip install -i https://test.pypi.org/simple/ sign-language-translator==$PACKAGE_VERSION
+
+      - name: Run Package CLI
+        run: |
+          slt translate "SLT" --model-code rule-based --text-lang ur --sign-lang pk-sl --sign-format video --display false
