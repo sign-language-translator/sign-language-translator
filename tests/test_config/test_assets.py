@@ -53,4 +53,5 @@ def test_resource_urls_are_live():
     broken = {
         name: url for (name, url), status in name_url_to_status.items() if status != 200
     }
-    assert not broken, f"Broken URLs: {broken}"
+    num_broken = len(broken)
+    assert num_broken == 0, f"{num_broken} Broken URLs: {broken}"

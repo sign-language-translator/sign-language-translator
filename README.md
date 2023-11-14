@@ -13,6 +13,8 @@
    2. [Major Components and Goals](#major-components-and-goals)
 2. [How to install the package](#how-to-install-the-package)
 3. [**Usage**](#usage)
+   1. [Python](#python)
+   2. [Command Line](#command-line)
 4. [Languages](#languages)
 5. [Models](#models)
 6. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
@@ -164,11 +166,57 @@ pip install -e git+https://github.com/sign-language-translator/sign-language-tra
 
 ## Usage
 
-Head over to <span style="font-size:large;">[sign-language-translator.**readthedocs**.io](https://sign-language-translator.readthedocs.io)</span> to see the detailed usage in Python, Command line and GUI.
+Head over to <span style="font-size:large;">[sign-language-translator.**readthedocs**.io](https://sign-language-translator.readthedocs.io)</span> to see the detailed usage in Python & CLI. <!-- and GUI. -->
 
 See the [*test cases*](https://github.com/sign-language-translator/sign-language-translator/blob/main/tests) or the [*notebooks* repo](https://github.com/sign-language-translator/notebooks) to see the internal code in action.
 
-Also see [How to build a custom sign language translator](#how-to-build-a-translator-for-sign-language).
+Also see the [How to build a custom sign language translator](#how-to-build-a-translator-for-sign-language) section.
+
+### Python
+
+```python
+# Documentation: https://sign-language-translator.readthedocs.io
+import sign_language_translator as slt
+# help(slt)
+
+# The core model of the project (rule-based text-to-sign translator)
+# which enables us to generate synthetic training datasets
+model = slt.models.ConcatenativeSynthesis(
+   text_language="urdu", sign_language="pk-sl", sign_format="video"
+)
+text = "یہ بہت اچھا ہے۔" # "This very good is."
+sign = model.translate(text) # tokenize, map, download & concatenate
+sign.show()
+# sign.save(f"{text}.mp4")
+```
+
+![this very good is](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/7f4ff312-df03-4b11-837b-5fb895c9f08e)
+
+```python
+import sign_language_translator as slt
+
+# # Load sign-to-text model (pytorch) (COMING SOON!)
+# translation_model = slt.get_model(slt.ModelCodes.Gesture)
+embedding_model = slt.models.MediaPipeLandmarksModel()
+
+sign = slt.Video("video.mp4")
+embedding = embedding_model.embed(sign.iter_frames())
+# text = model.translate(embedding)
+
+# print(text)
+sign.show()
+# slt.Landmarks(embedding, connections="mediapipe-world").show()
+```
+
+```python
+# custom translator
+help(slt.languages.SignLanguage)
+help(slt.languages.text.Urdu)
+help(slt.models.ConcatenativeSynthesis)
+# help(slt.models.TransformerLanguageModel)
+```
+
+### Command Line
 
 ```bash
 $ slt
@@ -186,38 +234,12 @@ Commands:
   translate  Translate text into sign language or vice versa.
 ```
 
-```python
-# Documentation: https://sign-language-translator.readthedocs.io
-import sign_language_translator as slt
-help(slt)
+**Generate training examples**: write a sentence with a language model and synthesize a sign language video from it with a single command:
 
-# The core model of the project (rule-based text-to-sign translator)
-# which enables us to generate synthetic training datasets
-model = slt.models.ConcatenativeSynthesis(
-   text_language="urdu", sign_language="psl", sign_format="video"
-)
-text = "سیب اچھا ہے"
-sign = model.translate(text) # tokenize, map, download & concatenate
-sign.show(inline_player="html5") # jupyter notebook
-sign.save(f"{text}.mp4")
-
-# # Load any model
-# # print(list(slt.ModelCodes))
-# model = slt.get_model(slt.ModelCodes.Gesture) # sign-to-text (pytorch)
-# sign = slt.Video("video.mp4")
-# text = model.translate(sign)
-# print(text)
-# # sign.show()
-
-# # DocStrings
-# help(slt.languages.SignLanguage)
-# help(slt.languages.text.Urdu)
-# help(slt.Video)
-# help(slt.models.MediaPipeLandmarksModel)
-# help(slt.models.TransformerLanguageModel)
+```bash
+slt translate --model-code rule-based --text-lang urdu --sign-lang pk-sl --sign-format video \
+"$(slt complete '<' --model-code urdu-mixed-ngram --join '')"
 ```
-
-https://github.com/sign-language-translator/sign-language-translator/assets/118578823/b5da28ef-d04d-44c0-9ed8-1343ac004255
 
 ## Languages
 
@@ -377,8 +399,7 @@ Remember to contribute back to the community:
 - Share your data, code, and models by creating a pull request (PR), allowing others to benefit from your efforts.
 - Create your own sign language translator (e.g. as your university thesis) and contribute to a more inclusive and accessible world.
 
-See more at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators) or in this [notebook](https://github.com/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb).
-<!-- TODO: rename this notebook ^ -->
+See more at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators) or in this [notebook](https://github.com/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb). [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb)
 
 ## Directory Tree
 
@@ -524,8 +545,6 @@ Stay Tuned!
 <summary>CLEAN_ARCHITECTURE_VISION: v0.7</summary>
 
 ```python
-# urls.json, extra-urls.json
-
 # bugfix: inaccurate num_frames in video file metadata
 # improvement: video wrapper class uses list of sources instead of linked list of videos
 # video transformations
@@ -609,7 +628,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-11-10.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-11-14.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -627,7 +646,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9287** + Tests: **1419**):
+Count total number of **lines of code** (Package: **9466** + Tests: **1421**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

@@ -2,8 +2,16 @@ import enum
 import re
 from typing import Any, Callable, Iterable, List, Tuple
 
+from sign_language_translator.utils import PrintableEnumMeta
 
-class Tags(enum.Enum):
+__all__ = [
+    "Rule",
+    "Tagger",
+    "Tags",
+]
+
+
+class Tags(enum.Enum, metaclass=PrintableEnumMeta):
     """Enumeration of token tags used in NLP processing."""
 
     WORD = "WORD"
@@ -31,7 +39,7 @@ class Tags(enum.Enum):
     def __repr__(self) -> str:
         return str(self)
 
-    # :TODO: rename SUPPORTED to something better e.g. directly_mapped, recognized
+    # TODO: rename SUPPORTED to something better e.g. directly_mapped, recognized
 
 
 class Rule:

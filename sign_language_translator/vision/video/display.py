@@ -94,7 +94,8 @@ class VideoDisplay:
                 animation = VideoDisplay.frames_to_matplotlib_animation(
                     frames, fps, close_plot=False
                 )
-            plt.show()
+            plt.show(block=False)  # TODO: window name
+            plt.pause((len(frames) / fps) * 1.02 if hasattr(frames, "__len__") else 10)  # type: ignore
             plt.close()
 
     @staticmethod

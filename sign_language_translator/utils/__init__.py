@@ -21,6 +21,8 @@ from sign_language_translator.utils.utils import (
     in_jupyter_notebook,
     sample_one_index,
     search_in_values_to_retrieve_key,
+    extract_recursive,
+    PrintableEnumMeta,
 )
 
 __all__ = [
@@ -32,6 +34,8 @@ __all__ = [
     "in_jupyter_notebook",
     "linear_interpolation",
     "threaded_map",
+    "extract_recursive",
     # classes
     "ArrayOps",
+    "PrintableEnumMeta",
 ]

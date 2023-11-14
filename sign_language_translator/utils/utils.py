@@ -1,3 +1,4 @@
+from enum import EnumMeta
 from random import choices
 from typing import Any, Dict, List, Set
 
@@ -6,6 +7,7 @@ __all__ = [
     "sample_one_index",
     "in_jupyter_notebook",
     "extract_recursive",
+    "PrintableEnumMeta",
 ]
 
 
@@ -99,3 +101,39 @@ def extract_recursive(data: Dict[str, Any], key: str) -> List[Any]:
     extract(data, extracted_values)
 
     return extracted_values
+
+
+class PrintableEnumMeta(EnumMeta):
+    """
+    Metaclass for customizing the string representation of Enum classes.
+
+    This metaclass overrides the __str__ & __repr__ method to provide a human-readable
+    representation of Enum classes when they are printed. The generated string
+    includes the class name and a formatted list of Enum members and their values.
+
+    Example:
+
+    .. code-block:: python
+
+        class MyEnumClass(enum.Enum, metaclass=PrintableEnumMeta):
+            MEMBER1 = "value_1"
+            MEMBER2 = "value_2"
+
+        print(MyEnumClass)
+
+        # "MyEnumClass" enum class. Available values:
+        # 1. MEMBER1 = value_1
+        # 2. MEMBER2 = value_2
+    """
+
+    def __str__(cls):
+        members = "\n".join(
+            [
+                f"{i + 1}. {member.name} = {member.value}"  # type:ignore
+                for i, member in enumerate(cls)
+            ]
+        )
+        return f'"{cls.__name__}" enum class. Available values:\n{members}'
+
+    def __repr__(cls) -> str:
+        return str(cls)

@@ -188,17 +188,20 @@ def translate(
 @click.option(
     "--end-token",
     default=">",
-    help="Keep generating until this token. Defaults to '>'.",
+    help="Keep generating until this token.",
+    show_default=True,
 )
 @click.option(
     "--max-length",
     default=20,
-    help="Maximum number of tokens to generate. Defaults to 20.",
+    help="Maximum number of tokens to generate.",
+    show_default=True,
 )
 @click.option(
     "--beam-width",
     default=3.0,
-    help="Number of possible branches to explore during generation. Defaults to 3.",
+    help="Number of possible branches to explore during generation.",
+    show_default=True,
 )
 @click.option(
     "--model-weight",
@@ -210,7 +213,13 @@ def translate(
 @click.option(
     "--selection-strategy",
     default="choose",
-    help="In case multiple models are used, should one model be selected at a time for inference ('choose') or should all models be inferred and their output probabilities combined before sampling ('merge'). Defaults to 'choose'.",
+    help="In case multiple models are used, should one model be selected at a time for inference ('choose') or should all models be inferred and their output probabilities combined before sampling ('merge').",
+    show_default=True,
+)
+@click.option(
+    "--join",
+    default=None,
+    help="Join the tokens by placing this string inbetween.",
 )
 def complete(
     inputs,
@@ -220,6 +229,7 @@ def complete(
     beam_width,
     model_weight,
     selection_strategy,
+    join,
 ):
     """
     Complete a sequence using Language Models.
@@ -262,10 +272,14 @@ def complete(
         if models[0].name and "character" in models[0].name:  # type: ignore
             for inp in inputs:
                 completion, _ = sampler.complete(inp)
+                if isinstance(join, str):
+                    completion = join.join(completion)
                 click.echo(completion)
         else:
             # assume that all inputs are tokens of same sequence
             completion, _ = sampler.complete(inputs)
+            if isinstance(join, str):
+                completion = join.join(completion)
             click.echo(completion)
 
     else:
