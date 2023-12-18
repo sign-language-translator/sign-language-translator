@@ -2,12 +2,15 @@ from enum import EnumMeta
 from random import choices
 from typing import Any, Dict, List, Set
 
+from tqdm.auto import tqdm
+
 __all__ = [
     "search_in_values_to_retrieve_key",
     "sample_one_index",
     "in_jupyter_notebook",
     "extract_recursive",
     "PrintableEnumMeta",
+    "ProgressStatusCallback",
 ]
 
 
@@ -42,7 +45,7 @@ def sample_one_index(weights: List[float], temperature: float = 1.0) -> int:
 
     return choices(
         range(len(weights)),
-        weights=[w / temperature for w in weights],
+        weights=[w ** (1 / temperature) for w in weights],
         k=1,
     )[0]
 
@@ -137,3 +140,47 @@ class PrintableEnumMeta(EnumMeta):
 
     def __repr__(cls) -> str:
         return str(cls)
+
+
+class ProgressStatusCallback:
+    """
+    A callback class to update a tqdm progress bar with custom status information.
+
+    Args:
+        tqdm_bar (tqdm): The tqdm progress bar to be updated.
+
+    Attributes:
+        tqdm_bar (tqdm): The tqdm progress bar associated with the callback.
+
+    Methods:
+        __call__(self, status: Dict[str, Any]):
+            Update the tqdm progress bar with the provided status information.
+
+    Example:
+        # Instantiate a tqdm progress bar & callback
+        progress_bar = tqdm(total=100, desc='Processing')
+        callback = ProgressStatusCallback(tqdm_bar=progress_bar)
+
+        # Update the progress bar inside some other function
+        status_info = {'Epoch': 1, 'Loss': 0.123, 'Accuracy': 0.95}
+        callback(status_info)
+    """
+
+    def __init__(self, tqdm_bar: tqdm):
+        """
+        Initialize the ProgressStatusCallback with a tqdm progress bar.
+
+        Args:
+            tqdm_bar (tqdm): The tqdm progress bar to be associated with the callback.
+        """
+        self.tqdm_bar = tqdm_bar
+
+    def __call__(self, status: Dict[str, Any]):
+        """
+        Update the tqdm progress bar with the provided status information.
+
+        Args:
+            status (Dict[str, Any]): A dictionary containing custom status information.
+                This information will be displayed as postfix on the tqdm progress bar.
+        """
+        self.tqdm_bar.set_postfix(status, refresh=True)

@@ -18,11 +18,12 @@ from sign_language_translator.utils.download import download
 from sign_language_translator.utils.parallel import threaded_map
 from sign_language_translator.utils.tree import tree
 from sign_language_translator.utils.utils import (
+    PrintableEnumMeta,
+    ProgressStatusCallback,
+    extract_recursive,
     in_jupyter_notebook,
     sample_one_index,
     search_in_values_to_retrieve_key,
-    extract_recursive,
-    PrintableEnumMeta,
 )
 
 __all__ = [
@@ -38,4 +39,5 @@ __all__ = [
     # classes
     "ArrayOps",
     "PrintableEnumMeta",
+    "ProgressStatusCallback",
 ]

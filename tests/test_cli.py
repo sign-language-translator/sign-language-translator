@@ -85,11 +85,30 @@ def test_slt_complete():
     assert result.output.split()[-1].startswith("[m")  # ignore progress bar
 
 
-def test_slt_download():
+def test_slt_assets_download():
     runner = CliRunner()
 
     result = runner.invoke(
-        slt, ["download", "text_preprocessing.json", "--overwrite", "true"]
+        slt, ["assets", "download", "text_preprocessing.json", "--overwrite", "true"]
     )
     assert result.exit_code == 0
     assert os.path.exists(Assets.get_path("text_preprocessing.json")[0])
+
+
+def test_slt_assets_tree():
+    runner = CliRunner()
+
+    result = runner.invoke(
+        slt, ["assets", "tree"]
+    )
+    assert result.exit_code == 0
+    assert result.output.strip().startswith("assets")
+
+def test_slt_assets_path():
+    runner = CliRunner()
+
+    result = runner.invoke(
+        slt, ["assets", "path"]
+    )
+    assert result.exit_code == 0
+    assert result.output.strip() == Assets.ROOT_DIR

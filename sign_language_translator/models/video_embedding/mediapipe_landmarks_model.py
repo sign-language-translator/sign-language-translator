@@ -31,6 +31,7 @@ from sign_language_translator.config.assets import Assets
 from sign_language_translator.models.video_embedding.video_embedding_model import (
     VideoEmbeddingModel,
 )
+from sign_language_translator.utils import ProgressStatusCallback
 
 
 class MediaPipeLandmarksModel(VideoEmbeddingModel):
@@ -79,6 +80,8 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
         self,
         frame_sequence: Iterable[torch.Tensor | NDArray[np.uint8]],
         landmark_type: str = "world" or "image" or "all",
+        progress_callback: None | ProgressStatusCallback = None,
+        total_frames: None | int = None,
         **kwargs,
     ) -> torch.Tensor:
         """
@@ -95,6 +98,8 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
         assert landmark_type in ("world", "image", "all"), "landmark type not supported"
 
         # TODO: Pose only or hands only
+        if hasattr(frame_sequence, "__len__"):
+            total_frames = len(frame_sequence)  # type: ignore
 
         embeddings = []
 
@@ -121,7 +126,10 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
                 frame_embedding = self._create_frame_embedding(persons, landmark_type)
 
                 embeddings.append(frame_embedding)
-                # TODO: progress callback (update description of tqdm bar)
+                if progress_callback and total_frames:
+                    progress_callback(
+                        {"file": f"{i / total_frames:.1%}" if total_frames else "?%"}
+                    )
 
         return torch.Tensor(embeddings)
 

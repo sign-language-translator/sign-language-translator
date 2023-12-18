@@ -126,43 +126,59 @@ Building Custom Translators
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Problem understanding is the most crucial part of solving it.
-Translation is a sequence-to-sequence (seq2seq) problem, not classification or any other.
+Translation is a sequence-to-sequence (seq2seq) problem, not classification or segmentation or any other.
 For translation, we need parallel corpora of text language sentences and corresponding sign language videos.
-But, no significant datasets are available for any sign language. Furthermore, there is no universal sign language and signs may vary within the same city.
+Since there is no universal sign language so signs vary even within the same city. Hence, no significant datasets would be available for your regional sign language.
+
+Rule Based Translator
+*********************
+
+.. note::
+   This approach can only work for text-to-sign language translation for a limited unambiguous vocabulary.
+
+.. image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/github/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb
+   :alt: Open In Colab
 
 We start by building our sign language dataset for sign language recognition & sign language production (both require 1:1 mapping of one language to the other).
 First gather sign language video dictionaries for various regions of the world to eventually train a multilingual model. These can be scraped off the internet or recorded manually against reference clips or images.
-Label the videos with all the text language words that have the same meaning as the sign. If there are multiple signs in the video, make sure that the words in text phrase have 1:1 correspondence with the signs in the video.
+Label the videos with all the text language words that have the same meaning as the sign. If there are multiple signs in the video, make sure to write the transcript (words in text have 1:1 correspondence with the signs in the video) and the translation (text follows the grammar of the spoken language).
 
-.. code-block:: json
-   :caption: assets/sign_recordings/collection_to_label_to_language_to_words.json
-      {
-      "country-organization-number": {
-         "1": {
-               "english": [
-                  "1",
-                  "one"
-               ],
-               "urdu": [
-                  "۱",
-                  "ایک"
-               ]
-            },
-         ...
-         },
-         ...
-      }
+`Here <https://github.com/sign-language-translator/sign-language-datasets/blob/main/parallel_texts/pk-dictionary-mapping.json>`_ is the format used in the library to store mappings. But you only need to add a dict to your language processing classes.
 
-.. code-block:: yaml
-   :caption: sign_language_translator/config/urls.yaml
-      datasets:
-        - name: reference-clips
-          files:
-            - name: videos/country-organization-number_1.mp4
-              url: https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/country-organization-number_1.mp4
-      ...
+.. code-block:: python
+   :caption: Word mappings to signs
 
-The dataset can now be synthesized by our rule-based translator (``slt.models.ConcatenativeSynthesis``) as follows:
+   mappings = {
+      "hello": [  # token to list of video-file-name sequences
+         ["pk-org-1_hello"]  # this sequence contains only one clip
+      ],
+      "world": [
+         ["xx-yyy-#_part-1", "xx-yyy-#_part-2"]  # two clips played consecutively make the right sign
+         ["pk-org-1_world"],  # This is another possible sign less commonly used for the same word
+      ],
+   }
+
+Place the actual video files in the ``assets/videos`` or ``assets/datasets/xx-yyy-#_videos-dictionary-mp4.zip`` (or preprocessed files in similar directory structure e.g. ``assets/landmarks``). Otherwise update the asset manager with the urls as follows:
+
+.. code-block:: python
+   :caption: Fetching signs for tokens
+
+      import sign-language-translator as slt
+
+      # help(slt.Assets)
+      # print(slt.Assets.ROOT_DIR)
+      # slt.Assets.set_root_dir("path/to/centralized/folder")
+
+      slt.Assets.FILE_TO_URL.update({
+         "videos/xx-yyy-#_word.mp4": "https://...",
+         "datasets/xx-yyy-#_videos-dictionary-mp4.zip": "https://...",
+      })
+
+      # paths = slt.Assets.download("videos/xx-yyy-#_word.mp4")
+      # paths = slt.Assets.extract("...mp4", "datasets/...zip")
+
+Now use our rule-based translator (``slt.models.ConcatenativeSynthesis``) as follows:
 
 .. code-block:: python
    :linenos:
@@ -171,6 +187,7 @@ The dataset can now be synthesized by our rule-based translator (``slt.models.Co
    import sign_language_translator as slt
 
    class MySignLanguage(slt.languages.SignLanguage):
+      # load and save mappings in __init__
       # override the abstract functions
       def restructure_sentence(...):
          # according to the sign language grammar
@@ -183,60 +200,52 @@ The dataset can now be synthesized by our rule-based translator (``slt.models.Co
       # for reference, see the implementation inside slt.languages.sign.pakistan_sign_language
 
    # optionally implement a text language processor as well
-   # class Chinese(slt.languages.TextLanguage):
+   # class MyChinese(slt.languages.TextLanguage):
        # ...
 
    model = slt.models.ConcatenativeSynthesis(
       text_language = slt.languages.text.English(),
-      sign_language = MySignLanguage(),
       sign_format = "video",
+      sign_language = MySignLanguage(),
    )
 
    text = """Some text that will be tokenized, tagged, rearranged, mapped to video files
-             (which will be concatenated and returned)."""
-   video = model.translate(text, restructure_sentence=False)
+             (which will be downloaded, concatenated and returned)."""
+   video = model.translate(text)
+   video.show()
+   # video.save(f"{text}.mp4")
 
-   embedding_model = slt.models.MediaPipeLandmarksModel()
-   features = embedding_model.embed(video.iter_frames())
+Deep Learning based
+*******************
 
-   features.save(f"parallel-dataset/{text}.mp4")
+.. note::
+   This approach can work for both sign-to-text and text-to-sign-language translation
 
-You can use `language models <Complete>`_ (trained on sentence chunks consisting of only the words present in your mapping dataset) to write sentences.
+You can use 3 types of Parallel corpus as training data (`more details <https://github.com/sign-language-translator/sign-language-datasets#problem-overview>`_):
+#. Sentences (bunch of signs performed consecutively in a single video to form a meaningful message.)
+#. Synthetic sentences (made by the rule-based translator)
+#. Replications (recordings of people performing the signs in dictionary videos and sentences.)
+
+`Here <https://github.com/sign-language-translator/sign-language-datasets/blob/main/parallel_texts/pk-sentence-mapping.json>`_ is a format that you can use for data labeling.
+You can use `language models <Complete>`_ to write sentences for synthetic data. The language models can be masked to use only specified words in the output so that the rule-based translator can translate them.
 
 Get the best out of your model by training it for multiple languages and multiple tasks. For example, provide task as start-of-sequence-token and target-text-language as the second token to the decoder of the seq2seq model.
 
-.. code-block:: yml
-   :linenos:
-   :caption: parallel-corpus
-
-   - pakistan-sign-language-dataset
-       - inputs: video_features_1.csv
-       - transcription: # generated by rule-based translator
-           - english: "this is a sentence."
-       - translation: # generated from the transcription by Google translate API
-           - urdu: "..."
-           - hindi: "..."
-           - chinese: "..."
-
 .. code-block:: python
    :linenos:
-   :caption: inferring through sign to text translation model
+   :caption: Custom rule-based Translator (text to sign)
 
-   ...
+   import sign_language_translator as slt
 
-   encoding = model.encoder(sign_features)
-   ids = model.tokens_to_ids(["<|transcribe|>", "<english>"])
-   # ids = model.tokens_to_ids(["<|translate|>", "<urdu>"])
+   pretrained_model = slt.get_model(slt.ModelCodes.Gesture)  # sign landmarks to text
 
-   for _ in range(max_length):
-       logits = model.decoder(encoding, ids)
-       ids.append(logits.argmax(-1).item())
+   # pytorch training loop to finetune our model on your dataset
+   for epoch in range(10):
+      for sign, text in train_dataset:
+         ...
 
-   tokens = model.ids_to_tokens(ids[2:])
-   sentence = model.detokenize(tokens)
-   print(sentence)
-
-see more in the `readme <https://github.com/sign-language-translator/sign-language-translator#how-to-build-a-translator-for-sign-language>`_.
+.. The training strategy I used was to translate the text labels to many languages using Google Translate and pretrain the encoder of a speech-to-text model on that. Then train on a mixture of the 3 types of parallel corpus mentioned above.
+See more in the package `readme <https://github.com/sign-language-translator/sign-language-translator#how-to-build-a-translator-for-sign-language>`_.
 
 Text Language Processing
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -307,7 +316,7 @@ Those objects have built-in functions for data augmentation and visualization et
 
    # load video
    video = slt.Video("sign.mp4")
-   print(video.duration(), video.shape)
+   print(video.duration, video.shape)
 
    # extract features
    model = slt.models.MediaPipeLandmarksModel()  # default args
@@ -445,20 +454,79 @@ You can use the following functionalities of the SLT package via CLI as well. A 
 
 Note: Objects & models do not persist in memory across commands, so this is a quick but inefficient way to use this package. In production, create a server which uses the python interface.
 
+Assets
+^^^^^^
+
+Download or view the resources needed by the sign language translator package using the following commands.
+
+Path
+****
+
+Print the root path where the assets are being stored.
+
+.. code-block:: bash
+
+   slt assets path
+
 Download
-^^^^^^^^
+********
 
 Download dataset files or models if you need them. The parameters are regular expressions.
 
 .. code-block:: bash
 
-   slt download --overwrite true '.*\.json' '.*\.mp4'
+   slt assets download --overwrite true '.*\.json' '.*\.mp4'
 
 .. code-block:: bash
 
-   slt download --progress-bar true '.*/tlm_14.0M.pt'
+   slt assets download --progress-bar true '.*/tlm_14.0M.pt'
 
 By default, auto-download is enabled. Default download directory is `/install-directory/sign_language_translator/sign-language-resources/`. (See slt.config.settings.Settings)
+
+Tree
+****
+
+View the directory structure of the present state of the assets folder.
+
+.. code-block:: bash
+
+   $ slt assets tree
+   assets
+   ├── checksum.json
+   ├── pk-dictionary-mapping.json
+   ├── text_preprocessing.json
+   ├── datasets
+   │   ├── pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-csv.zip
+   │   └── pk-hfad-1_videos-mp4.zip
+   │
+   ├── landmarks
+   │   ├── pk-hfad-1_1.landmarks-mediapipe-pose-2-hand-1.csv
+   │   └── pk-hfad-1_10.landmarks-mediapipe-pose-2-hand-1.csv
+   │
+   ├── models
+   │   ├── ur-supported-token-unambiguous-mixed-ngram-w1-w6-lm.pkl
+   │   └── mediapipe
+   │       └── pose_landmarker_heavy.task
+   │
+   └── videos
+      ├── pk-hfad-1_1.mp4
+      ├── pk-hfad-1_10.mp4
+      └── pk-hfad-1_مجھے.mp4
+
+.. code-block:: bash
+   :caption: Directories only
+
+   slt assets tree --files false
+
+.. code-block:: bash
+   :caption: omit files matching the regex
+
+   slt assets tree --ignore ".*mp4" -i ".*csv"
+
+.. code-block:: bash
+   :caption: Tree of a custom directory
+
+   slt assets tree -d "path/to/your/assets"
 
 Translate
 ^^^^^^^^^
