@@ -27,22 +27,16 @@ class Vocab:
 
         # source file paths
         self.label_to_words_path = os.path.join(
-            self.data_root_dir,
-            "sign_recordings",
-            "collection_to_label_to_language_to_words.json",
+            self.data_root_dir, "collection_to_label_to_language_to_words.json"
         )
         self.constructed_words_path = os.path.join(
-            self.data_root_dir,
-            "sign_recordings",
-            "organization_to_language_to_constructable_words.json",
+            self.data_root_dir, "organization_to_language_to_constructable_words.json"
         )
         self.preprocessing_path = os.path.join(
-            self.data_root_dir,
-            "text_preprocessing.json",
+            self.data_root_dir, "text-preprocessing.json"
         )
         self.token_to_id_path = os.path.join(
-            self.data_root_dir,
-            "language_to_token_to_id.json",
+            self.data_root_dir, "language_to_token_to_id.json"
         )
 
         # defaults
@@ -121,11 +115,7 @@ class Vocab:
 
     def __load_label_to_words(self):
         self._download_resource(self.label_to_words_path)
-        with open(
-            self.label_to_words_path,
-            "r",
-            encoding="utf-8",
-        ) as file_pointer:
+        with open(self.label_to_words_path, "r", encoding="utf-8") as file_pointer:
             collection_to_label_to_language_to_words: Dict[
                 str, Dict[str, Dict[str, List[str]]]
             ] = json.load(file_pointer)
@@ -134,11 +124,7 @@ class Vocab:
 
     def __load_constructable_words(self):
         self._download_resource(self.constructed_words_path)
-        with open(
-            self.constructed_words_path,
-            "r",
-            encoding="utf-8",
-        ) as file_pointer:
+        with open(self.constructed_words_path, "r", encoding="utf-8") as file_pointer:
             organization_to_language_to_constructable_words: Dict[
                 str, List[Dict[str, List[str]]]
             ] = json.load(file_pointer)
@@ -147,11 +133,7 @@ class Vocab:
 
     def __load_preprocessing(self, language: str, regex: bool = True) -> Dict[str, Any]:
         self._download_resource(self.preprocessing_path)
-        with open(
-            self.preprocessing_path,
-            "r",
-            encoding="utf-8",
-        ) as file_pointer:
+        with open(self.preprocessing_path, "r", encoding="utf-8") as file_pointer:
             raw_data: Dict[str, Dict[str, Any]] = json.load(file_pointer)
 
         preprocessing_map: Dict[str, Any] = {
@@ -165,11 +147,7 @@ class Vocab:
 
     def __load_token_to_id(self, language: str, regex: bool = True) -> Dict[str, int]:
         self._download_resource(self.token_to_id_path)
-        with open(
-            self.token_to_id_path,
-            "r",
-            encoding="utf-8",
-        ) as file_pointer:
+        with open(self.token_to_id_path, "r", encoding="utf-8") as file_pointer:
             raw_data: Dict[str, Dict[str, int]] = json.load(file_pointer)
 
         token_to_id: Dict[str, int] = {
@@ -288,6 +266,7 @@ class Vocab:
         if dictionary:
             # get an empty instance of first value's class
             first_value = list(dictionary.values())[0]
+            # TODO: first_value = next(iter(dictionary.values()))
             value_class = type(first_value)
             default_obj = value_class()
 

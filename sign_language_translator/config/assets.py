@@ -71,8 +71,11 @@ class Assets:
 
     asset_regex_to_urls_file: List[Tuple[str, str]] = [
         # regex_for_assets, urls_file
-        # (r"videos/pk-.*\.mp4, "pk-reference-clips-urls.json")
-        (r".*", "extra_urls.json"),
+        (r"^videos/pk-.*mp4$", "pk-dictionary-urls.json"),
+        # (r"^datasets/.*(video|mp4).*", "video-dataset-urls.json"),
+        # (r"^datasets/.*landmarks.*", "landmarks-dataset-urls.json"),
+        (r".*zip$", "archive-urls.json"),
+        (r".*", "extra-urls.json"),
     ]
     """A list of tuples that map regular expressions matching asset names to URLs files containing URLs to that asset group.
     The regex are tried sequentially so make sure list order is right."""

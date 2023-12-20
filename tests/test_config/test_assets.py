@@ -13,10 +13,10 @@ def test_set_assets_dir():
 
     temp_dir = tempfile.gettempdir()
     slt.Assets.set_root_dir(temp_dir)
-    slt.Assets.download("text_preprocessing.json")
-    download_path = os.path.abspath(os.path.join(temp_dir, "text_preprocessing.json"))
+    slt.Assets.download("text-preprocessing.json")
+    download_path = os.path.abspath(os.path.join(temp_dir, "text-preprocessing.json"))
     assert os.path.exists(download_path)
-    assert download_path == Assets.get_path("text_preprocessing.json")[0]
+    assert download_path == Assets.get_path("text-preprocessing.json")[0]
 
     try:
         with tempfile.NamedTemporaryFile() as f:

@@ -665,7 +665,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9588** + Tests: **1412**):
+Count total number of **lines of code** (Package: **9578** + Tests: **1431**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

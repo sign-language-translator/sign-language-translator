@@ -24,7 +24,7 @@ def load_data(file_id):
 
 def load_recordings_labels() -> List[str]:
     json_data: Dict[str, List[str]] | None = load_data(
-        "sign_recordings/recordings_labels.json"
+        "recordings_labels.json"
     )
 
     flattened_data = (
@@ -99,12 +99,7 @@ def test_recordings_labels():
 
 
 def test_constructable_words():
-    data = load_data(
-        os.path.join(
-            "sign_recordings",
-            "organization_to_language_to_constructable_words.json",
-        )
-    )
+    data = load_data("organization_to_language_to_constructable_words.json")
     if not data:
         warnings.warn(
             "'constructable_words' json file from dataset could not be loaded"
@@ -126,12 +121,7 @@ def test_constructable_words():
 
 
 def test_label_to_words():
-    data = load_data(
-        os.path.join(
-            "sign_recordings",
-            "collection_to_label_to_language_to_words.json",
-        )
-    )
+    data = load_data("collection_to_label_to_language_to_words.json")
     if not data:
         warnings.warn("'label_to_words' json file from dataset could not be loaded")
         return
