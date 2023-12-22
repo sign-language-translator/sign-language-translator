@@ -2,6 +2,7 @@ from itertools import islice
 from os.path import isfile
 from time import sleep, time
 from typing import Iterable
+from warnings import warn
 
 import cv2
 import matplotlib.pyplot as plt
@@ -22,7 +23,7 @@ class VideoDisplay:
         height=480,
     ) -> None:
         if not in_jupyter_notebook():
-            print("Attempted to use IPython.core.display.Video outside jupyter:", path)
+            warn(f"Attempted to use IPython.core.display.Video outside jupyter: {path}")
             return
 
         from IPython.display import Video, display  # type: ignore

@@ -6,17 +6,20 @@ It allows you to perform various operations such as translating text to sign lan
 downloading resource files, completing text sequences using Language Models & embedding videos into
 sequences of vectors.
 
-Usage:
-    slt [OPTIONS] COMMAND [ARGS]...
+.. code-block:: console
 
-Options:
-    --help  Show this message and exit.
+    $ slt
+    Usage:
+        slt [OPTIONS] COMMAND [ARGS]...
 
-Commands:
-    complete   Complete a sequence using Language Models.
-    download   Download resource files.
-    translate  Translate text into sign language or vice versa.
-    embed      Embed Videos Using Selected Model.
+    Options:
+        --help  Show this message and exit.
+
+    Commands:
+        assets     Assets manager to download & display Datasets & Models.
+        complete   Complete a sequence using Language Models.
+        translate  Translate text into sign language or vice versa.
+        embed      Embed Videos Using Selected Model.
 """
 
 import os
@@ -40,7 +43,7 @@ def slt():
 @slt.group(no_args_is_help=True)
 def assets():
     """
-    Sign Language Translator (SLT) assets manager to download & display Datasets & Models.
+    Assets manager to download & display Datasets & Models.
     """
 
 

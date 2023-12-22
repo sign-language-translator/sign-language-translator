@@ -12,9 +12,9 @@ Functions:
     Downloads package resources matching the given filename regex and saves them to the appropriate file paths.
 """
 
-import logging
 import os
 from time import time
+from warnings import warn
 
 import requests
 from tqdm.auto import tqdm
@@ -109,5 +109,5 @@ def download(
         return True
 
     except requests.exceptions.RequestException as e:
-        logging.error("Download Failed: %s", str(e))
+        warn(f"Download Failed: {str(e)}")
         return False

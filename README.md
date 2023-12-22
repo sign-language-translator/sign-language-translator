@@ -247,8 +247,8 @@ Options:
   --version  Show the version and exit.
   --help     Show this message and exit.
 Commands:
+  assets     Assets manager to download & display Datasets & Models.
   complete   Complete a sequence using Language Models.
-  download   Download resource files with regex.
   embed      Embed Videos Using Selected Model.
   translate  Translate text into sign language or vice versa.
 ```
@@ -496,8 +496,10 @@ See more at [Build Custom Translator section in ReadTheDocs](https://sign-langua
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/utils.py">utils.py</a>
     │
     ├── <b>utils</b>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/archive.py">archive.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/arrays.py">arrays.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/download.py">download.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/parallel.py">parallel.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/tree.py">tree.py</a>
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/utils.py">utils.py</a>
     │
@@ -647,7 +649,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-12-11.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-12-22.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -665,7 +667,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9578** + Tests: **1431**):
+Count total number of **lines of code** (Package: **9767** + Tests: **1461**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
