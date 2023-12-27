@@ -50,29 +50,17 @@ Usage
 
     import sign_language_translator as slt
 
-    # load sign
-    video = slt.Video("video.mp4")
-    # features = slt.extract_features(video, "mediapipe_pose_v2_hand_v1")
+    # # Load sign-to-text model (pytorch) (COMING SOON!)
+    # translation_model = slt.get_model(slt.ModelCodes.Gesture)
+    embedding_model = slt.models.MediaPipeLandmarksModel()
 
-    # Load sign-to-text model
-    # deep_s2t_model = slt.get_model(slt.ModelCodes.TRANSFORMER_S2T) # pytorch
-    deep_s2t_model = slt.get_model("gesture_mp_base-01") # pytorch
+    sign = slt.Video("video.mp4")
+    embedding = embedding_model.embed(sign.iter_frames())
+    # text = translation_model.translate(embedding)
 
-    # translate via single call to pipeline
-    # text = deep_s2t_model.translate(video)
-
-    # translate via individual steps
-    features = deep_s2t_model.extract_features(video.iter_frames())
-    encoding = deep_s2t_model.encoder(features)
-    # logits = deep_s2t_model.decoder(encoding, token_ids = [0])
-    # logits = deep_s2t_model.decoder(encoding, token_ids = [0, logits.argmax(dim=-1)])
-    # ...
-    tokens = deep_s2t_model.decode(encoding) # uses beam search to generate a token sequence
-    text = "".join(tokens) # deep_s2t_model.detokenize(tokens)
-
-    print(features.shape)
-    print(logits.shape)
-    print(text)
+    # print(text)
+    sign.show()
+    # slt.Landmarks(embedding, connections="mediapipe-world").show()
 """
 
 from sign_language_translator import (
@@ -126,5 +114,3 @@ __all__ = [
     "get_model",
     "get_sign_wrapper_class",
 ]
-
-# TODO: Assets.delete_all_out_of_date_assets()

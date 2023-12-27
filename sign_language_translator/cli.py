@@ -6,17 +6,20 @@ It allows you to perform various operations such as translating text to sign lan
 downloading resource files, completing text sequences using Language Models & embedding videos into
 sequences of vectors.
 
-Usage:
-    slt [OPTIONS] COMMAND [ARGS]...
+.. code-block:: console
 
-Options:
-    --help  Show this message and exit.
+    $ slt
+    Usage:
+        slt [OPTIONS] COMMAND [ARGS]...
 
-Commands:
-    complete   Complete a sequence using Language Models.
-    download   Download resource files.
-    translate  Translate text into sign language or vice versa.
-    embed      Embed Videos Using Selected Model.
+    Options:
+        --help  Show this message and exit.
+
+    Commands:
+        assets     Assets manager to download & display Datasets & Models.
+        complete   Complete a sequence using Language Models.
+        translate  Translate text into sign language or vice versa.
+        embed      Embed Videos Using Selected Model.
 """
 
 import os
@@ -37,17 +40,69 @@ def slt():
     """
 
 
-# @slt.command()
-# @click.option(
-#     "--dataset-dir",
-#     help="save the dataset directory in an environment variable so that all other subcommands use that value.",
-# )
-# def configure(dataset_dir):
-#     os.environ["SLT_DATASET_DIR"] = dataset_dir
+@slt.group(no_args_is_help=True)
+def assets():
+    """
+    Assets manager to download & display Datasets & Models.
+    """
+
+
+# Display the assets root directory
+@assets.command()
+def path():
+    """
+    Display the assets root directory.
+    """
+
+    from sign_language_translator.config.assets import Assets
+
+    click.echo(Assets.ROOT_DIR)
+
+
+# Display a tree of downloaded resource files
+@assets.command()
+@click.option(
+    "--files",
+    "-f",
+    default=True,
+    show_default=True,
+    help="Include files as leaf nodes in the directory tree.",
+)
+@click.option(
+    "--ignore",
+    "-i",
+    default=[],
+    multiple=True,
+    show_default=True,
+    help="List of regular expressions of file and directory names that should not be displayed.",
+)
+@click.option(
+    "--directory",
+    "-d",
+    default=None,
+    help="Where the asset files are stored. Defaults to 'installation-directory/assets'.",
+)
+def tree(files, ignore, directory):
+    """
+    Display a hierarchy of files in the SLT Assets folder.
+
+    Examples:\n
+        $ slt assets tree\n
+        $ slt assets tree -f false\n
+        $ slt assets tree -i ".*\\.mp4" -i ".*\\.csv"
+    """
+
+    from sign_language_translator.config.assets import Assets
+    from sign_language_translator.utils import tree as display_tree
+
+    if directory:
+        Assets.set_root_dir(directory)
+
+    display_tree(Assets.ROOT_DIR, directory_only=not files, ignore=ignore, regex=True)
 
 
 # Download resource files
-@slt.command(no_args_is_help=True)
+@assets.command(no_args_is_help=True)
 @click.argument("filenames", nargs=-1, required=True)
 @click.option(
     "--overwrite",
@@ -71,7 +126,13 @@ def slt():
     default=131072,
     help="number of bytes to download in each step. Defaults to 131072 or 128K.",
 )
-def download(filenames, overwrite, progress_bar, timeout, chunk_size):
+@click.option(
+    "--directory",
+    "-d",
+    default=None,
+    help="Where to save the downloaded files. Defaults to 'installation-directory/assets'.",
+)
+def download(filenames, overwrite, progress_bar, timeout, chunk_size, directory):
     """
     Download resource files with regex.
 
@@ -82,6 +143,9 @@ def download(filenames, overwrite, progress_bar, timeout, chunk_size):
     """
 
     from sign_language_translator.config.assets import Assets
+
+    if directory:
+        Assets.set_root_dir(directory)
 
     # Download the specified files
     for filename in filenames:
@@ -188,17 +252,20 @@ def translate(
 @click.option(
     "--end-token",
     default=">",
-    help="Keep generating until this token. Defaults to '>'.",
+    help="Keep generating until this token.",
+    show_default=True,
 )
 @click.option(
     "--max-length",
     default=20,
-    help="Maximum number of tokens to generate. Defaults to 20.",
+    help="Maximum number of tokens to generate.",
+    show_default=True,
 )
 @click.option(
     "--beam-width",
     default=3.0,
-    help="Number of possible branches to explore during generation. Defaults to 3.",
+    help="Number of possible branches to explore during generation.",
+    show_default=True,
 )
 @click.option(
     "--model-weight",
@@ -210,7 +277,13 @@ def translate(
 @click.option(
     "--selection-strategy",
     default="choose",
-    help="In case multiple models are used, should one model be selected at a time for inference ('choose') or should all models be inferred and their output probabilities combined before sampling ('merge'). Defaults to 'choose'.",
+    help="In case multiple models are used, should one model be selected at a time for inference ('choose') or should all models be inferred and their output probabilities combined before sampling ('merge').",
+    show_default=True,
+)
+@click.option(
+    "--join",
+    default=None,
+    help="Join the tokens by placing this string inbetween.",
 )
 def complete(
     inputs,
@@ -220,6 +293,7 @@ def complete(
     beam_width,
     model_weight,
     selection_strategy,
+    join,
 ):
     """
     Complete a sequence using Language Models.
@@ -262,10 +336,14 @@ def complete(
         if models[0].name and "character" in models[0].name:  # type: ignore
             for inp in inputs:
                 completion, _ = sampler.complete(inp)
+                if isinstance(join, str):
+                    completion = join.join(completion)
                 click.echo(completion)
         else:
             # assume that all inputs are tokens of same sequence
             completion, _ = sampler.complete(inputs)
+            if isinstance(join, str):
+                completion = join.join(completion)
             click.echo(completion)
 
     else:
@@ -306,6 +384,13 @@ def complete(
     default=False,
     help="Flag to indicate whether to overwrite existing files. Defaults to False.",
 )
+# TODO: Precision/format
+# @click.option(
+#     "--precision",
+#     default=4,
+#     help="Number of decimal places to save.",
+#     show_default=True,
+# )
 def embed(
     inputs,
     model_code,

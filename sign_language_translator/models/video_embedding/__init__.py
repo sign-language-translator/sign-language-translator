@@ -57,6 +57,8 @@ __all__ = [
 #   It can capture both spatial and temporal information in video frames.
 #   Pretrained I3D models are available and can be fine-tuned for recognizing specific sign language gestures.
 
+# 3D Resnet:
+
 # EfficientNet:
 #   EfficientNet is an architecture that provides a good trade-off between model size and performance.
 #   It has been used for various computer vision tasks, including object detection and classification.

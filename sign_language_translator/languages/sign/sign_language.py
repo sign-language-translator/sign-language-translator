@@ -4,6 +4,8 @@ import enum
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Iterable, List, Tuple
 
+from sign_language_translator.utils import PrintableEnumMeta
+
 
 class SignLanguage(ABC):
     """This abstract class defines the structure and methods required for mapping
@@ -19,7 +21,7 @@ class SignLanguage(ABC):
         _make_equal_weight_sign_dict: Creates a sign dictionary with equal weights for the provided signs.
     """
 
-    class SignDictKeys(enum.Enum):
+    class SignDictKeys(enum.Enum, metaclass=PrintableEnumMeta):
         """Enumerates all keys that are used in a sign dict.
 
         Attributes:

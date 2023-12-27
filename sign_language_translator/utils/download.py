@@ -14,6 +14,7 @@ Functions:
 
 import os
 from time import time
+from warnings import warn
 
 import requests
 from tqdm.auto import tqdm
@@ -31,6 +32,7 @@ def download(
     timeout: float = 20.0,
     leave=True,
     chunk_size=65536,
+    status_callback=None,
 ) -> bool:
     """
     Downloads a file from the specified URL and saves it to the given file path.
@@ -51,7 +53,7 @@ def download(
         FileExistsError: if overwrite is False and the destination path already contains a file.
     """
 
-    # TODO: resume failed download
+    # TODO: resume failed download (headers = {'Range': f'bytes={resume_byte_pos}-'})
     # TODO: separate threads for download and writing (implement queue(s))
 
     if os.path.exists(file_path) and not overwrite:
@@ -67,10 +69,8 @@ def download(
         with open(file_path, "wb") as fp:
             stream = response.iter_content(chunk_size=chunk_size)
 
+            total_bytes = int(response.headers.get("content-length", 0))
             if progress_bar:
-                total_bytes = int(
-                    response.headers.get("content-length", 0)
-                )  # for some reason, some bars finish too early
                 stream = tqdm(
                     stream,
                     total=(total_bytes // chunk_size) + 1,
@@ -81,21 +81,33 @@ def download(
 
             start_time = time()
             speed = 0
+            saved = 0
+            # download & write
             for chunk in stream:
                 if chunk:
                     fp.write(chunk)
 
-                # display download speed
-                if progress_bar:
-                    speed = (
-                        len(chunk) / (1024**2) / (time() - start_time) + speed
-                    ) / 2
-                    stream.set_postfix_str(  # type:ignore
-                        f"{speed:.3f}MB/s"
-                    )
-                    start_time = time()
+                # Calculate download speed (exponential moving average)
+                speed += len(chunk) / (1024**2) / (time() - start_time)
+                speed /= 2
+                start_time = time()
+
+                # Update progress bar
+                if isinstance(stream, tqdm):
+                    stream.set_postfix_str(f"{speed:.3f}MB/s")
+
+                if status_callback:
+                    saved += len(chunk)
+                    status = {
+                        "file": f"{saved / total_bytes:.1%}" if total_bytes else "?%",
+                        "down": f"{speed:.3f}MB/s",
+                    }
+                    status_callback(status)
+
+        # TODO: if hashlib.sha256(model_bytes).hexdigest() != expected_sha256:
 
         return True
 
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
+        warn(f"Download Failed: {str(e)}")
         return False

@@ -19,10 +19,24 @@ from __future__ import annotations
 
 from enum import Enum
 
-from sign_language_translator.utils import search_in_values_to_retrieve_key
+from sign_language_translator.utils import (
+    PrintableEnumMeta,
+    search_in_values_to_retrieve_key,
+)
+
+__all__ = [
+    "Countries",
+    "Organizations",
+    "SignCollections",
+    "TextLanguages",
+    "SignLanguages",
+    "SignFormats",
+    "ModelCodes",
+    "normalize_short_code",
+]
 
 
-class Countries(Enum):
+class Countries(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration of countries with their corresponding short codes.
 
@@ -35,7 +49,7 @@ class Countries(Enum):
     # USA = "usa"
 
 
-class Organizations(Enum):
+class Organizations(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration of organizations with their corresponding short codes.
 
@@ -49,7 +63,7 @@ class Organizations(Enum):
     # FESF = "fesf"
 
 
-class SignCollections(Enum):
+class SignCollections(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration of sign collections with their corresponding short codes.
 
@@ -63,7 +77,7 @@ class SignCollections(Enum):
     WORDLESS = "wordless"
 
 
-class TextLanguages(Enum):
+class TextLanguages(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration of text languages with their corresponding short codes.
 
@@ -77,7 +91,7 @@ class TextLanguages(Enum):
     # HINDI = "hindi"
 
 
-class SignLanguages(Enum):
+class SignLanguages(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration of sign languages with their corresponding short codes.
 
@@ -89,7 +103,7 @@ class SignLanguages(Enum):
     PAKISTAN_SIGN_LANGUAGE = "pakistan-sign-language"
 
 
-class SignFormats(Enum):
+class SignFormats(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration of available sign formats with their corresponding short codes.
     For example, sign language can be a sequence of frames (video) or a sequence of pose vectors (landmarks) etc.
@@ -115,7 +129,7 @@ class SignFormats(Enum):
     # Motion Vectors
 
 
-class ModelCodes(Enum):
+class ModelCodes(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration of model codes with their corresponding short codes.
 
@@ -128,7 +142,7 @@ class ModelCodes(Enum):
         - MIXER_LM_NGRAM_URDU (str): Short code for a mix of ngram models trained on urdu words of window size 1 to 6.
         - TRANSFORMER_LM_UR_SUPPORTED (str): Short code for a transformer-based language model trained on ur supported tokens.
 
-        - MEDIAPIPE_POSE_V2_HAND_V1 (str): Short code for a video embedding model which uses
+        - MEDIAPIPE_POSE_V2_HAND_V1 (str): Short code for a video embedding model which uses MediaPipe pose_landmarker_heavy & hand_landmarker.
         - MEDIAPIPE_POSE_V1_HAND_V1 (str):
         - MEDIAPIPE_POSE_V0_HAND_V1 (str):
         ...
@@ -137,8 +151,10 @@ class ModelCodes(Enum):
     # text-to-sign translation
     CONCATENATIVE_SYNTHESIS = "concatenative-synthesis"
     """Short code for the core rule-based text to sign translation model that joins video clips for each word in a sentence."""
+    # LANDMARK_GAN = "landmark-gan"
 
     # sign-to-text translation
+    # GESTURE = "gesture"
 
     # language-models
     NGRAM_LM_UNIGRAM_NAMES = "names-stat-lm-w1.json"
@@ -153,7 +169,7 @@ class ModelCodes(Enum):
     MEDIAPIPE_POSE_V0_HAND_V1 = "mediapipe-pose-0-hand-1"
 
 
-class ModelCodeGroups(Enum):
+class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration class for grouping supported model codes, making it easier to filter various models.
 
@@ -227,6 +243,7 @@ def normalize_short_code(short_code: str | Enum) -> str:
             "psl",
             "pk-sl",
             "pakistan-sign-language",
+            "pakistan-sl",
             "pakistansignlanguage",
             "pakistan_sign_language",
         },
@@ -273,15 +290,3 @@ def normalize_short_code(short_code: str | Enum) -> str:
     normalized = search_in_values_to_retrieve_key(short_code, normalized_to_codes)
 
     return normalized or short_code
-
-
-__all__ = [
-    "Countries",
-    "Organizations",
-    "SignCollections",
-    "TextLanguages",
-    "SignLanguages",
-    "SignFormats",
-    "ModelCodes",
-    "normalize_short_code",
-]

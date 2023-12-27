@@ -3,21 +3,49 @@
     {
       "description": "word-mapping-dataset",
       "file_to_url": {
+        "pk-dictionary-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/parallel_texts/pk-dictionary-mapping.json",
+        "pk-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/parallel_texts/pk-sentence-mapping.json",
+        "pk-synthetic-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/parallel_texts/pk-synthetic-sentence-mapping.json",
+        "text-preprocessing.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/text-preprocessing.json",
+        "collection_to_label_to_language_to_words.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d7d77ed8b7120f6d2db41b4e2b316935f8536d6a/sign_recordings/collection_to_label_to_language_to_words.json",
         "language_to_token_to_id.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/language_to_token_to_id.json",
-        "sign_recordings/collection_to_label_to_language_to_words.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d7d77ed8b7120f6d2db41b4e2b316935f8536d6a/sign_recordings/collection_to_label_to_language_to_words.json",
-        "sign_recordings/organization_to_language_to_constructable_words.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/sign_recordings/organization_to_language_to_constructable_words.json",
-        "sign_recordings/recordings_labels.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/7c1e21f1399a66d9146049facc0e23936107e07a/sign_recordings/recordings_labels.json",
-        "text_preprocessing.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/text_preprocessing.json"
+        "organization_to_language_to_constructable_words.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/e86a579a8d87180526fc73539544f18d0a8a3755/sign_recordings/organization_to_language_to_constructable_words.json",
+        "recordings_labels.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/7c1e21f1399a66d9146049facc0e23936107e07a/sign_recordings/recordings_labels.json"
       }
     },
     {
-      "description": "reference-clips",
+      "description": "sign-dictionary",
       "file_to_url": {
-        "videos/pk-hfad-1_اچھا.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_good.mp4",
-        "videos/pk-hfad-1_سیب.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_apple.mp4",
-        "videos/pk-hfad-1_ہے.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_is.mp4",
-        "videos/pk-hfad-2_hour.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-2_hour.mp4",
-        "videos/wordless_wordless.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/wordless_wordless.mp4"
+        "videos/wordless_wordless.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/wordless_wordless.mp4",
+        "videos/xx-wordless-1_wordless.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/wordless_wordless.mp4"
+      },
+      "note": "These urls are placed in secondary `country-dictionary-urls.json` files and they will be lazy loaded. (see the 'others' key for examples)"
+    },
+    {
+      "archives": {
+        "landmarks": [
+          {
+            "description": "mediapipe_pose_v2_hand_v1",
+            "file_to_url": {
+              "datasets/pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-csv.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-csv.zip",
+              "datasets/pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-json.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-json.zip"
+            }
+          }
+        ],
+        "videos": [
+          {
+            "description": "pakistan",
+            "file_to_url": {
+              "datasets/pk-hfad-1_videos-mp4.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.3/pk-hfad-1_videos-mp4.zip"
+            }
+          },
+          {
+            "description": "demo",
+            "file_to_url": {
+              "datasets/xx-wordless-1_videos-mp4.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.3/xx-wordless-1_videos-mp4.zip"
+            }
+          }
+        ]
       }
     }
   ],
@@ -52,9 +80,16 @@
   ],
   "others": [
     {
+      "description": "sign-dictionaries-url-files",
+      "file_to_url": {
+        "pk-dictionary-urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/asset_urls/pk-dictionary-urls.json"
+      }
+    },
+    {
       "description": "extra-url-files",
       "file_to_url": {
-        "extra_urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/ce70a4214e8203cfe52262242f8705fb0d0d6912/extra_urls.json"
+        "archive-urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/asset_urls/archive-urls.json",
+        "extra-urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/asset_urls/extra-urls.json"
       }
     }
   ]

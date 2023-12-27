@@ -23,12 +23,14 @@ def tree(
         directory_only (bool, optional): True means files will not be listed, only folders. Defaults to True.
     """
 
+    # TODO: ANSI colors: branches, directories, files
+
     def make_tree(
         cur_path: str,
         prev_indent: str,
         directory_only: bool,
         extra_line=True,
-        ignore=["__pycache__", "temp"],
+        ignore=None,
         regex=True,
     ) -> None:
         """actually makes the directory hierarchy
@@ -38,9 +40,13 @@ def tree(
             prev_indent (str): Whatever string was printed behind the provided directory's name
             directory_only (bool): True means files will not be listed, only folders.
         """
+        # TODO: glob patterns
+
+        if ignore is None:
+            ignore = ["__pycache__", "temp"]
 
         # list and sort subdirectories & contained files
-        children_paths = glob(os.path.join(cur_path, "*"))
+        children_paths = glob(os.path.join(cur_path, "*")) # TODO: use os.listdir to show hidden files
         child_files = []
         child_dirs = []
         for child in children_paths:

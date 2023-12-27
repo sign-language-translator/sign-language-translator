@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "sign_language_translator"
-version = "0.6.4"
-description = "Build Translators and Translate between text languages & sign language videos with AI."
+version = "0.7.0"
+description = "Build Translators and Translate between text & sign language videos with AI."
 authors = ["Mudassar Iqbal <mdsriqb@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-packages = [{include = "sign_language_translator"}]
+packages = [{ include = "sign_language_translator" }]
 repository = "https://github.com/sign-language-translator/sign-language-translator"
 documentation = "https://sign-language-translator.readthedocs.io/en/latest/"
 keywords = ["sign-language", "sign-language-translation", "nlp", "computer-vision", "deep-learning", "ai", "translation", "translator", "sign-language-translator", "rule-based"]
@@ -28,15 +28,22 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 addopts = "-vv "
-filterwarnings = [
-    "ignore::DeprecationWarning",
-]
-testpaths = [
-    "tests",
-]
+testpaths = ["tests"]
 
 [tool.isort]
 profile = "black"
 
 [tool.poetry.scripts]
 slt = "sign_language_translator.cli:slt"
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.run]
+omit = ["temp/*", "temp_*.py"]

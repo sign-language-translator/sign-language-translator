@@ -34,7 +34,10 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "sphinx_copybutton",
+    "sphinx_rtd_dark_mode",
 ]
+
+default_dark_mode = False
 
 # root_doc = "introduction"
 source_encoding = "utf-8"

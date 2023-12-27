@@ -7,9 +7,8 @@ Module Structure:
 """
 
 import json
+from importlib.metadata import version
 from typing import Dict
-
-from pkg_resources import get_distribution
 
 from sign_language_translator.utils.utils import extract_recursive
 
@@ -22,7 +21,7 @@ def get_package_version():
         str: The version of the package.
     """
 
-    return get_distribution("sign-language-translator").version
+    return version("sign_language_translator")
 
 
 def read_urls(file_path: str, encoding="utf-8") -> Dict[str, str]:

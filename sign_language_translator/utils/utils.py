@@ -1,11 +1,18 @@
+import re
+from enum import EnumMeta
 from random import choices
 from typing import Any, Dict, List, Set
 
+from tqdm.auto import tqdm
+
 __all__ = [
-    "search_in_values_to_retrieve_key",
-    "sample_one_index",
-    "in_jupyter_notebook",
+    "PrintableEnumMeta",
+    "ProgressStatusCallback",
     "extract_recursive",
+    "in_jupyter_notebook",
+    "is_regex",
+    "sample_one_index",
+    "search_in_values_to_retrieve_key",
 ]
 
 
@@ -40,7 +47,7 @@ def sample_one_index(weights: List[float], temperature: float = 1.0) -> int:
 
     return choices(
         range(len(weights)),
-        weights=[w / temperature for w in weights],
+        weights=[w ** (1 / temperature) for w in weights],
         k=1,
     )[0]
 
@@ -99,3 +106,103 @@ def extract_recursive(data: Dict[str, Any], key: str) -> List[Any]:
     extract(data, extracted_values)
 
     return extracted_values
+
+
+class PrintableEnumMeta(EnumMeta):
+    """
+    Metaclass for customizing the string representation of Enum classes.
+
+    This metaclass overrides the __str__ & __repr__ method to provide a human-readable
+    representation of Enum classes when they are printed. The generated string
+    includes the class name and a formatted list of Enum members and their values.
+
+    Example:
+
+    .. code-block:: python
+
+        class MyEnumClass(enum.Enum, metaclass=PrintableEnumMeta):
+            MEMBER1 = "value_1"
+            MEMBER2 = "value_2"
+
+        print(MyEnumClass)
+
+        # "MyEnumClass" enum class. Available values:
+        # 1. MEMBER1 = value_1
+        # 2. MEMBER2 = value_2
+    """
+
+    def __str__(cls):
+        members = "\n".join(
+            [
+                f"{i + 1}. {member.name} = {member.value}"  # type:ignore
+                for i, member in enumerate(cls)
+            ]
+        )
+        return f'"{cls.__name__}" enum class. Available values:\n{members}'
+
+    def __repr__(cls) -> str:
+        return str(cls)
+
+
+class ProgressStatusCallback:
+    """
+    A callback class to update a tqdm progress bar with custom status information.
+
+    Args:
+        tqdm_bar (tqdm): The tqdm progress bar to be updated.
+
+    Attributes:
+        tqdm_bar (tqdm): The tqdm progress bar associated with the callback.
+
+    Methods:
+        __call__(self, status: Dict[str, Any]):
+            Update the tqdm progress bar with the provided status information.
+
+    Example:
+        # Instantiate a tqdm progress bar & callback
+        progress_bar = tqdm(total=100, desc='Processing')
+        callback = ProgressStatusCallback(tqdm_bar=progress_bar)
+
+        # Update the progress bar inside some other function
+        status_info = {'Epoch': 1, 'Loss': 0.123, 'Accuracy': 0.95}
+        callback(status_info)
+    """
+
+    def __init__(self, tqdm_bar: tqdm):
+        """
+        Initialize the ProgressStatusCallback with a tqdm progress bar.
+
+        Args:
+            tqdm_bar (tqdm): The tqdm progress bar to be associated with the callback.
+        """
+        self.tqdm_bar = tqdm_bar
+
+    def __call__(self, status: Dict[str, Any]):
+        """
+        Update the tqdm progress bar with the provided status information.
+
+        Args:
+            status (Dict[str, Any]): A dictionary containing custom status information.
+                This information will be displayed as postfix on the tqdm progress bar.
+        """
+        self.tqdm_bar.set_postfix(status, refresh=True)
+
+
+def is_regex(string: str | re.Pattern) -> bool:
+    """Tests whether the argument is a regex or a regular string.
+
+    Args:
+        string (str | Pattern): The string to be tested.
+
+    Returns:
+        bool: whether the argument is a regex (True) or a regular string (False).
+    """
+    if isinstance(string, re.Pattern):
+        return True
+
+    if set("+*?|[]{}^$").intersection(set(string)):
+        try:
+            re.compile(string)
+            return True
+        except re.error:
+            return False
