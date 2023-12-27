@@ -6,7 +6,7 @@
 
 </br>
 
-*Build Custom Translators and Translate between Sign Language & Text.*
+*Build Custom Translators and Translate between Sign Language & Text with AI.*
 
 [![python](https://img.shields.io/pypi/pyversions/sign-language-translator?logo=python)](https://pypi.org/project/sign-language-translator/)
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator?logo=pypi)](https://pypi.org/project/sign-language-translator/)
@@ -577,6 +577,19 @@ Stay Tuned!
 ## Upcoming/Roadmap
 
 <details>
+<summary>TEXT_PROCESSING_IMPROVEMENTS: v0.7</summary>
+
+```python
+# remove data collection module
+# synonyms by tranlation
+# update vocab to new json dataset template
+# text embedding models
+# synonyms by similarity
+```
+
+</details>
+
+<details>
 <summary>LANDMARKS_WRAPPER: v0.8</summary>
 
 ```python
@@ -596,7 +609,7 @@ Stay Tuned!
 
 ```python
 # implement NLP classes for English & Hindi
-# Improve vocab class
+# Improve vocab class (OOP)
 # expand dictionary video data by scraping everything
 ```
 
