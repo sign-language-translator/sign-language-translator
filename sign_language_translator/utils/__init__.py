@@ -6,6 +6,7 @@ Functions:
 - sample_one_index: Select an index based on the given probability distribution.
 - search_in_values_to_retrieve_key: search inside every dict value and return the key on match.
 - in_jupyter_notebook: Checks if the code is running in a Jupyter notebook.
+- is_regex: Checks if the given string is a regex or a regular string.
 - linear_interpolation: figure out intermediate values inside an array.
 - threaded_map: Multi-threaded mapping of a function to an iterable.
 - extract_recursive: Recursively extracts values associated with a specified key from a nested dictionary.
@@ -27,6 +28,7 @@ from sign_language_translator.utils.utils import (
     ProgressStatusCallback,
     extract_recursive,
     in_jupyter_notebook,
+    is_regex,
     sample_one_index,
     search_in_values_to_retrieve_key,
 )
@@ -38,6 +40,7 @@ __all__ = [
     "search_in_values_to_retrieve_key",
     "sample_one_index",
     "in_jupyter_notebook",
+    "is_regex",
     "linear_interpolation",
     "threaded_map",
     "extract_recursive",

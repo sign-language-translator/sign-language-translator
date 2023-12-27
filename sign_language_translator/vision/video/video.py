@@ -655,7 +655,7 @@ class Video(Sign, VideoFrames):
         if isinstance(sign, str):
             if isfile(sign) and not kwargs.get("is_asset", False):
                 self._from_path(sign, **kwargs)
-            elif Assets.get_id(sign):
+            elif Assets.get_ids(sign):
                 Assets.download(sign, leave=False, overwrite=False)
                 self._from_path(Assets.get_path(sign)[0], **kwargs)
             else:

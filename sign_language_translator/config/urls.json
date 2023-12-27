@@ -16,13 +16,10 @@
     {
       "description": "sign-dictionary",
       "file_to_url": {
-        "videos/pk-hfad-1_اچھا.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_good.mp4",
-        "videos/pk-hfad-1_بہت.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_very.mp4",
-        "videos/pk-hfad-1_ہے.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_is.mp4",
-        "videos/pk-hfad-1_یہ.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-1_it.mp4",
-        "videos/pk-hfad-2_hour.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/pk-hfad-2_hour.mp4",
-        "videos/wordless_wordless.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/wordless_wordless.mp4"
-      }
+        "videos/wordless_wordless.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/wordless_wordless.mp4",
+        "videos/xx-wordless-1_wordless.mp4": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.2/wordless_wordless.mp4"
+      },
+      "note": "These urls are placed in secondary `country-dictionary-urls.json` files and they will be lazy loaded. (see the 'others' key for examples)"
     },
     {
       "archives": {
@@ -37,9 +34,15 @@
         ],
         "videos": [
           {
-            "description": "pk-hfad-1",
+            "description": "pakistan",
             "file_to_url": {
               "datasets/pk-hfad-1_videos-mp4.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.3/pk-hfad-1_videos-mp4.zip"
+            }
+          },
+          {
+            "description": "demo",
+            "file_to_url": {
+              "datasets/xx-wordless-1_videos-mp4.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.3/xx-wordless-1_videos-mp4.zip"
             }
           }
         ]
@@ -77,7 +80,7 @@
   ],
   "others": [
     {
-      "description": "sign-dictionaries",
+      "description": "sign-dictionaries-url-files",
       "file_to_url": {
         "pk-dictionary-urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/asset_urls/pk-dictionary-urls.json"
       }

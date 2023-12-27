@@ -1,3 +1,4 @@
+import re
 from enum import EnumMeta
 from random import choices
 from typing import Any, Dict, List, Set
@@ -5,12 +6,13 @@ from typing import Any, Dict, List, Set
 from tqdm.auto import tqdm
 
 __all__ = [
-    "search_in_values_to_retrieve_key",
-    "sample_one_index",
-    "in_jupyter_notebook",
-    "extract_recursive",
     "PrintableEnumMeta",
     "ProgressStatusCallback",
+    "extract_recursive",
+    "in_jupyter_notebook",
+    "is_regex",
+    "sample_one_index",
+    "search_in_values_to_retrieve_key",
 ]
 
 
@@ -184,3 +186,23 @@ class ProgressStatusCallback:
                 This information will be displayed as postfix on the tqdm progress bar.
         """
         self.tqdm_bar.set_postfix(status, refresh=True)
+
+
+def is_regex(string: str | re.Pattern) -> bool:
+    """Tests whether the argument is a regex or a regular string.
+
+    Args:
+        string (str | Pattern): The string to be tested.
+
+    Returns:
+        bool: whether the argument is a regex (True) or a regular string (False).
+    """
+    if isinstance(string, re.Pattern):
+        return True
+
+    if set("+*?|[]{}^$").intersection(set(string)):
+        try:
+            re.compile(string)
+            return True
+        except re.error:
+            return False

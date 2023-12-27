@@ -15,6 +15,8 @@ from warnings import warn
 
 from tqdm.auto import tqdm
 
+from sign_language_translator.utils.utils import is_regex
+
 
 class Archive:
     """This utility class provides static methods for creating, listing, and extracting files from ZIP archives.
@@ -94,7 +96,9 @@ class Archive:
                     warn(f"Skipping '{file}'. Already added a file of same base name.")
 
     @staticmethod
-    def list(archive_path: str, pattern: str = "*", regex: str | re.Pattern = r".*") -> List[str]:
+    def list(
+        archive_path: str, pattern: str = "*", regex: str | re.Pattern = r".*"
+    ) -> List[str]:
         """
         List files in the zip archive filtered by the specified pattern or regex.
 
@@ -114,8 +118,13 @@ class Archive:
         # filter
         if pattern not in ["", "*"]:
             names = fnmatch.filter(names, pattern)
+
         if regex not in ["", r".*"]:
-            names = [n for n in names if re.match(regex, n)]
+            names = [
+                n
+                for n in names
+                if (re.match(regex, n) if is_regex(regex) else n == regex)
+            ]
 
         return names
 

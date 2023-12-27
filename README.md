@@ -1,21 +1,28 @@
+<div align="center">
+
 # Sign Language Translator ⠎⠇⠞
 
-<center>
+<img width="61.8%" alt="SLT: Sign Language Translator" src="https://github.com/sign-language-translator/sign-language-translator/assets/118578823/d4723333-3d25-413d-83a1-a4bbdc8da15a">
+
+</br>
+
+*Build Custom Translators and Translate between Sign Language & Text.*
 
 [![python](https://img.shields.io/pypi/pyversions/sign-language-translator?logo=python)](https://pypi.org/project/sign-language-translator/)
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator?logo=pypi)](https://pypi.org/project/sign-language-translator/)
-[![Downloads](https://static.pepy.tech/personalized-badge/sign-language-translator?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/sign-language-translator/)
+[![Downloads](https://img.shields.io/pepy/dt/sign_language_translator?color=purple&logoColor=white&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIiBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiMwMDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTkuMiAyLjhjLS4yLjMtLjIuOC0uMiAxLjZWMTFINy44Yy0uOSAwLTEuMyAwLTEuNS4yYS44LjggMCAwIDAtLjMuNmMwIC4zLjMuNiAxIDEuMmw0LjEgNC40LjcuNmEuNy43IDAgMCAwIC40IDBsLjctLjZMMTcgMTNjLjYtLjYuOS0xIC45LTEuMmEuOC44IDAgMCAwLS4zLS42Yy0uMi0uMi0uNi0uMi0xLjUtLjJIMTVWNC40YzAtLjggMC0xLjMtLjItMS42YTEuNSAxLjUgMCAwIDAtLjYtLjZjLS4zLS4yLS44LS4yLTEuNi0uMmgtMS4yYy0uOCAwLTEuMyAwLTEuNi4yYTEuNSAxLjUgMCAwIDAtLjYuNnpNNSAyMWExIDEgMCAwIDAgMSAxaDEyYTEgMSAwIDEgMCAwLTJINmExIDEgMCAwIDAtMSAxeiIgY2xpcC1ydWxlPSJldmVub2RkIi8+PC9zdmc+)](https://pepy.tech/project/sign-language-translator/)
 ![Release Workflow Status](https://img.shields.io/github/actions/workflow/status/sign-language-translator/sign-language-translator/release.yml?branch=main&logo=pytest)
 [![codecov](https://codecov.io/gh/sign-language-translator/sign-language-translator/branch/main/graph/badge.svg)](https://codecov.io/gh/sign-language-translator/sign-language-translator)
 [![Documentation Status](https://img.shields.io/readthedocs/sign-language-translator?logo=readthedocs&)](https://sign-language-translator.readthedocs.io/)
 ![GitHub Repo stars](https://img.shields.io/github/stars/sign-language-translator/sign-language-translator?logo=github)
 
-</center>
+</div>
 
 1. [Overview](#overview)
    1. [Solution](#solution)
-   2. [Major Components and Goals](#major-components-and-goals)
-2. [How to install the package](#how-to-install-the-package)
+   2. [Major Components](#major-components)
+   3. [Goals](#goals)
+2. [**Installation**](#how-to-install-the-package)
 3. [**Usage**](#usage)
    1. [Python](#python)
    2. [Command Line](#command-line)
@@ -25,9 +32,8 @@
 7. [Directory Tree](#directory-tree)
 8. [How to Contribute](#how-to-contribute)
 9. [Research Papers & Citation](#research-papers--citation)
-10. [Upcoming/Roadmap](#upcomingroadmap)
-11. [Credits and Gratitude](#credits-and-gratitude)
-12. [Bonus](#bonus)
+10. [Credits and Gratitude](#credits-and-gratitude)
+11. [Bonus](#bonus)
     1. Number of lines of code
     2. :)
 
@@ -38,7 +44,7 @@ Sign language consists of gestures and expressions used mainly by the hearing-im
 The goal is to provide a user-friendly translation API and a framework for building sign language translators that can easily adapt to any regional sign language. Unlike most other projects, this python library can translate full sentences and not just the alphabet.
 <!-- This is the package that powers the [slt_ai website](https://github.com/mdsrqbl/slt_ai). -->
 
-A big hurdle is the lack of datasets (global & regional) and frameworks that deep learning engineers and software developers can use to build useful products for the target community. This project aims to empower sign language translation by providing robust components, tools and models for both sign language to text and text to sign language conversion. It aims to facilitate the creation of sign language translators for any region, while building the way towards sign language standardization.
+A big hurdle is the lack of datasets (global & regional) and frameworks that deep learning engineers and software developers can use to build useful products for the target community. This project aims to empower sign language translation by providing robust components, tools, datasets and models for both sign language to text and text to sign language conversion. It aims to facilitate the creation of sign language translators for any region, while building the way towards sign language standardization.
 
 ### Solution
 
@@ -46,7 +52,7 @@ I've have built an *extensible rule-based* text-to-sign translation system that 
 
 To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. To write sample texts of supported words, you can use our language models. Then, you can use that system to fine-tune our AI models. See the [documentation](https://sign-language-translator.readthedocs.io) and our [datasets](https://github.com/sign-language-translator/sign-language-datasets) for more.
 
-### Major Components and Goals
+### Major Components
 
 <ol>
 <li>
@@ -161,6 +167,12 @@ See these [docs](https://sign-language-translator.readthedocs.io/en/latest/datas
 
 </details>
 </ol>
+
+### Goals
+
+1. Enable integration of sign language into existing applications.
+2. Improve education quality for the deaf and increase litracy rates.
+3. Promote communication inclusivity of the deaf.
 
 ## How to install the package
 
@@ -289,7 +301,7 @@ Available Functions:
 
 | Name                                                                                                                                                                       | Vocabulary | Dataset | Parallel Corpus                                               |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------- | ------------------------------------------------------------- |
-| [Pakistan Sign Language](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py) | 789        | 3 hours | n transcribed sentences with translations in m text languages |
+| [Pakistan Sign Language](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py) | 789        | 23 hours | n transcribed sentences with translations in m text languages |
 
 </details>
 
@@ -418,7 +430,7 @@ Remember to contribute back to the community:
 - Share your data, code, and models by creating a pull request (PR), allowing others to benefit from your efforts.
 - Create your own sign language translator (e.g. as your university thesis) and contribute to a more inclusive and accessible world.
 
-See more at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators) or in this [notebook](https://github.com/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb). [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb)
+See the code at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators) or in this [notebook](https://github.com/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb). [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb)
 
 ## Directory Tree
 
@@ -522,8 +534,10 @@ See more at [Build Custom Translator section in ReadTheDocs](https://sign-langua
 <details>
 <summary><b>Datasets</b>:</summary>
 
+See our datasets & conventions [here](https://github.com/sign-language-translator/sign-language-datasets).
+
 - Contribute by scraping, compiling, and centralizing video datasets.
-- Help with labeling word mapping datasets.
+- Help with labeling [word mapping datasets](https://github.com/sign-language-translator/sign-language-datasets/tree/main/parallel_texts).
 - Establish connections with Academies for the Deaf to collaboratively develop standardized *sign language grammar* and integrate it into the rule-based translators.
 
 </details>
@@ -563,13 +577,9 @@ Stay Tuned!
 ## Upcoming/Roadmap
 
 <details>
-<summary>CLEAN_ARCHITECTURE_VISION: v0.7</summary>
+<summary>LANDMARKS_WRAPPER: v0.8</summary>
 
 ```python
-# bugfix: inaccurate num_frames in video file metadata
-# improvement: video wrapper class uses list of sources instead of linked list of videos
-# video transformations
-
 # landmarks wrapper class
 # landmark augmentation
 
@@ -582,7 +592,7 @@ Stay Tuned!
 </details>
 
 <details>
-<summary>LANGUAGES: v0.8</summary>
+<summary>LANGUAGES: v0.9</summary>
 
 ```python
 # implement NLP classes for English & Hindi
@@ -596,6 +606,10 @@ Stay Tuned!
 <summary>MISCELLANEOUS</summary>
 
 ```python
+# bugfix: inaccurate num_frames in video file metadata
+# improvement: video wrapper class uses list of sources instead of linked list of videos
+# video transformations
+
 # clean demonstration notebooks
 # * host video dataset online, descriptive filenames, zip extraction
 # dataset info table
@@ -607,7 +621,7 @@ Stay Tuned!
 </details>
 
 <details>
-<summary>DEEP_TRANSLATION: v0.9-v1.x</summary>
+<summary>DEEP_TRANSLATION: v1.X</summary>
 
 ```python
 # parallel text corpus
@@ -649,7 +663,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-12-22.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-12-28.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -659,7 +673,7 @@ This project started in October 2021 as a BS Computer Science final year project
 - Waqas Bin Abbas for assistance in initial video data collection process.
 - Kamran Malik for setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
 - [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing to collaborate and providing their sign dictionary, hearing-impaired performers for data creation, and creating the text2gloss dataset.
-- [UrduHack](https://github.com/urduhack/urduhack) (espacially Ikram Ali) for their work on Urdu character normalization.
+- [UrduHack](https://github.com/urduhack/urduhack) for their work on Urdu character normalization.
 
 - [Telha Bilal](https://github.com/TelhaBilal) for help in designing the architecture of some modules.
 
@@ -667,7 +681,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9767** + Tests: **1461**):
+Count total number of **lines of code** (Package: **10,008** + Tests: **1,522**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

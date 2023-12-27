@@ -289,8 +289,7 @@ class Vocab:
             and not os.path.exists(full_path)
             and full_path.startswith(Assets.ROOT_DIR)
         ):
-            filename = full_path[len(Assets.ROOT_DIR) :]
-            filename = re.escape(filename.strip(os.path.sep))
+            filename = full_path[len(Assets.ROOT_DIR) :].strip(os.path.sep)
             Assets.download(filename, overwrite=False)
 
     # load sign video/features
