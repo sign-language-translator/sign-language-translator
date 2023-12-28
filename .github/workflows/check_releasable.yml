@@ -1,6 +1,6 @@
-# This workflow will test, build & upload a Python Package to test.PyPI using Pytest, Poetry & Twine
+# This workflow will test, build & upload a Python Package to test.PyPI.org using Pytest, Poetry & Twine
 
-name: Check Python Package Releasablity
+name: Check Python Package Releasability
 
 on:
   push:
@@ -14,6 +14,9 @@ jobs:
   check_releasable:
     runs-on: ubuntu-latest
 
+    outputs:
+      package_version: ${{ steps.version.outputs.PACKAGE_VERSION }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -21,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -30,16 +33,15 @@ jobs:
           virtualenvs-create: false
           virtualenvs-in-project: false
 
-      - name: Create a virtual environment
-        run: python -m venv venv
-
-      - name: Activate the virtual environment
-        run: source venv/bin/activate
+      - name: Create & Activate a virtual environment
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
 
       - name: Install dependencies and the Package
         run: |
-          python -m pip install --upgrade pip
-          pip install "twine==4.0.2" "pytest==7.4.0"
+          python3 -m pip install --upgrade pip
+          pip3 install "twine==4.0.2" "pytest==7.4.0"
           poetry install
 
       - name: Run tests
@@ -47,8 +49,10 @@ jobs:
           poetry run pytest -vv
 
       - name: Append Build Number to version
+        id: version
         run: |
           PACKAGE_VERSION="$(poetry version -s).$(date +%Y%m%d%H%M%S)"
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
           poetry version $PACKAGE_VERSION
 
       - name: Build
@@ -58,14 +62,36 @@ jobs:
       - name: Publish to test.pypi.org
         if: success()
         run: |
-          python -m twine upload --repository testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }} dist/*
+          python3 -m twine upload --repository testpypi --username __token__ --password ${{ secrets.TEST_PYPI_API_TOKEN }} dist/*
 
-      - name: Install published package in a new virtual environment
+  install_released_package:
+    needs: check_releasable
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create & Activate a virtual environment
         run: |
-          python -m venv venv2
+          python3 -m venv venv2
           source venv2/bin/activate
-          pip install -i https://test.pypi.org/simple/ sign-language-translator==$PACKAGE_VERSION
+
+      - name: Install published package
+        run: |
+          pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ "sign-language-translator==${{ needs.check_releasable.outputs.package_version }}"
+          pip3 show sign-language-translator
+
+      - name: Retry Install published package after Delay
+        if: failure()
+        run: |
+          echo "Retrying installation in 100 seconds..."
+          sleep 100
+          pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ "sign-language-translator==${{ needs.check_releasable.outputs.package_version }}"
+          pip3 show sign-language-translator
 
       - name: Run Package CLI
+        if: success()
         run: |
-          slt translate "SLT" --model-code rule-based --text-lang ur --sign-lang pk-sl --sign-format video --display false
+          slt complete "<" --model-code urdu-mixed-ngram -w 1.0 --model-code ur-supported-gpt -w 1.5 --join ""
+
+        # BUG: OpenCV not writing videos on github actions: global cap_ffmpeg_impl.hpp:3018 open Could not find encoder for codec_id=27, error: Encoder not found
+        # slt translate "SLT" --model-code rule-based --text-lang ur --sign-lang pk-sl --sign-format video --display false --save-format avi
+        # ls -al | grep '.*\.avi$'
