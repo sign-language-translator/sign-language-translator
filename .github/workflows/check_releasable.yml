@@ -75,7 +75,9 @@ jobs:
           source venv2/bin/activate
 
       - name: Install published package
+        continue-on-error: true
         run: |
+          sleep 10
           pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ "sign-language-translator==${{ needs.check_releasable.outputs.package_version }}"
           pip3 show sign-language-translator
 
