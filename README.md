@@ -18,6 +18,8 @@
 
 </div>
 
+---
+
 1. [Overview](#overview)
    1. [Solution](#solution)
    2. [Major Components](#major-components)
@@ -459,11 +461,6 @@ See the code at [Build Custom Translator section in ReadTheDocs](https://sign-la
     │   ├── <i><a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/urls.json">urls.json</a></i>
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/utils.py">utils.py</a>
     │
-    ├── <b>data_collection</b>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/data_collection/completeness.py">completeness.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/data_collection/scraping.py">scraping.py</a>
-    │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/data_collection/synonyms.py">synonyms.py</a>
-    │
     ├── <b>languages</b>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/utils.py">utils.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/vocab.p">vocab.py</a>
@@ -495,6 +492,7 @@ See the code at [Build Custom Translator section in ReadTheDocs](https://sign-la
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py">concatenative_synthesis.py</a>
     │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/t2s_model.py">t2s_model.py</a>
     │   │
+    │   ├── text_embedding
     │   └── video_embedding
     │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py">mediapipe_landmarks_model.py</a>
     │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/video_embedding_model.py">video_embedding_model.py</a>
@@ -503,6 +501,7 @@ See the code at [Build Custom Translator section in ReadTheDocs](https://sign-la
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/metrics.py">metrics.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/preprocess.py">preprocess.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/subtitles.py">subtitles.py</a>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/synonyms.py">synonyms.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/tagger.py">tagger.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/tokenizer.py">tokenizer.py</a>
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/utils.py">utils.py</a>
@@ -580,9 +579,8 @@ Stay Tuned!
 <summary>TEXT_PROCESSING_IMPROVEMENTS: v0.7</summary>
 
 ```python
-# remove data collection module
-# synonyms by tranlation
 # update vocab to new json dataset template
+# improve urdu
 # text embedding models
 # synonyms by similarity
 ```
@@ -627,7 +625,7 @@ Stay Tuned!
 # * host video dataset online, descriptive filenames, zip extraction
 # dataset info table
 # sequence diagram for creating a translator
-# make scraping dependencies optional (beautifulsoup4, deep_translator). remove overly specific scrapping functions
+# make deep_translator optional.
 # GUI with gradio
 ```
 
@@ -642,6 +640,7 @@ Stay Tuned!
 # sign to text with custom seq2seq transformer
 # sign to text with fine-tuned whisper
 # pose vector generation with fine-tuned mBERT
+# custom 3DLandmark model (training data = mediapipe's output on activity recognition or any dataset)
 # motion transfer
 # pose2video: stable diffusion or GAN?
 # speech to text
@@ -676,7 +675,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-12-28.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-12-31.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -694,7 +693,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **10,008** + Tests: **1,522**):
+Count total number of **lines of code** (Package: **9,590** + Tests: **1,535**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
