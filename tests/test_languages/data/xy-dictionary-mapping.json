@@ -1,0 +1,41 @@
+[
+  {
+    "country": "xy",
+    "description": "sample dataset",
+    "organization": "abc",
+    "url": "http://www.example.com",
+    "mapping": [
+      {
+        "label": "xy-abc-1_sign-1",
+        "token": {
+          "en": ["word-0", "word-1"]
+        }
+      },
+      {
+        "label": "xy-abc-1_sign-2",
+        "token": {
+          "en": ["word-2", "word-3(context)"]
+        }
+      },
+      {
+        "components": ["xy-abc-1_sign-1", "xy-abc-2_sign-1"],
+        "label": "xy-abc-2_sign-3",
+        "token": {
+          "en": ["word-4", "word-5"]
+        }
+      },
+      {
+        "label": "xy-abc-2_sign-1",
+        "token": {
+          "en": ["word-6", "word-0"]
+        }
+      },
+      {
+        "components": ["xy-abc-2_sign-1", "xy-abc-1_sign-2"],
+        "token": {
+          "en": ["word-7", "word-8"]
+        }
+      }
+    ]
+  }
+]

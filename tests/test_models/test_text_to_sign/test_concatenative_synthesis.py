@@ -9,7 +9,7 @@ def test_concatenative_synthesis_model():
     model = ConcatenativeSynthesis(
         text_language=text_lang, sign_language=sign_lang, sign_format=sign_format
     )
-    assert model.text_language.name() == text_lang
+    assert model.text_language.name() == "ur"
     assert model.sign_language.name() == "pakistan-sign-language"
     assert model.sign_format.name() == "video"
 

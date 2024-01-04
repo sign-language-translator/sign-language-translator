@@ -24,10 +24,10 @@
    1. [Solution](#solution)
    2. [Major Components](#major-components)
    3. [Goals](#goals)
-2. [**Installation**](#how-to-install-the-package)
+2. [**Installation** `🛠️`](#how-to-install-the-package)
 3. [**Usage**](#usage)
-   1. [Python](#python)
-   2. [Command Line](#command-line)
+   1. [Python `🐍`](#python)
+   2. [Command Line <span style="color:green">**`>_`**</span>](#command-line)
 4. [Languages](#languages)
 5. [Models](#models)
 6. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
@@ -35,9 +35,6 @@
 8. [How to Contribute](#how-to-contribute)
 9. [Research Papers & Citation](#research-papers--citation)
 10. [Credits and Gratitude](#credits-and-gratitude)
-11. [Bonus](#bonus)
-    1. Number of lines of code
-    2. :)
 
 ## Overview
 
@@ -52,7 +49,7 @@ A big hurdle is the lack of datasets (global & regional) and frameworks that dee
 
 I've have built an *extensible rule-based* text-to-sign translation system that can be used to generate training data for *Deep Learning* models for both sign to text & text to sign translation.
 
-To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. To write sample texts of supported words, you can use our language models. Then, you can use that system to fine-tune our AI models. See the [documentation](https://sign-language-translator.readthedocs.io) and our [datasets](https://github.com/sign-language-translator/sign-language-datasets) for more.
+To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. To write sample texts of supported words, you can use our language models. Then, you can use that system to fine-tune our AI models. See the <kbd>[documentation](https://sign-language-translator.readthedocs.io)</kbd> and our <kbd>[datasets](https://github.com/sign-language-translator/sign-language-datasets)</kbd> for more.
 
 ### Major Components
 
@@ -242,7 +239,7 @@ sign.show()
 ```
 
 ```python
-# custom translator
+# custom translator (https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators)
 help(slt.languages.SignLanguage)
 help(slt.languages.text.Urdu)
 help(slt.models.ConcatenativeSynthesis)
@@ -579,8 +576,8 @@ Stay Tuned!
 <summary>TEXT_PROCESSING_IMPROVEMENTS: v0.7</summary>
 
 ```python
-# update vocab to new json dataset template
-# improve urdu
+# improve urdu code
+# add `hindi.py` (NotImplementedError) + `english.py`
 # text embedding models
 # synonyms by similarity
 ```
@@ -607,7 +604,6 @@ Stay Tuned!
 
 ```python
 # implement NLP classes for English & Hindi
-# Improve vocab class (OOP)
 # expand dictionary video data by scraping everything
 ```
 
@@ -675,7 +671,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2023-12-31.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-01-04.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -686,14 +682,13 @@ This project started in October 2021 as a BS Computer Science final year project
 - Kamran Malik for setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
 - [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing to collaborate and providing their sign dictionary, hearing-impaired performers for data creation, and creating the text2gloss dataset.
 - [UrduHack](https://github.com/urduhack/urduhack) for their work on Urdu character normalization.
-
 - [Telha Bilal](https://github.com/TelhaBilal) for help in designing the architecture of some modules.
 
 </details>
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9,590** + Tests: **1,535**):
+Count total number of **lines of code** (Package: **9,596** + Tests: **1,509**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

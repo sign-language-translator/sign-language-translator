@@ -1,11 +1,11 @@
 {
     "joint_word_to_split_words": {
-        "english": {
+        "en": {
             "icecream": "ice cream"
         }
     },
     "person_names": {
-        "english": [
+        "en": [
             "alice",
             "bob"
         ]

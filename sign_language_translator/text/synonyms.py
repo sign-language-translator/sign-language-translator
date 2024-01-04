@@ -5,16 +5,10 @@ by utilizing translation and back-translation or similarity in embedding vectors
 Dependencies:
 - deep_translator
 
-Usage:
-    1. Create a SynonymFinder object by providing the target language.
-    2. Use either the 'synonyms_by_translation' method for translation-based synonym finding
-       or the 'synonyms_by_similarity' method for embedding-based synonym finding.
-
-Note:
-    For similarity-based synonym finding, the embedding model needs to be specified
-    in the 'embedding_model' property of the SynonymFinder class.
-
+Classes:
+    - SynonymFinder: A class for finding synonyms using translation and similarity methods.
 """
+
 from collections import Counter
 from typing import List, Optional
 
@@ -28,7 +22,7 @@ from sign_language_translator.utils.parallel import threaded_map
 class SynonymFinder:
     """
     This class provides methods for finding synonyms of a given text using two different approaches:
-    1. Translation and back-translation through the 'synonyms_by_translation' method.
+    1. Translation and back-translation through the 'synonyms_by_translation' method (requires internet).
     2. Embedding-based similarity search through the 'synonyms_by_similarity' method.
 
     Attributes:
@@ -39,8 +33,23 @@ class SynonymFinder:
 
     Methods:
         synonyms_by_translation: Finds synonyms by translating text into an intermediate language and then back-translation.
-        translate: Translates text to the specified target language.
         synonyms_by_similarity: Finds synonyms based on embedding vector similarity.
+        translate: Translates text to the specified target language.
+
+    Example:
+        .. code-block:: python
+            # Instantiate SynonymFinder with the target language
+            synonym_finder = SynonymFinder("en")
+
+            # Find synonyms using translation and back-translation
+            text = "happy"
+            synonyms = synonym_finder.synonyms_by_translation(text)
+            print(f"Synonyms by Translation: {synonyms}")
+
+            # Find synonyms using similarity based on embedding vectors
+            text = "joyful"
+            synonyms = synonym_finder.synonyms_by_similarity(text)
+            print(f"Synonyms by Similarity: {synonyms}")
     """
 
     def __init__(self, language: str) -> None:
@@ -91,6 +100,7 @@ class SynonymFinder:
         text: str,
         intermediate_languages: Optional[List[str]] = None,
         time_delay: float = 1e-2,
+        timeout: float | None = 10,
         max_n_threads: int = 132,
         lower_case: bool = True,
         progress_bar: bool = True,
@@ -104,6 +114,7 @@ class SynonymFinder:
             text (str): The text to be translated.
             intermediate_languages (Optional[List[str]]): List of intermediate languages to translate the text into. Use 2-letter codes (ISO 639-1). If None, all supported languages of the translator will be used. Defaults to None.
             time_delay (float): Time delay between translation requests (in seconds). Defaults to 1e-2.
+            timeout (float | None): The maximum amount of time (in seconds) to wait for a thread to finish. None means wait indefinitely. Defaults to 10.
             max_n_threads (int): Maximum number of threads to use for parallel translation. Defaults to 128.
             lower_case (bool): Whether to convert the synonyms to lowercase. Defaults to True.
             progress_bar (bool): Whether to display a progress bar during translation. Defaults to True.
@@ -130,6 +141,7 @@ class SynonymFinder:
             translation_function,
             [(text, lang, translations) for lang in intermediate_languages],
             time_delay=time_delay,
+            timeout=timeout,
             max_n_threads=max_n_threads,
             progress_bar=progress_bar,
             leave=leave,
@@ -146,6 +158,7 @@ class SynonymFinder:
                 if translation.strip()
             ],
             time_delay=time_delay,
+            timeout=timeout,
             max_n_threads=max_n_threads,
             progress_bar=progress_bar,
             leave=leave,

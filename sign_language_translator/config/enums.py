@@ -86,7 +86,7 @@ class TextLanguages(Enum, metaclass=PrintableEnumMeta):
         ...
     """
 
-    URDU = "urdu"
+    URDU = "ur"
     # ENGLISH = "english"
     # HINDI = "hindi"
 
@@ -211,7 +211,7 @@ class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
     }
     ALL_VIDEO_EMBEDDING_MODELS = ALL_MEDIAPIPE_EMBEDDING_MODELS
 
-
+# TODO: move the mapping list outside of the function. maybe convert it to a class variable.
 def normalize_short_code(short_code: str | Enum) -> str:
     """
     Normalize the provided short code to a standard form that is recognized package wide.

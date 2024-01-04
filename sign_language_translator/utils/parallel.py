@@ -17,6 +17,7 @@ def threaded_map(
     target: Callable,
     args_list: Iterable,
     time_delay=0.02,
+    timeout: float | None = None,
     max_n_threads=None,
     progress_bar=True,
     leave=True,
@@ -31,6 +32,7 @@ def threaded_map(
         target (Callable): The function to apply to each element in the iterable.
         args_list (Iterable): An iterable of arguments to be passed to the target function in parallel.
         time_delay (float, optional): Time delay (in seconds) between launching threads. Default is 0.02.
+        timeout (float, optional): The maximum amount of time (in seconds) to wait for a thread to finish. Default is None, which means wait indefinitely.
         max_n_threads (int, optional): The maximum number of threads to run concurrently. Default is None, which means entire args_list will be processed concurrently.
         progress_bar (bool, optional): Enable or disable the progress bar. Default is True.
         leave (bool, optional): Whether to leave the progress bar after completion. Default is True.
@@ -68,7 +70,7 @@ def threaded_map(
             for i, thread in enumerate(threads):
                 if isinstance(args_list, tqdm):
                     args_list.set_description(f"Awaiting threads {i/len(threads):.0%}")
-                thread.join()
+                thread.join(timeout=timeout)
                 # TODO: progress_callback
             # reset threads list
             threads = []
@@ -79,5 +81,5 @@ def threaded_map(
     if progress_bar:
         threads = tqdm(threads, desc="Awaiting threads", leave=leave)
     for thread in threads:
-        thread.join()
+        thread.join(timeout=timeout)
         # TODO: progress_callback

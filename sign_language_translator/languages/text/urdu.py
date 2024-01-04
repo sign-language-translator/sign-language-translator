@@ -33,8 +33,10 @@ class Urdu(TextLanguage):
 
     def __init__(self) -> None:
         self.vocab = Vocab(
-            language=self.name(),
-            sign_collections=[r".*"],
+            language=r"^ur$",
+            country=r".+",
+            organization=r".+",
+            part_number=r"[0-9]+",
             data_root_dir=Assets.ROOT_DIR,
             arg_is_regex=True,
         )

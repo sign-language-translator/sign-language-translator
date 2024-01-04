@@ -398,8 +398,8 @@ class Assets:
 
         checksum = cls._read_checksum()
 
-        for asset_id, info in checksum.items():
-            path = cls._abs_path(asset_id)[0]
+        for asset_id, info in checksum.copy().items():
+            path = cls._abs_path(asset_id)
             if not exists(path):
                 checksum.pop(asset_id, None)
                 continue
