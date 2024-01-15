@@ -46,7 +46,8 @@ class Countries(Enum, metaclass=PrintableEnumMeta):
     """
 
     PAKISTAN = "pk"
-    # USA = "usa"
+    # INDIA = "in"
+    # USA = "us"
 
 
 class Organizations(Enum, metaclass=PrintableEnumMeta):
@@ -59,7 +60,7 @@ class Organizations(Enum, metaclass=PrintableEnumMeta):
     """
 
     HFAD = "hfad"
-    # NICE = "nice"
+    # NISE = "nise"
     # FESF = "fesf"
 
 
@@ -83,12 +84,13 @@ class TextLanguages(Enum, metaclass=PrintableEnumMeta):
 
     Attributes:
         - URDU (str): Short code for the Urdu language.
+        - HINDI (str): Short code for the Hindi language.
         ...
     """
 
     URDU = "ur"
-    # ENGLISH = "english"
-    # HINDI = "hindi"
+    # ENGLISH = "en"
+    HINDI = "hi"
 
 
 class SignLanguages(Enum, metaclass=PrintableEnumMeta):
@@ -168,6 +170,7 @@ class ModelCodes(Enum, metaclass=PrintableEnumMeta):
     MEDIAPIPE_POSE_V1_HAND_V1 = "mediapipe-pose-1-hand-1"
     MEDIAPIPE_POSE_V0_HAND_V1 = "mediapipe-pose-0-hand-1"
 
+    # text-embedding-models
 
 class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
     """
@@ -237,7 +240,13 @@ def normalize_short_code(short_code: str | Enum) -> str:
         },
         TextLanguages.URDU.value: {
             "urdu",
+            "urd",
             "ur",
+        },
+        TextLanguages.HINDI.value: {
+            "hindi",
+            "hin",
+            "hi",
         },
         SignLanguages.PAKISTAN_SIGN_LANGUAGE.value: {
             "psl",

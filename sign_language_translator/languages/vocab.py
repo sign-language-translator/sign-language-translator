@@ -26,8 +26,8 @@ class Mapping(TypedDict):
     """the filename of the sign video"""
     token: Dict[str, List[str]]
     """maps language codes to list of tokens that correspond to the label"""
-    transcription: Dict[str, List[str]]
-    """maps language codes to list of transcripts that correspond to the video. A transcript is word-for-word translation of the signs in the video."""
+    gloss: Dict[str, List[str]]
+    """maps language codes to list of glosses that correspond to the video. A gloss is a word-for-word translation of the signs in the video."""
     translation: Dict[str, List[str]]
     """maps language codes to list of translations that correspond to the video. A translation is a grammatically correct text that has the same meaning as the sign sequence in the video."""
 
@@ -74,7 +74,7 @@ class Vocab:
         # initialize properties with defaults
         self.word_to_labels: Dict[str, List[List[str]]] = {}
         self.supported_words_with_word_sense: Set[str] = set()
-        self.supported_words: Set[str] = set()
+        self.supported_words: Set[str] = set()  # TODO: why does this variable exist?
         self.ambiguous_to_unambiguous: Dict[str, List[str]] = {}
         self.person_names: List[str] = []
         self.words_to_numbers: Dict[str, int] = {}

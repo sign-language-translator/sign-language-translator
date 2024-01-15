@@ -1,6 +1,6 @@
 import re
 from string import ascii_uppercase, digits
-from typing import Any, Dict, Iterable, List, Set, Union
+from typing import Any, Dict, Iterable, List, Set, Tuple, Union
 
 from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import TextLanguages
@@ -19,19 +19,26 @@ __all__ = [
 
 
 class Urdu(TextLanguage):
+    """NLP class for Urdu text. Extends `slt.languages.text.TextLanguage` class.
+
+    Urdu is an Indo-Aryan language spoken mostly in Pakistan. Urdu uses the Perso-Arabic script, which consists of 46 Alphabets, 10 Digits, 6 Punctuations & 6 Diacritics, and is written from right to left.
+    See unicode details at: https://unicode.org/charts/PDF/U0600.pdf
+    """
+
     @staticmethod
     def name() -> str:
         return TextLanguages.URDU.value
 
     @classmethod
-    def word_regex(cls) -> str:
-        return cls.NUMBER_REGEX + r"|" + cls.URDU_WORD_REGEX
+    def token_regex(cls) -> str:
+        return cls.NUMBER_REGEX + r"|" + cls.WORD_REGEX
 
     @classmethod
     def allowed_characters(cls) -> Set[str]:
         return cls.ALLOWED_CHARACTERS
 
     def __init__(self) -> None:
+        # TODO: args to filter dataset
         self.vocab = Vocab(
             language=r"^ur$",
             country=r".+",
@@ -51,9 +58,9 @@ class Urdu(TextLanguage):
         }
 
         self.tokenizer = SignTokenizer(
-            word_regex=self.word_regex(),
+            word_regex=self.token_regex(),
             compound_words=(
-                self.vocab.supported_words  # TODO why does this variable exist?
+                self.vocab.supported_words
                 | self.vocab.supported_words_with_word_sense
                 | set(self.vocab.words_to_numbers.keys())
                 | set(self.vocab.person_names)
@@ -61,7 +68,7 @@ class Urdu(TextLanguage):
             end_of_sentence_tokens=self.END_OF_SENTENCE_MARKS,
             full_stops=self.FULL_STOPS,
             non_sentence_end_words=self.non_sentence_end_tokens,
-            tokenized_word_sense_pattern=[self.URDU_WORD_REGEX, r"\(", [r"نام"], r"\)"],
+            tokenized_word_sense_pattern=[self.WORD_REGEX, r"\(", [r"نام"], r"\)"],
         )
 
         # :TODO: {<unk>: id_}, def token_to_id, tokenize(..., as_input_ids = True),
@@ -76,7 +83,7 @@ class Urdu(TextLanguage):
                 5,
             ),
             # e.g. "word"
-            Rule.from_pattern("^" + self.word_regex() + "$", Tags.WORD, 5),
+            Rule.from_pattern("^" + self.token_regex() + "$", Tags.WORD, 5),
             # e.g. COVID
             Rule.from_pattern(r"^[A-Z]{2,7}$", Tags.ACRONYM, 4),
             # e.g. 2002-02-20
@@ -128,7 +135,7 @@ class Urdu(TextLanguage):
         text = replace_words(
             text,
             word_map=self.vocab.misspelled_to_correct,  # :TODO: split joint words
-            word_regex=self.word_regex(),
+            word_regex=self.token_regex(),
         )
         text = self.delete_unallowed_characters(text)
         text = re.sub(r"[۔\.][۔\. ]+[\.۔]", "۔۔۔", text)
@@ -182,7 +189,12 @@ class Urdu(TextLanguage):
 
         return word_senses
 
-    # Character Groups
+    # ====================== #
+    #    Character Groups    #
+    # ====================== #
+
+    UNICODE_RANGE: Tuple[int, int] = (1536, 1791)
+
     FULL_STOPS: List[str] = [".", "۔"]
     QUESTION_MARKS: List[str] = ["?", "؟"]
     END_OF_SENTENCE_MARKS: List[str] = FULL_STOPS + QUESTION_MARKS + ["!"]
@@ -194,9 +206,10 @@ class Urdu(TextLanguage):
     SYMBOLS: List[str] = PUNCTUATION + QUOTATION_MARKS + BRACKETS + [" ", "-"]
 
     PUNCTUATION_REGEX = r"[" + "".join([re.escape(punc) for punc in PUNCTUATION]) + r"]"
-    URDU_DIACRITICS = " ٍ ً ٰ َ ُ ِ ".split()
-    URDU_WORD_REGEX = r"[\w" + "".join(URDU_DIACRITICS) + r"]+"
-    # TODO: r"[[^\W\d_]"+ "".join(URDU_DIACRITICS) + r"]+"
+    DIACRITICS = str(" ٍ ً ٰ َ ُ ِ ").split()
+    EXTRA_DIACRITICS = str(" ؐ  ؑ ؒ ؓ").split()
+    WORD_REGEX = r"[\w" + "".join(DIACRITICS) + r"]+"
+    # TODO: r"[[^\W\d_]"+ "".join(DIACRITICS) + r"]+"
 
     NUMBER_REGEX = r"\d+(?:[\.:]\d+)*"
 
@@ -222,7 +235,7 @@ class Urdu(TextLanguage):
             [
                 line.strip("() '\"\t")
                 for line in text.splitlines()
-                if len(re.findall(Urdu.URDU_WORD_REGEX, line)) > 1
+                if len(re.findall(Urdu.WORD_REGEX, line)) > 1
             ]
         )
         MISSPELLED_TO_CORRECT = {
@@ -234,7 +247,7 @@ class Urdu(TextLanguage):
         text = replace_words(
             text,
             word_map=MISSPELLED_TO_CORRECT,
-            word_regex=Urdu.URDU_WORD_REGEX,
+            word_regex=Urdu.WORD_REGEX,
         )
 
         return text
@@ -254,8 +267,8 @@ class Urdu(TextLanguage):
     if True or "UrduHack":
         # Start of the code borrowed from "UrduHack/normalization/character.py"
         # """Following Dictionaries and code are copied from UrduHack package
-        # Original Author: Ikram Ali (mrikram1989@gmail.com)
-        # Source Repo URL: https://github.com/urduhack/urduhack"""
+        # Source Repo URL: https://github.com/urduhack/urduhack
+        # Source Repo URL: https://github.com/urduhack/urdu-characters"""
 
         # Maps correct Urdu characters to list of visually similar non-urdu characters
         CORRECT_URDU_CHARACTERS_TO_INCORRECT: Dict[str, List[str]] = {
@@ -324,7 +337,7 @@ class Urdu(TextLanguage):
         }
 
         # Maps (character + diacritic) to single characters (beware RTL text rendering)
-        SPLIT_TO_COMBINED_URDU_CHARACTERS: Dict[str, str] = {
+        SPLIT_TO_COMBINED_CHARACTERS: Dict[str, str] = {
             "آ": "آ",
             "أ": "أ",
             "ؤ": "ؤ",
@@ -339,8 +352,8 @@ class Urdu(TextLanguage):
             for urdu, others in CORRECT_URDU_CHARACTERS_TO_INCORRECT.items()
             for non_urdu in others
         }
-        COMBINE_CHARACTERS_REGEX = r"|".join(SPLIT_TO_COMBINED_URDU_CHARACTERS.keys())
-        DIACRITICS_REGEX = r"|".join(URDU_DIACRITICS)
+        COMBINE_CHARACTERS_REGEX = r"|".join(SPLIT_TO_COMBINED_CHARACTERS.keys())
+        DIACRITICS_REGEX = r"|".join(DIACRITICS)
 
         @staticmethod
         def character_normalize(text: str) -> str:
@@ -356,7 +369,7 @@ class Urdu(TextLanguage):
             text = text.translate(Urdu.CHARACTER_TRANSLATOR)
             text = re.sub(
                 Urdu.COMBINE_CHARACTERS_REGEX,
-                lambda match: Urdu.SPLIT_TO_COMBINED_URDU_CHARACTERS[match.group()],
+                lambda match: Urdu.SPLIT_TO_COMBINED_CHARACTERS[match.group()],
                 text,
             )
 
@@ -372,11 +385,12 @@ class Urdu(TextLanguage):
 
     ALLOWED_CHARACTERS = (
         set(CORRECT_URDU_CHARACTERS_TO_INCORRECT.keys())
-        | set(URDU_DIACRITICS)
+        | set(DIACRITICS)
         | set(SYMBOLS)
         | set(ascii_uppercase)  # acronyms
         | set(digits)
-        | set("()!.,?/[]{} ؑ ")
+        | set(EXTRA_DIACRITICS)
+        | set("()!.,?/[]{} \n")
     )
     UNALLOWED_CHARACTERS_REGEX = (
         "[^" + "".join(map(re.escape, ALLOWED_CHARACTERS)) + "]"

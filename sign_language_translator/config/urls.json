@@ -3,11 +3,11 @@
     {
       "description": "word-mapping-dataset",
       "file_to_url": {
-        "pk-dictionary-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/b0ed81394241bdfb9d2c90bc6ca1ff503d707091/parallel_texts/pk-dictionary-mapping.json",
-        "pk-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/parallel_texts/pk-sentence-mapping.json",
-        "pk-synthetic-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/parallel_texts/pk-synthetic-sentence-mapping.json",
+        "pk-dictionary-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-dictionary-mapping.json",
+        "pk-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-sentence-mapping.json",
+        "pk-synthetic-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-synthetic-sentence-mapping.json",
         "text-preprocessing.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/a62449e395140c0e3bb0f87ed586b28f0a8f193b/text-preprocessing.json",
-        "mapping-schema.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/a62449e395140c0e3bb0f87ed586b28f0a8f193b/schemas/mapping-schema.json"
+        "mapping-schema.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/schemas/mapping-schema.json"
       }
     },
     {

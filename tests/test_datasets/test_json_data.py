@@ -86,10 +86,10 @@ def test_mapping_datasets():
                     assert (
                         "token" not in mapping
                     ), f"'token' key is in mapping: '{mapping}' in non-dictionary dataset file: '{path}'"
-                    # check presence: transcription or translation
+                    # check presence: gloss or translation
                     assert (
-                        "transcription" in mapping or "translation" in mapping
-                    ), f"'transcription' or 'translation' key is not in mapping: '{mapping}' in file: '{path}'"
+                        "gloss" in mapping or "translation" in mapping
+                    ), f"'gloss' or 'translation' key is not in mapping: '{mapping}' in file: '{path}'"
                     # TODO: check archive link
                     # assert Assets.get_archive_url(f"videos/{mapping['label']}.mp4"), f"no URL for label: {mapping['label']}"
 
