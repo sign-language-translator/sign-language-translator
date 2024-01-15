@@ -35,8 +35,10 @@ class PakistanSignLanguage(SignLanguage):
     def __init__(self) -> None:
         # load word maps and info from dataset files
         self.vocab = Vocab(
-            language=r"^(?!.*\bcomponents\b).*$",  # r".*",
-            sign_collections=[r"pk-hfad(-\d+)?"],  # [r"pk-.+"]
+            language=r".+",
+            country=r"^pk$",
+            organization=r".+",
+            part_number=r"[0-9]+",
             data_root_dir=Assets.ROOT_DIR,
             arg_is_regex=True,
         )

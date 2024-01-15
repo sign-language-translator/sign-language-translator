@@ -12,15 +12,13 @@ class SignTokenizer:
         end_of_sentence_tokens: Iterable[str] = (".", "?", "!"),
         full_stops=(".",),
         non_sentence_end_words: Iterable[str] = ("A", "B", "C"),
-        tokenized_word_sense_pattern: List|None=None,
+        tokenized_word_sense_pattern: List | None = None,
     ):
         self.word_regex = word_regex
 
         self._first_subword_to_full = self._make_compound_word_map(compound_words)
 
-        self.end_of_sentence_tokens = list(
-            set(end_of_sentence_tokens) | set(full_stops)
-        )
+        self.end_of_sentence_tokens = list(set(end_of_sentence_tokens))
         self.non_sentence_end_words = non_sentence_end_words
         self.full_stops = full_stops
         self.tokenized_word_sense_pattern = tokenized_word_sense_pattern or [

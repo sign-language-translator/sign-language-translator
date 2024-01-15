@@ -85,7 +85,7 @@ Translation
    )
 
    sign_language_sentence = model.translate("یہ اچھا ہے۔")
-   # sign_language_sentence.show()
+   sign_language_sentence.show()
    # sign_language_sentence.save("output.mp4")
 
 .. code-block:: python
@@ -142,7 +142,7 @@ Rule Based Translator
 
 We start by building our sign language dataset for sign language recognition & sign language production (both require 1:1 mapping of one language to the other).
 First gather sign language video dictionaries for various regions of the world to eventually train a multilingual model. These can be scraped off the internet or recorded manually against reference clips or images.
-Label the videos with all the text language words that have the same meaning as the sign. If there are multiple signs in the video, make sure to write the transcript (words in text have 1:1 correspondence with the signs in the video) and the translation (text follows the grammar of the spoken language).
+Label the videos with all the text language words that have the same meaning as the sign. If there are multiple signs in the video, make sure to write the gloss (words in text have 1:1 correspondence with the signs in the video) and the translation (text follows the grammar of the spoken language).
 
 `Here <https://github.com/sign-language-translator/sign-language-datasets/blob/main/parallel_texts/pk-dictionary-mapping.json>`_ is the format used in the library to store mappings. But you only need to add a dict to your language processing classes.
 
@@ -245,6 +245,7 @@ Get the best out of your model by training it for multiple languages and multipl
          ...
 
 .. The training strategy I used was to translate the text labels to many languages using Google Translate and pretrain the encoder of a speech-to-text model on that. Then train on a mixture of the 3 types of parallel corpus mentioned above.
+
 See more in the package `readme <https://github.com/sign-language-translator/sign-language-translator#how-to-build-a-translator-for-sign-language>`_.
 
 Text Language Processing
