@@ -10,14 +10,16 @@ from sign_language_translator.config.enums import (
     normalize_short_code,
 )
 from sign_language_translator.languages.sign import PakistanSignLanguage
-from sign_language_translator.languages.text import Urdu
+from sign_language_translator.languages.text import Hindi, Urdu
 
 if TYPE_CHECKING:
+    from enum import Enum
+
     from sign_language_translator.languages.sign import SignLanguage
     from sign_language_translator.languages.text import TextLanguage
 
-
-def get_text_language(language_name: str) -> TextLanguage:
+# TODO: AbstractFactory to store str to class mappings
+def get_text_language(language_name: str | Enum) -> TextLanguage:
     """
     Retrieves a TextLanguage object based on the provided language name.
 
@@ -33,6 +35,7 @@ def get_text_language(language_name: str) -> TextLanguage:
 
     code_to_class = {
         TextLanguages.URDU.value: Urdu,
+        TextLanguages.HINDI.value: Hindi,
     }
 
     class_ = code_to_class.get(normalize_short_code(language_name), None)
@@ -43,7 +46,7 @@ def get_text_language(language_name: str) -> TextLanguage:
     raise ValueError(f"no text language class known for '{language_name = }'")
 
 
-def get_sign_language(language_name: str) -> SignLanguage:
+def get_sign_language(language_name: str | Enum) -> SignLanguage:
     """
     Retrieves a SignLanguage object based on the provided language name.
 

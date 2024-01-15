@@ -63,15 +63,7 @@ Usage
     # slt.Landmarks(embedding, connections="mediapipe-world").show()
 """
 
-from sign_language_translator import (
-    config,
-    data_collection,
-    languages,
-    models,
-    text,
-    utils,
-    vision,
-)
+from sign_language_translator import config, languages, models, text, utils, vision
 from sign_language_translator.config import enums
 from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import ModelCodeGroups, ModelCodes
@@ -94,7 +86,6 @@ __all__ = [
     # modules
     "vision",
     "text",
-    "data_collection",
     "models",
     "languages",
     "utils",
