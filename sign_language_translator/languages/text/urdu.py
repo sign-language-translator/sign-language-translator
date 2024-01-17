@@ -347,10 +347,13 @@ class Urdu(TextLanguage):
         }
 
         # Convert the dictionaries to a useable format
-        CHARACTER_TRANSLATOR = {ord(c): w for c, w in CHARACTER_TO_WORD.items()} | {
-            ord(non_urdu): urdu
-            for urdu, others in CORRECT_URDU_CHARACTERS_TO_INCORRECT.items()
-            for non_urdu in others
+        CHARACTER_TRANSLATOR = {
+            **{ord(c): w for c, w in CHARACTER_TO_WORD.items()},
+            **{
+                ord(non_urdu): urdu
+                for urdu, others in CORRECT_URDU_CHARACTERS_TO_INCORRECT.items()
+                for non_urdu in others
+            },
         }
         COMBINE_CHARACTERS_REGEX = r"|".join(SPLIT_TO_COMBINED_CHARACTERS.keys())
         DIACRITICS_REGEX = r"|".join(DIACRITICS)
