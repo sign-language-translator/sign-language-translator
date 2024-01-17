@@ -37,8 +37,8 @@ class MappingRule(ABC):
     def is_applicable(
         self,
         token: str,
-        tag: Any | None = None,
-        context: Any | None = None,
+        tag: Any = None,
+        context: Any = None,
     ) -> bool:
         """
         Check if the mapping rule is applicable for the given token, tag, and context.

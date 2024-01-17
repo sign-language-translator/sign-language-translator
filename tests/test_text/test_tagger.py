@@ -1,4 +1,4 @@
-from sign_language_translator.text.tagger import Tagger, Rule, Tags
+from sign_language_translator.text.tagger import Rule, Tagger, Tags
 
 
 def get_tagger():

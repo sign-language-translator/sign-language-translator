@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from sign_language_translator.utils import linear_interpolation, ArrayOps
+from sign_language_translator.utils import ArrayOps, linear_interpolation
 
 
 def test_linear_interpolation():
@@ -42,7 +42,7 @@ def test_linear_interpolation():
             ],
         ]
     )
-    assert (np.abs(new_array - expected_array)<1e-4).all()
+    assert (np.abs(new_array - expected_array) < 1e-4).all()
 
     # test intermediate rows
     old_x = np.array([3, 5, 9])
@@ -81,4 +81,3 @@ def test_array_ops():
 
     ArrayOps.floor(tensor)
     ArrayOps.floor(array)
-

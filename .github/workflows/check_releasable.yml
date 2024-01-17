@@ -46,7 +46,7 @@ jobs:
 
       - name: Run tests
         run: |
-          poetry run pytest -vv
+          poetry run pytest -vvv
 
       - name: Append Build Number to version
         id: version
@@ -68,31 +68,49 @@ jobs:
     needs: check_releasable
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+
     steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - name: Create & Activate a virtual environment
         run: |
           python3 -m venv venv2
           source venv2/bin/activate
+          python --version
 
       - name: Install published package
         continue-on-error: true
         run: |
+          pip install --upgrade pip
           sleep 10
           pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ "sign-language-translator==${{ needs.check_releasable.outputs.package_version }}"
           pip3 show sign-language-translator
 
       - name: Retry Install published package after Delay
-        if: failure()
+        if: always()
         run: |
-          echo "Retrying installation in 100 seconds..."
-          sleep 100
-          pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ "sign-language-translator==${{ needs.check_releasable.outputs.package_version }}"
-          pip3 show sign-language-translator
+          if ! pip3 show sign-language-translator &> /dev/null; then
+            echo "Retrying installation in 100 seconds..."
+            sleep 100
+            pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ "sign-language-translator==${{ needs.check_releasable.outputs.package_version }}"
+            pip3 show sign-language-translator
+          fi
 
       - name: Run Package CLI
         if: success()
         run: |
           slt complete "<" --model-code urdu-mixed-ngram -w 1.0 --model-code ur-supported-gpt -w 1.5 --join ""
+
+      - name: Run Package Python API
+        if: success()
+        run: |
+          python3 -c "import sign_language_translator as slt; print(slt.__version__); model = slt.models.ConcatenativeSynthesis(text_language='urdu', sign_language='pk-sl', sign_format='video'); sign = model.translate('یہ بہت اچھا ہے۔'); print(len(sign));"
 
         # BUG: OpenCV not writing videos on github actions: global cap_ffmpeg_impl.hpp:3018 open Could not find encoder for codec_id=27, error: Encoder not found
         # slt translate "SLT" --model-code rule-based --text-lang ur --sign-lang pk-sl --sign-format video --display false --save-format avi

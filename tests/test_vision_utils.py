@@ -1,7 +1,8 @@
-import numpy as np
 import cv2
+import numpy as np
 
 from sign_language_translator.vision.utils import iter_frames_with_opencv
+
 
 def test_image_iteration():
     # create and save image

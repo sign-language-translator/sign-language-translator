@@ -16,7 +16,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from os.path import abspath
 from time import time
-from typing import Iterable, Sequence
+from typing import Iterable, Optional, Sequence
 
 import cv2
 import numpy as np
@@ -34,7 +34,7 @@ class VideoFrames(ABC):
     releasing resources, and providing information about the video.
 
     Methods:
-    - get_frame(timestamp: float | None = None, index: int | None = None) -> NDArray[np.uint8]:
+    - get_frame(timestamp: float = None, index: int = None) -> NDArray[np.uint8]:
         Get a frame at a given timestamp or index from the video object.
 
     - close():
@@ -56,7 +56,7 @@ class VideoFrames(ABC):
 
     @abstractmethod
     def get_frame(
-        self, timestamp: float | None = None, index: int | None = None
+        self, timestamp: Optional[float] = None, index: Optional[int] = None
     ) -> NDArray[np.uint8]:
         """Get a frame at a given timestamp or index from the video object."""
 
@@ -112,13 +112,13 @@ class VideoCaptureFrames(VideoFrames):
         _n_channels (int): Number of color channels in the video frames.
 
     Methods:
-        get_frame(timestamp: float | None = None, index: int | None = None) -> NDArray[np.uint8]:
+        get_frame(timestamp: float = None, index: int = None) -> NDArray[np.uint8]:
             Retrieve a video frame based on either a timestamp or an index.
 
         current_index() -> int:
             Get the current index of the video frame being read.
 
-        seek(timestamp: float | None = None, index: int | None = None):
+        seek(timestamp: float = None, index: int = None):
             Move the video frame position to the specified timestamp or index.
 
         read_frame() -> NDArray[np.uint8] | None:
@@ -164,8 +164,8 @@ class VideoCaptureFrames(VideoFrames):
 
     def get_frame(
         self,
-        timestamp: float | None = None,
-        index: int | None = None,
+        timestamp: Optional[float] = None,
+        index: Optional[int] = None,
     ) -> NDArray[np.uint8]:
         """
         Retrieve a video frame at a specified timestamp or index.
@@ -215,7 +215,7 @@ class VideoCaptureFrames(VideoFrames):
         """Where the VideoCapture is currently pointing to."""
         return int(self.video_capture.get(cv2.CAP_PROP_POS_FRAMES))
 
-    def seek(self, timestamp: float | None = None, index: int | None = None):
+    def seek(self, timestamp: Optional[float] = None, index: Optional[int] = None):
         """
         Seek to a specified timestamp or frame index.
 
@@ -256,7 +256,7 @@ class VideoCaptureFrames(VideoFrames):
         if new_read_time is not None:
             self._read_time = self._read_time * 0.95 + 0.05 * new_read_time
 
-    def read_frame(self) -> NDArray[np.uint8] | None:
+    def read_frame(self) -> Optional[NDArray[np.uint8]]:
         """
         Read the next frame from the video.
 
@@ -355,7 +355,7 @@ class SequenceFrames(VideoFrames):
         self._n_channels = frame_shape[2] if len(frame_shape) == 3 else 1
 
     def get_frame(
-        self, timestamp: float | None = None, index: int | None = None
+        self, timestamp: Optional[float] = None, index: Optional[int] = None
     ) -> NDArray[np.uint8]:
         """
         Retrieve a video frame based on the specified timestamp or index.
@@ -430,7 +430,7 @@ class IterableFrames(VideoFrames):
         total_frames (int): The total number of frames in the video.
 
     Methods:
-        get_frame(timestamp: float | None = None, index: int | None = None) -> NDArray[np.uint8]:
+        get_frame(timestamp: float = None, index: int = None) -> NDArray[np.uint8]:
             Retrieve a video frame by specifying either a timestamp or an index.
 
         close():
@@ -461,7 +461,7 @@ class IterableFrames(VideoFrames):
         self._n_channels = frame.shape[2] if len(frame.shape) == 3 else 1
 
     def get_frame(
-        self, timestamp: float | None = None, index: int | None = None
+        self, timestamp: Optional[float] = None, index: Optional[int] = None
     ) -> NDArray[np.uint8]:
         """
         Retrieve a video frame by specifying either a timestamp or an index.
@@ -549,9 +549,9 @@ class VideoSource(VideoFrames):
         self,
         source: VideoFrames,
         start_index: int = 0,
-        end_index: int | None = None,
+        end_index: Optional[int] = None,
         step_size: int = 1,
-        transformations: List[Callable] | None = None,
+        transformations: Optional[List[Callable]] = None,
     ) -> None:
         self.source = source
         if start_index < 0 or start_index >= len(self.source):
@@ -606,7 +606,7 @@ class VideoSource(VideoFrames):
         )
 
     def get_frame(
-        self, timestamp: float | None = None, index: int | None = None
+        self, timestamp: Optional[float] = None, index: Optional[int] = None
     ) -> NDArray[np.uint8]:
         timestamp, index = _normalize_args_index_and_timestamp(
             timestamp,

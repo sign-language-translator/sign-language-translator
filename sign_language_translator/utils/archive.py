@@ -10,7 +10,7 @@ import re
 import zipfile
 from glob import glob
 from os.path import basename, exists, join
-from typing import List
+from typing import List, Optional, Union
 from warnings import warn
 
 from tqdm.auto import tqdm
@@ -30,7 +30,7 @@ class Archive:
         List the files in a ZIP archive, optionally filtered by a glob pattern or regex.
 
     - extract(archive_path: str, pattern: str = "*", regex: str | re.Pattern = r".*", output_dir: str = ".",
-              overwrite=False, progress_bar=True, leave=True, password: bytes | None = None, verbose=True) -> List[str]
+              overwrite=False, progress_bar=True, leave=True, password: bytes = None, verbose=True) -> List[str]
         Extract files from a ZIP archive to the specified output directory, optionally
         filtered by file names, patterns, or regex.
 
@@ -56,7 +56,7 @@ class Archive:
 
     @staticmethod
     def create(
-        filename_or_patterns: str | List[str],
+        filename_or_patterns: Union[str, List[str]],
         archive_path: str,
         compression=zipfile.ZIP_DEFLATED,
         progress_bar=True,
@@ -97,7 +97,7 @@ class Archive:
 
     @staticmethod
     def list(
-        archive_path: str, pattern: str = "*", regex: str | re.Pattern = r".*"
+        archive_path: str, pattern: str = "*", regex: Union[str, re.Pattern] = r".*"
     ) -> List[str]:
         """
         List files in the zip archive filtered by the specified pattern or regex.
@@ -132,12 +132,12 @@ class Archive:
     def extract(
         archive_path: str,
         pattern: str = "*",
-        regex: str | re.Pattern = r".*",
+        regex: Union[str, re.Pattern] = r".*",
         output_dir: str = ".",
         overwrite=False,
         progress_bar=True,
         leave=True,
-        password: bytes | None = None,
+        password: Optional[bytes] = None,
         verbose=True,
     ) -> List[str]:
         """

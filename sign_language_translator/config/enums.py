@@ -18,6 +18,7 @@ Functions:
 from __future__ import annotations
 
 from enum import Enum
+from typing import Union
 
 from sign_language_translator.utils import (
     PrintableEnumMeta,
@@ -172,6 +173,7 @@ class ModelCodes(Enum, metaclass=PrintableEnumMeta):
 
     # text-embedding-models
 
+
 class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration class for grouping supported model codes, making it easier to filter various models.
@@ -214,8 +216,9 @@ class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
     }
     ALL_VIDEO_EMBEDDING_MODELS = ALL_MEDIAPIPE_EMBEDDING_MODELS
 
+
 # TODO: move the mapping list outside of the function. maybe convert it to a class variable.
-def normalize_short_code(short_code: str | Enum) -> str:
+def normalize_short_code(short_code: Union[str, Enum]) -> str:
     """
     Normalize the provided short code to a standard form that is recognized package wide.
 

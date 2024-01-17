@@ -1,4 +1,5 @@
 import string
+
 from sign_language_translator.text.tokenizer import SignTokenizer
 
 
@@ -77,9 +78,23 @@ def test_join_subwords():
     expected_joint = ["ice-cream", " ", "from", " ", "book shop"]
     assert tokenizer._join_subwords(tokens) == expected_joint
 
+
 def test_join_word_sense():
     tokenizer = get_tokenizer()
 
-    tokens = ["this", " ", "is", " ", "a", "spring", "(", "metal", "-", "coil", ")", "."]
+    tokens = [
+        "this",
+        " ",
+        "is",
+        " ",
+        "a",
+        "spring",
+        "(",
+        "metal",
+        "-",
+        "coil",
+        ")",
+        ".",
+    ]
     expected_joint = ["this", " ", "is", " ", "a", "spring(metal-coil)", "."]
     assert tokenizer._join_word_sense(tokens) == expected_joint

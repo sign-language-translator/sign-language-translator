@@ -70,6 +70,7 @@ def test_transformer_language_model_position_ids():
     pos_ids = model._make_position_ids(token_ids)
     assert pos_ids[..., 0] == 0
 
+
 def test_transformer_language_model_predict_next():
     model = get_tlm_model()
     model.next(["<sos>"])

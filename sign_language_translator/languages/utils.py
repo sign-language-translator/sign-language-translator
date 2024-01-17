@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from sign_language_translator.config.enums import (
     SignLanguages,
@@ -18,8 +18,9 @@ if TYPE_CHECKING:
     from sign_language_translator.languages.sign import SignLanguage
     from sign_language_translator.languages.text import TextLanguage
 
+
 # TODO: AbstractFactory to store str to class mappings
-def get_text_language(language_name: str | Enum) -> TextLanguage:
+def get_text_language(language_name: Union[str, Enum]) -> TextLanguage:
     """
     Retrieves a TextLanguage object based on the provided language name.
 
@@ -46,7 +47,7 @@ def get_text_language(language_name: str | Enum) -> TextLanguage:
     raise ValueError(f"no text language class known for '{language_name = }'")
 
 
-def get_sign_language(language_name: str | Enum) -> SignLanguage:
+def get_sign_language(language_name: Union[str, Enum]) -> SignLanguage:
     """
     Retrieves a SignLanguage object based on the provided language name.
 

@@ -57,6 +57,7 @@ def test_video_iteration():
     assert (base.numpy() == frames).all()
     assert base.torch() is not None
 
+
 # def test_video_display():
 #     pass
 

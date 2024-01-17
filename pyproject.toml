@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sign_language_translator"
-version = "0.7.1"
+version = "0.7.2"
 description = "Build Translators and Translate between text & sign language videos with AI."
 authors = ["Mudassar Iqbal <mdsriqb@gmail.com>"]
 license = "Apache-2.0"
@@ -11,11 +11,11 @@ documentation = "https://sign-language-translator.readthedocs.io/en/latest/"
 keywords = ["sign-language", "sign-language-translation", "nlp", "computer-vision", "deep-learning", "ai", "translation", "translator", "sign-language-translator", "rule-based"]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
-matplotlib = "^3.7.2"
-mediapipe = "0.10.3"
-numpy = "^1.25.1"
-torch = "^2.1.2"
+python = ">=3.8,<3.12"
+matplotlib = "^3.7.4"
+mediapipe = "==0.10.*"
+numpy = "==1.24.*"
+torch = "==2.1.*"
 deep-translator = "^1.11.4"
 opencv-contrib-python = "^4.8.0.74"
 tqdm = "^4.65.0"

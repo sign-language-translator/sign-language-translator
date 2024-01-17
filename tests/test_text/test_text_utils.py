@@ -1,7 +1,7 @@
 from sign_language_translator.text.utils import (
+    ListRegex,
     extract_supported_subsequences,
     make_ngrams,
-    ListRegex,
 )
 
 
@@ -43,7 +43,7 @@ def test_list_regex():
         [
             r"(abc|cba)",
             [r"jk", r"lmno?"],
-            ("123", (0, 2)), # test for max_count=0
+            ("123", (0, 2)),  # test for max_count=0
         ],
     )
     assert span == (0, 4)

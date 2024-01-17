@@ -1,3 +1,4 @@
+import os
 import random
 from re import match
 
@@ -42,5 +43,12 @@ def test_ngram_language_model():
     assert 0 <= prob <= 1
 
     generation, prob = sampler.complete("x")
-    assert generation == "x" # unknown token is not appended
-    assert prob == 1 # 2**0
+    assert generation == "x"  # unknown token is not appended
+    assert prob == 1  # 2**0
+
+    # save model
+    os.makedirs("temp", exist_ok=True)
+    lm1.save("temp/lm1.json", overwrite=True)
+
+    assert os.path.exists("temp/lm1.json")
+    assert NgramLanguageModel.load("temp/lm1.json").model == lm1.model
