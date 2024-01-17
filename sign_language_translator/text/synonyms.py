@@ -100,7 +100,7 @@ class SynonymFinder:
         text: str,
         intermediate_languages: Optional[List[str]] = None,
         time_delay: float = 1e-2,
-        timeout: float | None = 10,
+        timeout: Optional[float] = 10,
         max_n_threads: int = 132,
         lower_case: bool = True,
         progress_bar: bool = True,

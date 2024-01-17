@@ -10,7 +10,7 @@ import re
 import zipfile
 from glob import glob
 from os.path import basename, exists, join
-from typing import List
+from typing import List, Optional
 from warnings import warn
 
 from tqdm.auto import tqdm
@@ -30,7 +30,7 @@ class Archive:
         List the files in a ZIP archive, optionally filtered by a glob pattern or regex.
 
     - extract(archive_path: str, pattern: str = "*", regex: str | re.Pattern = r".*", output_dir: str = ".",
-              overwrite=False, progress_bar=True, leave=True, password: bytes | None = None, verbose=True) -> List[str]
+              overwrite=False, progress_bar=True, leave=True, password: bytes = None, verbose=True) -> List[str]
         Extract files from a ZIP archive to the specified output directory, optionally
         filtered by file names, patterns, or regex.
 
@@ -137,7 +137,7 @@ class Archive:
         overwrite=False,
         progress_bar=True,
         leave=True,
-        password: bytes | None = None,
+        password: Optional[bytes] = None,
         verbose=True,
     ) -> List[str]:
         """

@@ -42,7 +42,7 @@ from functools import partial
 from glob import glob
 from os import makedirs
 from os.path import abspath, basename, exists, join
-from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Type
+from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Optional, Type
 from warnings import warn
 
 import numpy
@@ -58,8 +58,8 @@ if TYPE_CHECKING:
 
 def top_p_top_k_indexes(
     probabilities: Iterable[float],
-    top_p: float | None = None,
-    top_k: int | None = None,
+    top_p: Optional[float] = None,
+    top_k: Optional[int] = None,
 ) -> List[int]:
     """Perform top-p (nucleus) and top-k filtering based on the given probabilities.
     Top-k returns the indices of the top-k elements.
@@ -183,7 +183,7 @@ def plot_lr_scheduler(
     n_steps: int = 20,
     parameter_group_number: int = 0,
     save_fig: bool = False,
-    fig_name: str | None = None,
+    fig_name: Optional[str] = None,
     **kwargs,
 ):
     """Plot the learning rate of a specific parameter group across training steps.

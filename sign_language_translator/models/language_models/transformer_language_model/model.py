@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from os.path import exists
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -68,9 +68,9 @@ class TransformerLanguageModel(LanguageModel, torch.nn.Module):
         activation="gelu",
         device="cuda" if torch.cuda.is_available() else "cpu",
         sampling_temperature: float = 1.0,
-        top_k: int | None = None,
-        top_p: float | None = 0.9,
-        name: str | None = None,
+        top_k: Optional[int] = None,
+        top_p: Optional[float] = 0.9,
+        name: Optional[str] = None,
         pretrained_token_embeddings: torch.Tensor | None = None,
         randomly_shift_position_embedding_during_training: bool = False,
     ) -> None:

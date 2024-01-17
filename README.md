@@ -14,7 +14,7 @@
 ![Release Workflow Status](https://img.shields.io/github/actions/workflow/status/sign-language-translator/sign-language-translator/release.yml?branch=main&logo=pytest)
 [![codecov](https://codecov.io/gh/sign-language-translator/sign-language-translator/branch/main/graph/badge.svg)](https://codecov.io/gh/sign-language-translator/sign-language-translator)
 [![Documentation Status](https://img.shields.io/readthedocs/sign-language-translator?logo=readthedocs&)](https://sign-language-translator.readthedocs.io/)
-![GitHub Repo stars](https://img.shields.io/github/stars/sign-language-translator/sign-language-translator?logo=github)
+[![GitHub Repo stars](https://img.shields.io/github/stars/sign-language-translator/sign-language-translator?logo=github)](https://github.com/sign-language-translator/sign-language-translator/stargazers)
 
 </div>
 
@@ -180,7 +180,7 @@ pip install sign-language-translator
 ```
 
 <details>
-<summary>Editable mode:</summary>
+<summary>Editable mode (<code>git clone</code>):</summary>
 
 ```bash
 git clone https://github.com/sign-language-translator/sign-language-translator.git
@@ -219,8 +219,8 @@ sign = model.translate(text) # tokenize, map, download & concatenate
 sign.show()
 # sign.save(f"{text}.mp4")
 
-model.text_language = "hindi"
-sign = model.translate("पाँच घंटे।") # "5 hours."
+# model.text_language = "hindi"
+# sign = model.translate("पाँच घंटे।") # "5 hours."
 ```
 
 ![this very good is](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/7f4ff312-df03-4b11-837b-5fb895c9f08e)
@@ -286,10 +286,10 @@ Available Functions:
 - Token Classification (Tagging)
 - Word Sense Disambiguation
 
-| Name                                                                                                                                   | Vocabulary         | Ambiguous tokens | Signs |
-| -------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ---------------- | ----- |
-| [Urdu](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/urdu.py) | 2090 words+phrases | 227              | 790   |
-| [Hindi](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/hindi.py) | 34 words+phrases | 5              | 16   |
+| Name                                                                                                                                     | Vocabulary         | Ambiguous tokens | Signs |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ---------------- | ----- |
+| [Urdu](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/urdu.py)   | 2090 words+phrases | 227              | 790   |
+| [Hindi](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/hindi.py) | 34 words+phrases   | 5                | 16    |
 
 </details>
 
@@ -302,8 +302,8 @@ Available Functions:
 - Sentence restructuring according to grammar
 - Sentence simplification (drop stopwords)
 
-| Name                                                                                                                                                                       | Vocabulary | Dataset | Parallel Corpus                                               |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------- | ------------------------------------------------------------- |
+| Name                                                                                                                                                                       | Vocabulary | Dataset  | Parallel Corpus                                         |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------- | ------------------------------------------------------- |
 | [Pakistan Sign Language](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py) | 789        | 23 hours | n gloss sentences with translations in m text languages |
 
 </details>
@@ -433,7 +433,7 @@ Remember to contribute back to the community:
 - Share your data, code, and models by creating a pull request (PR), allowing others to benefit from your efforts.
 - Create your own sign language translator (e.g. as your university thesis) and contribute to a more inclusive and accessible world.
 
-See the code at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators) or in this [notebook](https://github.com/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb). [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb)
+See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators) or in this [notebook](https://github.com/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb). [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb)
 
 ## Directory Tree
 
@@ -578,11 +578,9 @@ Stay Tuned!
 ## Upcoming/Roadmap
 
 <details>
-<summary>TEXT_PROCESSING_IMPROVEMENTS: v0.7</summary>
+<summary>TEXT_EMBEDDING: v0.7</summary>
 
 ```python
-# improve urdu code
-# add `hindi.py` (NotImplementedError) + `english.py`
 # text embedding models
 # synonyms by similarity
 ```
@@ -608,7 +606,8 @@ Stay Tuned!
 <summary>LANGUAGES: v0.9</summary>
 
 ```python
-# implement NLP classes for English & Hindi
+# improve Urdu code
+# implement NLP class for English
 # expand dictionary video data by scraping everything
 ```
 
@@ -676,7 +675,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-01-15.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-01-17.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>

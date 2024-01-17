@@ -2,7 +2,7 @@
 """
 
 from mimetypes import guess_type
-from typing import Generator, List, Sequence, Tuple
+from typing import Generator, List, Optional, Sequence, Tuple
 
 import cv2
 from numpy import uint8
@@ -72,7 +72,7 @@ def iter_frames_with_opencv(path: str) -> Generator[NDArray[uint8], None, None]:
 
 
 def _normalize_args_index_and_timestamp(
-    timestamp: float | None, index: int | None, max_duration: float, max_index: int
+    timestamp: Optional[float], index: Optional[int], max_duration: float, max_index: int
 ) -> Tuple[float, int]:
     if (timestamp is not None) and index is None:
         if not 0 <= timestamp <= max_duration:

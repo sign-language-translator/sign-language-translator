@@ -7,7 +7,7 @@ import os
 import re
 from datetime import datetime
 from os.path import abspath, dirname, exists, isdir, isfile, join, sep
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from tqdm.auto import tqdm
 
@@ -38,10 +38,10 @@ class Assets:
         get_ids(filename_or_regex: str) -> List[str]:
             Get the relative paths of assets matching the given filename_or_regex.
 
-        download(filename_or_regex: str, overwrite=False, progress_bar: bool | None = None, timeout: float = 20.0, leave=True, chunk_size=65536) -> bool:
+        download(filename_or_regex: str, overwrite=False, progress_bar: bool = None, timeout: float = 20.0, leave=True, chunk_size=65536) -> bool:
             Download assets matching the given filename regex and save them to the appropriate file paths inside the assets root directory.
 
-        extract(filename_or_regex: str, archive_name_or_regex: str | None = None, overwrite=False, download_archive=True) -> List[str]:
+        extract(filename_or_regex: str, archive_name_or_regex: str = None, overwrite=False, download_archive=True) -> List[str]:
             extract the files matching the argument from an archived dataset into the appropriate location.
 
         fetch(filename_or_regex: str, overwrite=False, archive_name_or_regex: str=None, download_archive=False) -> List[str]:
@@ -206,7 +206,7 @@ class Assets:
     def extract(
         cls,
         filename_or_regex: str,
-        archive_name_or_regex: str | None = None,
+        archive_name_or_regex: Optional[str] = None,
         overwrite=False,
         progress_bar=True,
         leave=True,
@@ -266,7 +266,7 @@ class Assets:
         overwrite=False,
         timeout: float = 20.0,
         chunk_size=2**18,
-        progress_bar: bool | None = None,
+        progress_bar: Optional[bool] = None,
         leave=True,
     ) -> List[str]:
         """
@@ -335,7 +335,7 @@ class Assets:
         cls,
         filename_or_regex: str,
         overwrite=False,
-        archive_name_or_regex: str | None = None,
+        archive_name_or_regex: Optional[str] = None,
         download_archive=False,
         progress_bar=True,
         leave=True,

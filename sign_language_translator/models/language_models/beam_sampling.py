@@ -2,7 +2,7 @@
 
 from math import exp, log2
 from random import random
-from typing import Any, Callable, Iterable, Tuple
+from typing import Any, Callable, Iterable, Optional, Tuple
 
 from sign_language_translator.models.language_models.abstract_language_model import (
     LanguageModel,
@@ -48,12 +48,12 @@ class BeamSampling:
         self.scoring_function = scoring_function
         self.return_log_of_probability = return_log_of_probability
 
-    def __call__(self, context: Iterable | None = None) -> Iterable:
+    def __call__(self, context: Optional[Iterable] = None) -> Iterable:
         return self.complete(initial_context=context)
 
     def complete(
         self,
-        initial_context: Iterable | None = None,
+        initial_context: Optional[Iterable] = None,
         append_func: Callable[[Any, Any], Any] = lambda context, token: (
             context + [token]
             if isinstance(context, list)
