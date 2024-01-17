@@ -98,17 +98,14 @@ def test_slt_assets_download():
 def test_slt_assets_tree():
     runner = CliRunner()
 
-    result = runner.invoke(
-        slt, ["assets", "tree"]
-    )
+    result = runner.invoke(slt, ["assets", "tree"])
     assert result.exit_code == 0
     assert result.output.strip().startswith("assets")
+
 
 def test_slt_assets_path():
     runner = CliRunner()
 
-    result = runner.invoke(
-        slt, ["assets", "path"]
-    )
+    result = runner.invoke(slt, ["assets", "path"])
     assert result.exit_code == 0
     assert result.output.strip() == Assets.ROOT_DIR

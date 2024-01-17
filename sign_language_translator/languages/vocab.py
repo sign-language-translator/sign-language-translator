@@ -184,7 +184,7 @@ class Vocab:
         Takes JSON word mapping datasets and creates a dictionary mapping text tokens to sign labels.
 
         Args:
-            language (str | None, optional): Language code used in JSON or a regex matching it whose data should be extracted. Defaults to None.
+            language (str, optional): Language code used in JSON or a regex matching it whose data should be extracted. Defaults to None.
             country (str): Country code used to filter the mapping datasets.
             organization (str): Organization code used to filter the mapping datasets.
             part_number (str): Part number used to filter the mapping datasets.

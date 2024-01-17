@@ -9,7 +9,7 @@ from copy import copy, deepcopy
 from mimetypes import guess_type
 from os import makedirs
 from os.path import abspath, dirname, isfile, join
-from typing import Callable, Generator, Iterable, List, Optional, Sequence, Tuple
+from typing import Callable, Generator, Iterable, List, Optional, Sequence, Tuple, Union
 
 import cv2  # TODO: Compile OpenCV with GPU
 import numpy as np
@@ -37,11 +37,13 @@ from sign_language_translator.vision.video.video_iterators import (
 class Video(Sign, VideoFrames):
     def __init__(
         self,
-        sign: str
-        | Sequence[NDArray[np.uint8] | torch.Tensor]
-        | NDArray[np.uint8]
-        | torch.Tensor
-        | Generator[NDArray[np.uint8], None, None],
+        sign: Union[
+            str,
+            Sequence[Union[NDArray[np.uint8], torch.Tensor]],
+            NDArray[np.uint8],
+            torch.Tensor,
+            Generator[NDArray[np.uint8], None, None],
+        ],
         **kwargs,
     ) -> None:
         self._path: Optional[str] = None
@@ -167,7 +169,7 @@ class Video(Sign, VideoFrames):
         for i in range(start, end or len(self), (step or 1) * self._default_step_size):
             yield self.get_frame(index=i)
 
-    def __get_node(self, index: int) -> Tuple[Video | None, int]:
+    def __get_node(self, index: int) -> Tuple[Optional[Video], int]:
         """
         Find the node in the video linked list that contains the specified index/frame.
 
@@ -205,8 +207,8 @@ class Video(Sign, VideoFrames):
         raise StopIteration
 
     def __getitem__(
-        self, key: int | slice | Sequence[int | slice]
-    ) -> Video | NDArray[np.uint8]:
+        self, key: Union[int, slice, Sequence[Union[int, slice]]]
+    ) -> Union[Video, NDArray[np.uint8]]:
         slices = _validate_and_normalize_slices(key, max_n_dims=4)
         if len(slices) > 4:
             raise ValueError(f"Expected at most 4 slices. Got {len(slices)}: {key}")
@@ -306,7 +308,11 @@ class Video(Sign, VideoFrames):
             VideoDisplay.display_frames([frame], inline_player="jshtml")
 
     def frames_grid(
-        self, rows=2, columns=3, width: Optional[int] = None, height: Optional[int] = None
+        self,
+        rows=2,
+        columns=3,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
     ):
         grid = np.concatenate(
             [
@@ -333,7 +339,11 @@ class Video(Sign, VideoFrames):
         return grid
 
     def show_frames_grid(
-        self, rows=2, columns=3, width: Optional[int] = 800, height: Optional[int] = None
+        self,
+        rows=2,
+        columns=3,
+        width: Optional[int] = 800,
+        height: Optional[int] = None,
     ):
         grid = self.frames_grid(rows=rows, columns=columns, width=width, height=height)
 

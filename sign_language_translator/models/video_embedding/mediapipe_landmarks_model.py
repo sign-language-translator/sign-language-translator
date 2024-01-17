@@ -20,7 +20,7 @@ Example:
 """
 
 from os.path import join
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Optional, Union
 
 import mediapipe
 import numpy as np
@@ -78,10 +78,10 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
 
     def embed(
         self,
-        frame_sequence: Iterable[torch.Tensor | NDArray[np.uint8]],
+        frame_sequence: Iterable[Union[torch.Tensor, NDArray[np.uint8]]],
         landmark_type: str = "world" or "image" or "all",
-        progress_callback: None | ProgressStatusCallback = None,
-        total_frames: None | int = None,
+        progress_callback: Optional[ProgressStatusCallback] = None,
+        total_frames: Optional[int] = None,
         **kwargs,
     ) -> torch.Tensor:
         """

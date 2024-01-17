@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import random
 from enum import Enum
-from typing import List, Type
+from typing import List, Type, Union
 
 from sign_language_translator.config.enums import SignFormats
 from sign_language_translator.languages import get_sign_language, get_text_language
@@ -22,9 +22,9 @@ class ConcatenativeSynthesis(TextToSignModel):
 
     def __init__(
         self,
-        text_language: str | TextLanguage | Enum,
-        sign_language: str | SignLanguage | Enum,
-        sign_format: str | Type[Sign],
+        text_language: Union[str, TextLanguage, Enum],
+        sign_language: Union[str, SignLanguage, Enum],
+        sign_format: Union[str, Type[Sign]],
     ) -> None:
         """
         Args:
@@ -42,7 +42,7 @@ class ConcatenativeSynthesis(TextToSignModel):
         return self._text_language
 
     @text_language.setter
-    def text_language(self, text_language: str | TextLanguage | Enum):
+    def text_language(self, text_language: Union[str, TextLanguage, Enum]):
         self._text_language = self.__get_text_language_object(text_language)
 
     @property
@@ -51,7 +51,7 @@ class ConcatenativeSynthesis(TextToSignModel):
         return self._sign_language
 
     @sign_language.setter
-    def sign_language(self, sign_language: str | SignLanguage | Enum):
+    def sign_language(self, sign_language: Union[str, SignLanguage, Enum]):
         self._sign_language = self.__get_sign_language_object(sign_language)
 
     @property
@@ -65,7 +65,7 @@ class ConcatenativeSynthesis(TextToSignModel):
         return self._sign_format
 
     @sign_format.setter
-    def sign_format(self, sign_format: str | Type[Sign]):
+    def sign_format(self, sign_format: Union[str, Type[Sign]]):
         self._sign_format = self.__get_sign_format_class(sign_format)
 
     def translate(self, text: str, *args, **kwargs) -> Sign:
@@ -135,7 +135,7 @@ class ConcatenativeSynthesis(TextToSignModel):
         return name
 
     def __get_text_language_object(
-        self, text_language: str | TextLanguage | Enum
+        self, text_language: Union[str, TextLanguage, Enum]
     ) -> TextLanguage:
         if isinstance(text_language, (str, Enum)):
             return get_text_language(text_language)
@@ -144,7 +144,7 @@ class ConcatenativeSynthesis(TextToSignModel):
         raise TypeError(f"Expected str or TextLanguage, got {type(text_language) = }.")
 
     def __get_sign_language_object(
-        self, sign_language: str | SignLanguage | Enum
+        self, sign_language: Union[str, SignLanguage, Enum]
     ) -> SignLanguage:
         if isinstance(sign_language, (str, Enum)):
             return get_sign_language(sign_language)
@@ -152,8 +152,10 @@ class ConcatenativeSynthesis(TextToSignModel):
             return sign_language
         raise TypeError(f"Expected str or SignLanguage, got {type(sign_language) = }.")
 
-    def __get_sign_format_class(self, sign_format: str | Type[Sign]) -> Type[Sign]:
-        if isinstance(sign_format, str | Enum):
+    def __get_sign_format_class(
+        self, sign_format: Union[str, Type[Sign]]
+    ) -> Type[Sign]:
+        if isinstance(sign_format, (str, Enum)):
             return get_sign_wrapper_class(sign_format)
         if isinstance(sign_format, type) and issubclass(sign_format, Sign):
             return sign_format

@@ -256,7 +256,7 @@ class VideoCaptureFrames(VideoFrames):
         if new_read_time is not None:
             self._read_time = self._read_time * 0.95 + 0.05 * new_read_time
 
-    def read_frame(self) -> NDArray[np.uint8] | None:
+    def read_frame(self) -> Optional[NDArray[np.uint8]]:
         """
         Read the next frame from the video.
 
@@ -551,7 +551,7 @@ class VideoSource(VideoFrames):
         start_index: int = 0,
         end_index: Optional[int] = None,
         step_size: int = 1,
-        transformations: List[Callable] | None = None,
+        transformations: Optional[List[Callable]] = None,
     ) -> None:
         self.source = source
         if start_index < 0 or start_index >= len(self.source):

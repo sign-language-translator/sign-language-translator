@@ -14,7 +14,7 @@ Classes:
 """
 
 import re
-from typing import Any, Iterable, List, Set, Tuple
+from typing import Any, Iterable, List, Optional, Set, Tuple, Union
 
 
 def make_ngrams(sequence: Iterable, n: int) -> List[Iterable]:
@@ -196,8 +196,8 @@ class ListRegex:
 
     @staticmethod
     def match(
-        items: List[str], patterns: List[str | List | Tuple]
-    ) -> Tuple[int, int] | None:
+        items: List[str], patterns: List[Union[str, List, Tuple]]
+    ) -> Optional[Tuple[int, int]]:
         """
         Matches the given patterns against the items in the list.
         Applies the patterns at the start of the list of string.
@@ -282,7 +282,7 @@ class ListRegex:
         return does_match
 
     @staticmethod
-    def search(items: List[str], patterns) -> Tuple[int, int] | None:
+    def search(items: List[str], patterns) -> Optional[Tuple[int, int]]:
         """
         Searches for the first occurrence of the patterns in the list of items.
 

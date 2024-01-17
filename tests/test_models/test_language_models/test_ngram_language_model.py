@@ -42,5 +42,5 @@ def test_ngram_language_model():
     assert 0 <= prob <= 1
 
     generation, prob = sampler.complete("x")
-    assert generation == "x" # unknown token is not appended
-    assert prob == 1 # 2**0
+    assert generation == "x"  # unknown token is not appended
+    assert prob == 1  # 2**0

@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, Iterable, Union
+from typing import Iterable, Union
+
+from sign_language_translator.vision.sign.sign import Sign
 
 
 class TextToSignModel(ABC):
@@ -19,8 +21,8 @@ class TextToSignModel(ABC):
         """The format of the sign language (e.g. slt.Vision.sign.sign.Sign)."""
 
     @abstractmethod
-    def translate(self, text: Union[str, Iterable[str]], *args, **kwargs) -> Any:  # -> VideoFeatures
+    def translate(self, text: Union[str, Iterable[str]], *args, **kwargs) -> Sign:
         """Translate the text to sign language."""
 
-    def __call__(self, text: Union[str, Iterable[str]], *args, **kwargs) -> Any:
+    def __call__(self, text: Union[str, Iterable[str]], *args, **kwargs) -> Sign:
         return self.translate(text, *args, **kwargs)

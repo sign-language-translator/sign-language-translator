@@ -129,6 +129,6 @@ class BeamSampling:
 
         # reformat score
         if not self.return_log_of_probability:
-            score = 2 ** score # math.exp2(score)
+            score = 2**score  # math.exp2(score)
 
         return selected_completion, score

@@ -2,7 +2,7 @@
 
 import enum
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from sign_language_translator.utils import PrintableEnumMeta
 
@@ -41,9 +41,9 @@ class SignLanguage(ABC):
     def tokens_to_sign_dicts(
         self,
         tokens: Iterable[str],
-        tags: Iterable[Any] | None = None,
-        contexts: Iterable[Any] | None = None,
-    ) -> List[Dict[str, List[List[str]] | List[float]]]:
+        tags: Optional[Iterable[Any]] = None,
+        contexts: Optional[Iterable[Any]] = None,
+    ) -> List[Dict[str, Union[List[List[str]], List[float]]]]:
         """Converts tokens to signs based on rules and returns a list of sign dictionaries.
 
         Args:
@@ -62,8 +62,8 @@ class SignLanguage(ABC):
     def restructure_sentence(
         self,
         sentence: Iterable[str],
-        tags: Iterable[Any] | None = None,
-        contexts: Iterable[Any] | None = None,
+        tags: Optional[Iterable[Any]] = None,
+        contexts: Optional[Iterable[Any]] = None,
     ) -> Tuple[Iterable[str], Iterable[Any], Iterable[Any]]:
         """Restructures a sentence by changing the grammar,
         removing stopwords, spaces & punctuation, and modifying token contents.
@@ -79,7 +79,7 @@ class SignLanguage(ABC):
 
     def _make_equal_weight_sign_dict(
         self, signs: List[List[str]]
-    ) -> Dict[str, List[List[str]] | List[float]]:
+    ) -> Dict[str, Union[List[List[str]], List[float]]]:
         """Creates a sign dictionary with equal weights for the provided signs.
 
         Args:

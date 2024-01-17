@@ -107,9 +107,11 @@ class LM_Trainer:
         lr_update_step_count: Optional[int] = None,
         optimizer="adamw",
         seed: int = 0,
-        model_output_renderer: Callable[[TransformerLanguageModel], str] | None = None,
-        epoch_unfreeze_map: Dict[int, List[str]] | None = None,
-        class_weights: torch.Tensor | None = None,
+        model_output_renderer: Optional[
+            Callable[[TransformerLanguageModel], str]
+        ] = None,
+        epoch_unfreeze_map: Optional[Dict[int, List[str]]] = None,
+        class_weights: Optional[torch.Tensor] = None,
         max_gradient_norm: Optional[float] = None,
     ):
         self.model = model.to(device)
