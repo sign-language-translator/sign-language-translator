@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pickle
 from os.path import exists
-from typing import Any, Iterable, List, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 from sign_language_translator.models.language_models.abstract_language_model import (
     LanguageModel,
@@ -41,7 +41,7 @@ class MixerLM(LanguageModel):
     def __init__(
         self,
         models: List[LanguageModel],
-        selection_probabilities: List[float] | None = None,
+        selection_probabilities: Optional[List[float]] = None,
         unknown_token="<unk>",
         name=None,
         model_selection_strategy="choose" or "merge",

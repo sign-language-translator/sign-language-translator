@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from os.path import exists
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import torch
@@ -68,10 +68,10 @@ class TransformerLanguageModel(LanguageModel, torch.nn.Module):
         activation="gelu",
         device="cuda" if torch.cuda.is_available() else "cpu",
         sampling_temperature: float = 1.0,
-        top_k: int | None = None,
-        top_p: float | None = 0.9,
-        name: str | None = None,
-        pretrained_token_embeddings: torch.Tensor | None = None,
+        top_k: Optional[int] = None,
+        top_p: Optional[float] = 0.9,
+        name: Optional[str] = None,
+        pretrained_token_embeddings: Optional[torch.Tensor] = None,
         randomly_shift_position_embedding_during_training: bool = False,
     ) -> None:
         """Transformer-based language model for text generation.
@@ -363,7 +363,7 @@ class TransformerLanguageModel(LanguageModel, torch.nn.Module):
 
         return [self.token_to_id.get(token, self.unknown_token_id) for token in tokens]
 
-    def ids_to_tokens(self, ids: Iterable[int] | torch.Tensor):
+    def ids_to_tokens(self, ids: Union[Iterable[int], torch.Tensor]):
         """
         Convert a sequence of token IDs to tokens.
 

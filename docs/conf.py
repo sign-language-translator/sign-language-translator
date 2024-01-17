@@ -51,10 +51,12 @@ intersphinx_mapping = {
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+from typing import Optional
+
 import requests
 
 
-def linkcode_resolve(domain, info) -> str | None:
+def linkcode_resolve(domain, info) -> Optional[str]:
     """
     Generates a URL for the given domain and module information.
 

@@ -42,7 +42,7 @@ from functools import partial
 from glob import glob
 from os import makedirs
 from os.path import abspath, basename, exists, join
-from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Type
+from typing import TYPE_CHECKING, Callable, Dict, Iterable, List, Optional, Type, Union
 from warnings import warn
 
 import numpy
@@ -58,8 +58,8 @@ if TYPE_CHECKING:
 
 def top_p_top_k_indexes(
     probabilities: Iterable[float],
-    top_p: float | None = None,
-    top_k: int | None = None,
+    top_p: Optional[float] = None,
+    top_k: Optional[int] = None,
 ) -> List[int]:
     """Perform top-p (nucleus) and top-k filtering based on the given probabilities.
     Top-k returns the indices of the top-k elements.
@@ -176,14 +176,14 @@ class FullyLambdaLR(torch.optim.lr_scheduler.LRScheduler):
 
 def plot_lr_scheduler(
     *args,
-    lr_scheduler_class: Type[torch.optim.lr_scheduler.LRScheduler] | None = None,
-    # lr_lambda: Callable[[Any], float] | None = None,
-    lr_scheduler_object: torch.optim.lr_scheduler.LRScheduler | None = None,
+    lr_scheduler_class: Optional[Type[torch.optim.lr_scheduler.LRScheduler]] = None,
+    # lr_lambda: Optional[Callable[[Any], float]] = None,
+    lr_scheduler_object: Optional[torch.optim.lr_scheduler.LRScheduler] = None,
     initial_lr: float = 1e-3,
     n_steps: int = 20,
     parameter_group_number: int = 0,
     save_fig: bool = False,
-    fig_name: str | None = None,
+    fig_name: Optional[str] = None,
     **kwargs,
 ):
     """Plot the learning rate of a specific parameter group across training steps.
@@ -303,8 +303,8 @@ def downwards_wave(
 
 def set_layers_trainability_(
     model: torch.nn.Module,
-    layers_to_unfreeze: List[str] | None = None,
-    layers_to_freeze: List[str] | None = None,
+    layers_to_unfreeze: Optional[List[str]] = None,
+    layers_to_freeze: Optional[List[str]] = None,
 ):
     """
     Set the trainability of specified layers in the given PyTorch model.
@@ -489,7 +489,7 @@ class VideoEmbeddingPipeline:
 
     def __save_embedding(
         self,
-        embedding: NDArray | torch.Tensor,
+        embedding: Union[NDArray, torch.Tensor],
         filename: str,
         output_dir=".",
         file_format="csv",

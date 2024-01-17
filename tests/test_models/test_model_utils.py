@@ -21,8 +21,8 @@ def test_lr_scheduling():
     plot_lr_scheduler(
         lr_scheduler_class=FullyLambdaLR,
         initial_lr=0.01,
-        n_steps=len(wave)-1,
+        n_steps=len(wave) - 1,
         lr_lambda=(lambda step_num, base_lr, last_lr: wave[step_num]),
         save_fig=True,
-        fig_name="temp_wave.png"
+        fig_name="temp_wave.png",
     )

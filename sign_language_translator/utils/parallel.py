@@ -8,7 +8,7 @@ Functions:
 
 import threading
 from time import sleep
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Optional
 
 from tqdm.auto import tqdm
 
@@ -17,7 +17,7 @@ def threaded_map(
     target: Callable,
     args_list: Iterable,
     time_delay=0.02,
-    timeout: float | None = None,
+    timeout: Optional[float] = None,
     max_n_threads=None,
     progress_bar=True,
     leave=True,

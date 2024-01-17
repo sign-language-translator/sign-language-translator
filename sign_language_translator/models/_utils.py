@@ -13,7 +13,7 @@ __all__ = [
     "get_model",
 ]
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import (
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from enum import Enum
 
 
-def get_model(model_code: str | Enum, *args, **kwargs):
+def get_model(model_code: Union[str, Enum], *args, **kwargs):
     """
     Get the model based on the provided model code and optional parameters.
     See sign_language_translator.config.enums.ModelCodes

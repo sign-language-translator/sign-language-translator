@@ -1,7 +1,7 @@
 import re
 from enum import EnumMeta
 from random import choices
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Set, Union
 
 from tqdm.auto import tqdm
 
@@ -188,7 +188,7 @@ class ProgressStatusCallback:
         self.tqdm_bar.set_postfix(status, refresh=True)
 
 
-def is_regex(string: str | re.Pattern) -> bool:
+def is_regex(string: Union[str, re.Pattern]) -> bool:
     """Tests whether the argument is a regex or a regular string.
 
     Args:
@@ -206,3 +206,5 @@ def is_regex(string: str | re.Pattern) -> bool:
             return True
         except re.error:
             return False
+
+    return False

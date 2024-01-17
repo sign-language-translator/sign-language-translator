@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Optional
 
 from sign_language_translator.text.utils import ListRegex
 
@@ -12,7 +12,7 @@ class SignTokenizer:
         end_of_sentence_tokens: Iterable[str] = (".", "?", "!"),
         full_stops=(".",),
         non_sentence_end_words: Iterable[str] = ("A", "B", "C"),
-        tokenized_word_sense_pattern: List | None = None,
+        tokenized_word_sense_pattern: Optional[List] = None,
     ):
         self.word_regex = word_regex
 

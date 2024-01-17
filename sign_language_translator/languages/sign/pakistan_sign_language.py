@@ -2,7 +2,7 @@
 
 import random
 import re
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import SignLanguages
@@ -68,9 +68,9 @@ class PakistanSignLanguage(SignLanguage):
     def tokens_to_sign_dicts(
         self,
         tokens: Iterable[str],
-        tags: Iterable[Any] | None = None,
-        contexts: Iterable[Any] | None = None,
-    ) -> List[Dict[str, List[List[str]] | List[float]]]:
+        tags: Optional[Iterable[Any]] = None,
+        contexts: Optional[Iterable[Any]] = None,
+    ) -> List[Dict[str, Union[List[List[str]], List[float]]]]:
         # fix args
         if isinstance(tokens, str):
             tokens = [tokens]
@@ -90,7 +90,7 @@ class PakistanSignLanguage(SignLanguage):
 
     def _apply_rules(
         self, token: str, tag=None, context=None
-    ) -> List[Dict[str, List[List[str]] | List[float]]]:
+    ) -> List[Dict[str, Union[List[List[str]], List[float]]]]:
         """Applies all the mapping rules to a token.
         Rules with lower value of priority overwrite the result.
         If multiple rules of same priority are applicable, one is selected at random.
@@ -129,8 +129,8 @@ class PakistanSignLanguage(SignLanguage):
     def restructure_sentence(
         self,
         sentence: Iterable[str],
-        tags: Iterable[Any] | None = None,
-        contexts: Iterable[Any] | None = None,
+        tags: Optional[Iterable[Any]] = None,
+        contexts: Optional[Iterable[Any]] = None,
     ) -> Tuple[Iterable[str], Iterable[Any], Iterable[Any]]:
         # Fix the args
         tags = [Tags.DEFAULT for _ in sentence] if tags is None else tags
@@ -168,9 +168,9 @@ class PakistanSignLanguage(SignLanguage):
     def __call__(
         self,
         tokens: Iterable[str],
-        tags: Iterable[Any] | None = None,
-        contexts: Iterable[Any] | None = None,
-    ) -> List[Dict[str, List[List[str]] | List[float]]]:
+        tags: Optional[Iterable[Any]] = None,
+        contexts: Optional[Iterable[Any]] = None,
+    ) -> List[Dict[str, Union[List[List[str]], List[float]]]]:
         tokens, tags, contexts = self.restructure_sentence(
             tokens, tags=tags, contexts=contexts
         )

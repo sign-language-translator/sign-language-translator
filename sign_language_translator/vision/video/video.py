@@ -9,7 +9,7 @@ from copy import copy, deepcopy
 from mimetypes import guess_type
 from os import makedirs
 from os.path import abspath, dirname, isfile, join
-from typing import Callable, Generator, Iterable, List, Sequence, Tuple
+from typing import Callable, Generator, Iterable, List, Optional, Sequence, Tuple, Union
 
 import cv2  # TODO: Compile OpenCV with GPU
 import numpy as np
@@ -37,19 +37,21 @@ from sign_language_translator.vision.video.video_iterators import (
 class Video(Sign, VideoFrames):
     def __init__(
         self,
-        sign: str
-        | Sequence[NDArray[np.uint8] | torch.Tensor]
-        | NDArray[np.uint8]
-        | torch.Tensor
-        | Generator[NDArray[np.uint8], None, None],
+        sign: Union[
+            str,
+            Sequence[Union[NDArray[np.uint8], torch.Tensor]],
+            NDArray[np.uint8],
+            torch.Tensor,
+            Generator[NDArray[np.uint8], None, None],
+        ],
         **kwargs,
     ) -> None:
-        self._path: str | None = None
+        self._path: Optional[str] = None
 
         # ToDo: use list of sources instead of linked list of videos.
         # source
         self.source: VideoFrames
-        self.__next: Video | None = None
+        self.__next: Optional[Video] = None
 
         # play
         self._source_start_index: int = 0
@@ -82,7 +84,7 @@ class Video(Sign, VideoFrames):
     # ========================= #
 
     def get_frame(
-        self, timestamp: float | None = None, index: int | None = None
+        self, timestamp: Optional[float] = None, index: Optional[int] = None
     ) -> NDArray[np.uint8]:
         # allow negative indexing
         if index and index < 0:
@@ -114,10 +116,10 @@ class Video(Sign, VideoFrames):
 
     def trim(
         self,
-        start_time: float | None = None,
-        end_time: float | None = None,
-        start_index: int | None = None,
-        end_index: int | None = None,
+        start_time: Optional[float] = None,
+        end_time: Optional[float] = None,
+        start_index: Optional[int] = None,
+        end_index: Optional[int] = None,
     ) -> Video:
         # allow negative indexing
         if start_index and start_index < 0:
@@ -162,12 +164,12 @@ class Video(Sign, VideoFrames):
         return new
 
     def iter_frames(
-        self, start: int = 0, end: int | None = None, step: int | None = None
+        self, start: int = 0, end: Optional[int] = None, step: Optional[int] = None
     ):
         for i in range(start, end or len(self), (step or 1) * self._default_step_size):
             yield self.get_frame(index=i)
 
-    def __get_node(self, index: int) -> Tuple[Video | None, int]:
+    def __get_node(self, index: int) -> Tuple[Optional[Video], int]:
         """
         Find the node in the video linked list that contains the specified index/frame.
 
@@ -205,8 +207,8 @@ class Video(Sign, VideoFrames):
         raise StopIteration
 
     def __getitem__(
-        self, key: int | slice | Sequence[int | slice]
-    ) -> Video | NDArray[np.uint8]:
+        self, key: Union[int, slice, Sequence[Union[int, slice]]]
+    ) -> Union[Video, NDArray[np.uint8]]:
         slices = _validate_and_normalize_slices(key, max_n_dims=4)
         if len(slices) > 4:
             raise ValueError(f"Expected at most 4 slices. Got {len(slices)}: {key}")
@@ -298,7 +300,7 @@ class Video(Sign, VideoFrames):
             )
 
     def show_frame(
-        self, timestamp: float | None = None, index: int | None = None
+        self, timestamp: Optional[float] = None, index: Optional[int] = None
     ) -> None:
         frame = self.get_frame(timestamp=timestamp, index=index)
 
@@ -306,7 +308,11 @@ class Video(Sign, VideoFrames):
             VideoDisplay.display_frames([frame], inline_player="jshtml")
 
     def frames_grid(
-        self, rows=2, columns=3, width: int | None = None, height: int | None = None
+        self,
+        rows=2,
+        columns=3,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
     ):
         grid = np.concatenate(
             [
@@ -333,7 +339,11 @@ class Video(Sign, VideoFrames):
         return grid
 
     def show_frames_grid(
-        self, rows=2, columns=3, width: int | None = 800, height: int | None = None
+        self,
+        rows=2,
+        columns=3,
+        width: Optional[int] = 800,
+        height: Optional[int] = None,
     ):
         grid = self.frames_grid(rows=rows, columns=columns, width=width, height=height)
 
@@ -508,13 +518,13 @@ class Video(Sign, VideoFrames):
         frames_iterable: Iterable[NDArray[np.uint8]],
         path: str,
         overwrite=False,
-        height: int | None = None,
-        width: int | None = None,
+        height: Optional[int] = None,
+        width: Optional[int] = None,
         fps: float = 30.0,
         codec: str = "XVID",
         progress_bar=True,
         leave=False,
-        total_frames: int | None = None,
+        total_frames: Optional[int] = None,
         **kwargs,
     ) -> None:
         path = abspath(path)
@@ -554,8 +564,8 @@ class Video(Sign, VideoFrames):
         self,
         path: str,
         overwrite=False,
-        fps: float | None = None,
-        codec: str | None = None,
+        fps: Optional[float] = None,
+        codec: Optional[str] = None,
         progress_bar=True,
         leave=False,
         **kwargs,
@@ -586,8 +596,8 @@ class Video(Sign, VideoFrames):
     def save_frame(
         self,
         path: str,
-        timestamp: float | None = None,
-        index: int | None = None,
+        timestamp: Optional[float] = None,
+        index: Optional[int] = None,
         overwrite=False,
     ) -> None:
         """
@@ -618,8 +628,8 @@ class Video(Sign, VideoFrames):
         path: str,
         rows: int = 2,
         columns: int = 3,
-        width: int | None = 1024,
-        height: int | None = None,
+        width: Optional[int] = 1024,
+        height: Optional[int] = None,
         overwrite=False,
     ) -> None:
         path = abspath(path)

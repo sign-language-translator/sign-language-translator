@@ -1,4 +1,4 @@
-from typing import Iterable, List, Sequence, Type
+from typing import Iterable, List, Optional, Sequence, Type, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -13,7 +13,7 @@ __all__ = [
 
 class ArrayOps:
     @staticmethod
-    def floor(array: NDArray | Tensor) -> NDArray | Tensor:
+    def floor(array: Union[NDArray, Tensor]) -> Union[NDArray, Tensor]:
         if isinstance(array, np.ndarray):
             return np.floor(array)
         elif isinstance(array, Tensor):
@@ -22,7 +22,7 @@ class ArrayOps:
             raise TypeError(f"Invalid type for flooring: {type(array)}")
 
     @staticmethod
-    def ceil(array: NDArray | Tensor) -> NDArray | Tensor:
+    def ceil(array: Union[NDArray, Tensor]) -> Union[NDArray, Tensor]:
         if isinstance(array, np.ndarray):
             return np.ceil(array)
         elif isinstance(array, Tensor):
@@ -32,8 +32,8 @@ class ArrayOps:
 
     @staticmethod
     def take(
-        array: NDArray | Tensor, index: NDArray | Tensor | List, dim: int = 0
-    ) -> NDArray | Tensor:
+        array: Union[NDArray, Tensor], index: Union[NDArray, Tensor, List], dim: int = 0
+    ) -> Union[NDArray, Tensor]:
         if isinstance(array, np.ndarray):
             if not isinstance(index, np.ndarray):
                 index = np.array(index)
@@ -47,8 +47,9 @@ class ArrayOps:
 
     @staticmethod
     def cast(
-        x: NDArray | Tensor | List | Iterable, data_type: Type[np.ndarray | Tensor]
-    ) -> NDArray | Tensor:
+        x: Union[NDArray, Tensor, List, Iterable],
+        data_type: Type[Union[np.ndarray, Tensor]],
+    ) -> Union[NDArray, Tensor]:
         if data_type == np.ndarray:
             return np.array(x)
         elif data_type == Tensor:
@@ -58,12 +59,12 @@ class ArrayOps:
 
 
 def linear_interpolation(
-    array: NDArray[np.float64] | Tensor | List,
-    new_indexes: Sequence[int | float] | None = None,
-    old_x: Sequence[int | float] | None = None,
-    new_x: Sequence[int | float] | None = None,
+    array: Union[NDArray[np.float64], Tensor, List],
+    new_indexes: Optional[Sequence[Union[int, float]]] = None,
+    old_x: Optional[Sequence[Union[int, float]]] = None,
+    new_x: Optional[Sequence[Union[int, float]]] = None,
     dim: int = 0,
-) -> NDArray | Tensor:
+) -> Union[NDArray, Tensor]:
     """
     Perform linear interpolation on a multidimensional array or tensor along a dimension.
 
