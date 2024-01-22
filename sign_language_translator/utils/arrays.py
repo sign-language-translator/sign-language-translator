@@ -1,4 +1,4 @@
-from typing import Iterable, List, Optional, Sequence, Type, Union
+from typing import Iterable, List, Optional, Sequence, Tuple, Type, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -8,6 +8,7 @@ from torch import long as torch_long
 __all__ = [
     "ArrayOps",
     "linear_interpolation",
+    "adjust_vector_angle",
 ]
 
 
@@ -56,6 +57,34 @@ class ArrayOps:
             return Tensor(x)
         else:
             raise TypeError(f"Invalid type for array casting: {data_type}")
+
+    @staticmethod
+    def norm(
+        x: Union[NDArray, Tensor, List, Iterable],
+        dim: Optional[int] = None,
+        keepdim=False,
+    ) -> Union[NDArray, Tensor]:
+        """
+        Compute the norm of a given array or tensor along a specified dimension.
+
+        Args:
+            x (Union[NDArray, Tensor, List, Iterable]): The input array or tensor.
+            dim (Optional[int]): The dimension along which to compute the norm. If None, the norm is computed over the entire array or tensor. Default is None.
+            keepdim (bool): Whether to keep the dimension of the input array or tensor after computing the norm. Default is False.
+
+        Returns:
+            Union[NDArray, Tensor]: The norm of the input array or tensor.
+
+        Raises:
+            TypeError: If the input type is not supported.
+        """
+
+        if isinstance(x, np.ndarray):
+            return np.linalg.norm(x, axis=dim, keepdims=keepdim)  # type: ignore
+        elif isinstance(x, Tensor):
+            return x.norm(dim=dim, keepdim=keepdim)
+        else:
+            raise TypeError(f"Invalid type for norm: {type(x)}")
 
 
 def linear_interpolation(
@@ -159,3 +188,82 @@ def __validate_linear_interpolation_args(array, new_indexes, old_x, new_x, dim):
         raise ValueError(f"Invalid dim: {dim}. Must be between 0 and {array.ndim-1}.")
 
     return indexes_, dim
+
+
+def adjust_vector_angle(
+    vector_1: Union[NDArray, Tensor, Sequence[float]],
+    vector_2: Union[NDArray, Tensor, Sequence[float]],
+    scaling_factor: float,
+    post_normalize: bool = False,
+) -> Tuple[Union[NDArray, Tensor], Union[NDArray, Tensor]]:
+    """Move a pair of vectors away or towards each other in the same plane.
+
+    Converge or Diverge a pair of vectors by increasing or decreasing their distance from each other.
+    The norm or the length of the vectors is preserved.
+
+    Args:
+        vector_1 (NDArray | Tensor): A 1D array of size n representing a word in an n dimensional vector space.
+        vector_2 (NDArray | Tensor): A 1D array of size n representing another word in an n dimensional vector space.
+        scaling_factor (float): The scaling factor by which the vector difference should be enhanced or diminished. The fraction of distance between the vectors where new vector should land. (sf > 1 diverges the two vectors. sf = 1 leaves the two vectors unchanged. 0.5 < sf < 1 converges the two vectors. sf = 0.5 makes the two vectors equal to their mean. sf = 0 swaps the two vectors. sf < 0.5 move the vectors away from their mean but in opposite direction.)
+        post_normalize (bool, optional): Make the magnitude of both output vectors equal to 1 after they have been rotated. Defaults to False.
+
+    Returns:
+        Tuple[NDArray | Tensor, NDArray | Tensor]: moved vectors.
+    """
+
+    # TODO: make it work for batches of vectors or nd-arrays
+    # TODO: Handle NaNs
+
+    if not isinstance(vector_1, (np.ndarray, Tensor)):
+        vector_1 = np.array(vector_1)
+    if not isinstance(vector_2, (np.ndarray, Tensor)):
+        vector_2 = np.array(vector_2)
+
+    v1_norm = ArrayOps.norm(vector_1, dim=None)
+    v2_norm = ArrayOps.norm(vector_2, dim=None)
+
+    # make the magnitude of both vectors = 1
+    vector_1 = vector_1 / (v1_norm or 1)
+    vector_2 = vector_2 / (v2_norm or 1)
+
+    # figure out the dimension of divergence
+    v1_minus_v2 = vector_1 - vector_2
+
+    # move each vector away or towards the other by equal amount
+    new_v1 = vector_2 + scaling_factor * v1_minus_v2
+    new_v2 = vector_1 - scaling_factor * v1_minus_v2
+
+    # make the magnitude of the new vectors = 1
+    new_v1 = new_v1 / (ArrayOps.norm(new_v1) or 1)
+    new_v2 = new_v2 / (ArrayOps.norm(new_v2) or 1)
+
+    if not post_normalize:
+        # restore original magnitudes
+        new_v1 = new_v1 * v1_norm
+        new_v2 = new_v2 * v2_norm
+
+    # sf > 1 diverges the two vectors
+    # new_v1 = v2 + 2.00 * (v1 - v2) = 2 * v1 - v2     # more v1, less v2.
+    # new_v2 = v1 - 2.00 * (v1 - v2) = 2 * v2 - v1     # more v2, less v1.
+
+    # sf = 1 leaves the two vectors unchanged
+    # new_v1 = v2 + 1.00 * (v1 - v2) = v1
+    # new_v2 = v1 - 1.00 * (v1 - v2) = v2
+
+    # 0.5 < sf < 1 converges the two vectors
+    # new_v1 = v2 + 0.75 * (v1 - v2) = 0.75 * v1 + 0.25 * v2    # weighted average
+    # new_v1 = v1 - 0.75 * (v1 - v2) = 0.75 * v2 + 0.25 * v1    # weighted average
+
+    # sf = 0.5 makes the two vectors equal
+    # new_v1 = v2 + 0.50 * (v1 - v2) = 0.5 * v1 + 0.5 * v2   # mean
+    # new_v1 = v1 - 0.50 * (v1 - v2) = 0.5 * v2 + 0.5 * v1   # mean
+
+    # sf = 0. swaps the two vectors
+    # new_v1 = v2 + 0.00 * (v1 - v2) = v2
+    # new_v2 = v1 + 0.00 * (v1 - v2) = v1
+
+    # sf < 0.5 move the vectors away from their mean but in opposite direction
+    # new_v1 = v2 + (-1) * (v1 - v2) = 2 * v2 - v1    # more v2, less v1.
+    # new_v2 = v1 - (-1) * (v1 - v2) = 2 * v1 - v2    # more v1, less v2.
+
+    return new_v1, new_v2

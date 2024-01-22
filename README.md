@@ -4,9 +4,10 @@
 
 <img width="61.8%" alt="SLT: Sign Language Translator" src="https://github.com/sign-language-translator/sign-language-translator/assets/118578823/d4723333-3d25-413d-83a1-a4bbdc8da15a">
 
+<br>
 </br>
 
-*Build Custom Translators and Translate between Sign Language & Text with AI.*
+***Build Custom Translators and Translate between Sign Language & Text with AI.***
 
 [![python](https://img.shields.io/pypi/pyversions/sign-language-translator?logo=python)](https://pypi.org/project/sign-language-translator/)
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator?logo=pypi)](https://pypi.org/project/sign-language-translator/)
@@ -40,10 +41,17 @@
 
 Sign language consists of gestures and expressions used mainly by the hearing-impaired to talk. This project is an effort to bridge the communication gap between the hearing and the hearing-impaired community using Artificial Intelligence.
 
-The goal is to provide a user-friendly translation API and a framework for building sign language translators that can easily adapt to any regional sign language. Unlike most other projects, this python library can translate full sentences and not just the alphabet.
-<!-- This is the package that powers the [slt_ai website](https://github.com/mdsrqbl/slt_ai). -->
-
+<details>
+<summary>This python library provides a user-friendly translation API and a framework for building sign language translators that can easily adapt to any regional sign language...</summary>
+</br>
 A big hurdle is the lack of datasets (global & regional) and frameworks that deep learning engineers and software developers can use to build useful products for the target community. This project aims to empower sign language translation by providing robust components, tools, datasets and models for both sign language to text and text to sign language conversion. It aims to facilitate the creation of sign language translators for any region, while building the way towards sign language standardization.
+
+</br>
+Unlike most other projects, this python library can translate full sentences and not just the alphabet.
+
+</details>
+
+<!-- This is the package that powers the [slt_ai website](https://github.com/mdsrqbl/slt_ai). -->
 
 ### Solution
 
@@ -222,6 +230,9 @@ sign.show()
 # model.text_language = "hindi"
 # sign = model.translate("पाँच घंटे।") # "5 hours."
 ```
+<!-- model.text_language = slt.TextLanguageCodes.ENGLISH
+sign = model.translate("Hello World!") -->
+
 
 ![this very good is](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/7f4ff312-df03-4b11-837b-5fb895c9f08e)
 
@@ -366,6 +377,17 @@ Available Functions:
 | [Transformer Language Model](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/model.py) | Decoder-only Transformers (GPT) | Predicts next token using query-key-value attention, linear transformations and soft probabilities. | torch.Tensor<br/>(batch, token_ids)<br/><br/>List of tokens | torch.Tensor<br/>(batch, token_ids, vocab_size)<br/><br/>(token, probability) |
 </details>
 
+<details>
+<summary><b>Text Embedding</b>:</summary>
+
+[Available Trained models](https://github.com/sign-language-translator/sign-language-datasets/releases/)
+
+| Name                                                                                                                                                                  | Architecture | Description                                                                                                             | Input format | Output format             |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------- |
+| [Vector Lookup](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_embedding/vector_lookup_model.py) | HashTable    | Finds token index and returns the coresponding vector. Tokenizes sentences and computes average vector of known tokens. | string       | torch.Tensor<br/>(n_dim,) |
+
+</details>
+
 <!--
 ## Servers
 
@@ -451,29 +473,29 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
 │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/tests">*</a>
 │
 └── <b style="font-size:large;">sign_language_translator</b>
-    ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/cli.py">cli.py</a> <sub><sup>────────────────────────────────────────────────────── `> slt` command line interface</sup></sub>
+    ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/cli.py">cli.py</a> <sub><sup>`> slt` command line interface</sup></sub>
     ├── <i><b>assets</b></i> <sub><sup>(auto-downloaded)</sup></sub>
     │   └── <a href="https://github.com/sign-language-translator/sign-language-datasets">*</a>
     │
     ├── <b>config</b>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/assets.py">assets.py</a> <sub><sup>───────────────────────────────────────── download, extract and remove models & datasets</sup></sub>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/enums.py">enums.py</a> <sub><sup>─────────────────────────────────────────── string short codes to identify models & classes</sup></sub>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/settings.py">settings.py</a> <sub><sup>────────────────────────────────────── global variables in repository design-pattern</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/assets.py">assets.py</a> <sub><sup>download, extract and remove models & datasets</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/enums.py">enums.py</a> <sub><sup>string short codes to identify models & classes</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/settings.py">settings.py</a> <sub><sup>global variables in repository design-pattern</sup></sub>
     │   ├── <i><a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/urls.json">urls.json</a></i>
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/utils.py">utils.py</a>
     │
     ├── <b>languages</b>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/utils.py">utils.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/vocab.p">vocab.py</a> <sub><sup>─────────────────────────────────────────── reads word mapping datasets</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/vocab.p">vocab.py</a> <sub><sup>reads word mapping datasets</sup></sub>
     │   ├── sign
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/mapping_rules.py">mapping_rules.py</a> <sub><sup>────────────────────── strategy design-pattern for word mapping</sup></sub>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/mapping_rules.py">mapping_rules.py</a> <sub><sup>strategy design-pattern for word mapping</sup></sub>
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py">pakistan_sign_language.py</a>
-    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/sign_language.py">sign_language.py</a> <sub><sup>────────────────────── Base class for sign mapping and sentence restructuring</sup></sub>
+    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/sign_language.py">sign_language.py</a> <sub><sup>Base class for sign mapping and sentence restructuring</sup></sub>
     │   │
     │   └── text
     │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/english.py">english.py</a>
     │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/hindi.py">hindi.py</a>
-    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/text_language.py">text_language.py</a> <sub><sup>────────────────────── Base class for text normalization, tokenization & tagging</sup></sub>
+    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/text_language.py">text_language.py</a> <sub><sup>Base class for text normalization, tokenization & tagging</sup></sub>
     │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/urdu.py">urdu.py</a>
     │
     ├── <b>models</b>
@@ -482,38 +504,41 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
     │   ├── language_models
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/abstract_language_model.py">abstract_language_model.py</a>
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/beam_sampling.py">beam_sampling.py</a>
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/mixer.py">mixer.py</a> <sub><sup>───────────────────────────────────── wrap multiple models into a single object</sup></sub>
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/ngram_language_model.py">ngram_language_model.py</a> <sub><sup>────────── uses hash-tables & frequency to predict next token</sup></sub>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/mixer.py">mixer.py</a> <sub><sup>wrap multiple models into a single object</sup></sub>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/ngram_language_model.py">ngram_language_model.py</a> <sub><sup>uses hash-tables & frequency to predict next token</sup></sub>
     │   │   └── transformer_language_model
     │   │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/layers.py">layers.py</a>
-    │   │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/model.py">model.py</a> <sub><sup>───────────────────────────── decoder-only transformer with controllable vocabulary</sup></sub>
+    │   │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/model.py">model.py</a> <sub><sup>decoder-only transformer with controllable vocabulary</sup></sub>
     │   │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/train.py">train.py</a>
     │   │
     │   ├── sign_to_text
     │   ├── text_to_sign
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py">concatenative_synthesis.py</a> <sub><sup>──── join sign clip of each word in text using rules</sup></sub>
-    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/t2s_model.py">t2s_model.py</a> <sub><sup>───────────────────────────── Base class</sup></sub>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py">concatenative_synthesis.py</a> <sub><sup>join sign clip of each word in text using rules</sup></sub>
+    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/t2s_model.py">t2s_model.py</a> <sub><sup>Base class</sup></sub>
     │   │
     │   ├── text_embedding
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_embedding/text_embedding_model.py">text_embedding_model.py</a> <sub><sup>Base class</sup></sub>
+    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_embedding/vector_lookup_model.py">vector_lookup_model.py</a> <sub><sup>retrieved word embedding from a vector database</sup></sub>
+    │   │
     │   └── video_embedding
-    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py">mediapipe_landmarks_model.py</a> <sub><sup>─ 3D coordinates of points on body</sup></sub>
-    │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/video_embedding_model.py">video_embedding_model.py</a> <sub><sup>──────── Base class</sup></sub>
+    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py">mediapipe_landmarks_model.py</a> <sub><sup>3D coordinates of points on body</sup></sub>
+    │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/video_embedding_model.py">video_embedding_model.py</a> <sub><sup>Base class</sup></sub>
     │
     ├── <b>text</b>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/metrics.py">metrics.py</a> <sub><sup>──────────────────────────────────────── numeric score techniques</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/metrics.py">metrics.py</a> <sub><sup>numeric score techniques</sup></sub>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/preprocess.py">preprocess.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/subtitles.py">subtitles.py</a> <sub><sup>───────────────────────────────────── WebVTT</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/subtitles.py">subtitles.py</a> <sub><sup>WebVTT</sup></sub>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/synonyms.py">synonyms.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/tagger.py">tagger.py</a> <sub><sup>────────────────────────────────────────── classify tokens to assist in mapping</sup></sub>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/tokenizer.py">tokenizer.py</a> <sub><sup>───────────────────────────────────── break text into words, phrases, sentences etc</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/tagger.py">tagger.py</a> <sub><sup>classify tokens to assist in mapping</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/tokenizer.py">tokenizer.py</a> <sub><sup>break text into words, phrases, sentences etc</sup></sub>
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/text/utils.py">utils.py</a>
     │
     ├── <b>utils</b>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/archive.py">archive.py</a> <sub><sup>──────────────────────────────────────── zip datasets</sup></sub>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/arrays.py">arrays.py</a> <sub><sup>────────────────────────────────────────── common interface for numpy.ndarray and torch.Tensor</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/archive.py">archive.py</a> <sub><sup>zip datasets</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/arrays.py">arrays.py</a> <sub><sup>common interface & operations for numpy.ndarray and torch.Tensor</sup></sub>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/download.py">download.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/parallel.py">parallel.py</a> <sub><sup>────────────────────────────────────── multi-threading</sup></sub>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/tree.py">tree.py</a> <sub><sup>───────────────────────────────────────────── print file hierarchy</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/parallel.py">parallel.py</a> <sub><sup>multi-threading</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/tree.py">tree.py</a> <sub><sup>print file hierarchy</sup></sub>
     │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/utils/utils.py">utils.py</a>
     │
     └── <b>vision</b>
@@ -521,12 +546,12 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
         ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/utils.py">utils.py</a>
         ├── landmarks
         ├── sign
-        │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/sign/sign.py">sign.py</a> <sub><sup>────────────────────────────────────── Base class to wrap around sign clips</sup></sub>
+        │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/sign/sign.py">sign.py</a> <sub><sup>Base class to wrap around sign clips</sup></sub>
         │
         └── video
-            ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/display.py">display.py</a> <sub><sup>───────────────────────────────── jupyter notebooks inline video & pop-up in CLI</sup></sub>
-            ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/transformations.py">transformations.py</a> <sub><sup>─────────────────── strategy design-pattern for image augmentation</sup></sub>
-            ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/video_iterators.py">video_iterators.py</a> <sub><sup>─────────────────── adapter design-pattern for video reading</sup></sub>
+            ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/display.py">display.py</a> <sub><sup>jupyter notebooks inline video & pop-up in CLI</sup></sub>
+            ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/transformations.py">transformations.py</a> <sub><sup>strategy design-pattern for image augmentation</sup></sub>
+            ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/video_iterators.py">video_iterators.py</a> <sub><sup>adapter design-pattern for video reading</sup></sub>
             └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/video.py">video.py</a>
 </pre>
 
@@ -537,6 +562,7 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
 
 See our datasets & conventions [here](https://github.com/sign-language-translator/sign-language-datasets).
 
+- Implement the `# TODO:` in this repository.
 - Contribute by scraping, compiling, and centralizing video datasets.
 - Help with labeling [word mapping datasets](https://github.com/sign-language-translator/sign-language-datasets/tree/main/parallel_texts).
 - Establish connections with Academies for the Deaf to collaboratively develop standardized *sign language grammar* and integrate it into the rule-based translators.
@@ -581,7 +607,6 @@ Stay Tuned!
 <summary>TEXT_EMBEDDING: v0.7</summary>
 
 ```python
-# text embedding models
 # synonyms by similarity
 ```
 
@@ -629,6 +654,8 @@ Stay Tuned!
 # GUI with gradio
 ```
 
+[![Total Views](https://u8views.com/api/v1/github/profiles/118578823/views/total-count.svg)](https://u8views.com/github/mdsrqbl)
+
 </details>
 
 <details>
@@ -675,14 +702,14 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-01-17.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-01-22.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
 
 - [Mudassar Iqbal](https://github.com/mdsrqbl) for coding the project so far.
 - [Rabbia Arshad](https://github.com/Rabbia-Arshad) for help in initial R&D and web development.
-- Waqas Bin Abbas for assistance in initial video data collection process.
+- [Waqas Bin Abbas](https://github.com/Waqas-Bin-Abbas) for assistance in initial video data collection process.
 - Kamran Malik for setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
 - [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing to collaborate and providing their sign dictionary, hearing-impaired performers for data creation, and creating the text2gloss dataset.
 - [UrduHack](https://github.com/urduhack/urduhack) for their work on Urdu character normalization.
@@ -692,7 +719,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **9,960** + Tests: **1,622**):
+Count total number of **lines of code** (Package: **10,372** + Tests: **1,723**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
@@ -704,3 +731,10 @@ git ls-files | grep '\.py' | xargs wc -l
 Q: What was the deaf student's favorite course?
 A: Communication skills
 ```
+
+<details>
+<summary><b>Star History</b></summary>
+
+[![Star History Chart](https://api.star-history.com/svg?repos=sign-language-translator/sign-language-translator&type=Timeline)](https://star-history.com/#sign-language-translator/sign-language-translator&Timeline)
+
+</details>

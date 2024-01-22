@@ -1,7 +1,11 @@
 import numpy as np
 import torch
 
-from sign_language_translator.utils import ArrayOps, linear_interpolation
+from sign_language_translator.utils.arrays import (
+    ArrayOps,
+    linear_interpolation,
+    adjust_vector_angle,
+)
 
 
 def test_linear_interpolation():
@@ -48,8 +52,8 @@ def test_linear_interpolation():
     old_x = np.array([3, 5, 9])
     new_x = [4, 7.7, 9]
     new_array = linear_interpolation(torch.Tensor(array), old_x=old_x, new_x=new_x, dim=1)  # type: ignore
-    assert new_array.isclose(
-        torch.Tensor(  # type: ignore
+    assert new_array.isclose(  # type: ignore
+        torch.Tensor(
             [
                 [
                     [2.0, 3.0, 4.0, 5.0],
@@ -79,5 +83,49 @@ def test_array_ops():
     tensor = torch.arange(10)
     array = np.arange(10)
 
-    ArrayOps.floor(tensor)
-    ArrayOps.floor(array)
+    assert (tensor == ArrayOps.floor(tensor + 0.1)).all()
+    assert (array == ArrayOps.floor(array + 0.1)).all()
+
+    assert ArrayOps.norm(torch.Tensor([1, 1])) == torch.Tensor([2]).sqrt()
+
+
+def test_adjust_vector_angle():
+    v1 = np.array([1, 1])
+    v2 = np.array([1, -1])
+
+    #   |  ,· (1, 1)           [v1]
+    #   | /,· (1, 1/sqrt(3))   [new_v1]
+    # --+---+---+-->
+    #   | \`· (1, -1/sqrt(3))  [new_v2]
+    #   |  `· (1, -1)          [v2]
+
+    height = v1[1] - 0
+    target_height = 1 / np.sqrt(3)  # height at 30 degrees (width=1)
+
+    v1_weight = (target_height + height) / (2 * height)
+
+    new_v1, new_v2 = adjust_vector_angle(v1, v2, v1_weight, post_normalize=True)
+
+    # chect norm
+    assert np.isclose(np.linalg.norm(new_v1), 1)
+    assert np.isclose(np.linalg.norm(new_v2), 1)
+
+    # check angle
+    assert np.isclose(new_v1, np.array([np.sqrt(3) / 2, 0.5])).all()
+    assert np.isclose(new_v2, np.array([np.sqrt(3) / 2, -0.5])).all()
+
+    def rotation_matrix_2d(x: float):
+        """get the 2d rotation matrix based on radian angle theta
+
+        Args:
+            theta (float): clockwise angle in radians
+        """
+        return np.array([[np.cos(x), -np.sin(x)], [np.sin(x), np.cos(x)]])
+
+    new_v1, new_v2 = adjust_vector_angle(v1, v2, v1_weight, post_normalize=False)
+
+    R = rotation_matrix_2d(-15 / 180 * np.pi)
+    assert np.isclose(new_v1, R @ v1).all()
+
+    R = rotation_matrix_2d(15 / 180 * np.pi)
+    assert np.isclose(new_v2, R @ v2).all()
