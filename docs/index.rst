@@ -448,6 +448,43 @@ Use a pre-trained language model:
    model.next_all(["میں", " ", "وزیراعظم", " ",])
    # (["سے", "عمران", ...], [0.1415926535, 0.7182818284, ...])
 
+Text Embedding
+^^^^^^^^^^^^^^
+
+Embed text words & phrases into pre-trained vectors using a selected embedding model.
+It is useful for finding synonyms in other languages and for building controllable language models.
+
+.. code-block:: python
+   :linenos:
+   :emphasize-lines: 2, 5, 11, 13
+   :caption: Pretrained Text Embedding
+
+   import torch
+   from sign_language_translator.models import VectorLookupModel, get_model
+
+   # Custom Model
+   model = VectorLookupModel(["hello", "world"], torch.Tensor([[0, 1], [2, 3]]))
+   vector = model.embed("hello")  # torch.Tensor([0, 1])
+   vector = model.embed("hello world")  # torch.Tensor([1., 2.])  # average of two tokens
+   model.save("vectors.pt")
+
+   # Pretrained Model
+   model = get_model("lookup-ur-fasttext-cc")
+   print(model.description)
+   vector = model.embed("تعلیم", align=True, post_normalize=True)
+   print(vector.shape)  # (300,)
+
+   # find similar words but in a different language
+   en_model = get_model("lookup-en-fasttext-cc")
+   en_vectors = en_model.vectors / en_model.vectors.norm(dim=-1, keepdim=True)
+   similarities = en_vectors @ vector
+   similar_words = [
+      (en_model.index_to_token[i], similarities[i].item())
+      for i in similarities.argsort(descending=True)[:5]
+   ]
+   print(similar_words)  # [(education, 0.5469), ...]
+
+
 Command line (CLI)
 ------------------
 
@@ -565,12 +602,23 @@ These models predict next characters until a specified token appears. (e.g. gene
 Embed Videos
 ^^^^^^^^^^^^
 
-Embed videos into a sequence of vectors using a selected embedding model:
+Embed **videos** into a sequence of vectors using a selected embedding model:
 
 .. code-block:: bash
 
    slt embed videos/*.mp4 --model-code mediapipe-pose-2-hand-1 --embedding-type world \
       --processes 4 --save-format csv --output-dir ./embeddings
+
+Embed texts
+^^^^^^^^^^^^
+
+Embed **texts** into pyTorch state dict pickled file using a selected embedding model.
+The target file is a `.pt` containing `{"tokens": ..., "vectors": ...}`.
+
+.. code-block:: bash
+
+   slt embed "hello" "world" "more-tokens.txt" --model-code lookup-en-fasttext-cc
+
 
 GUI
 ---

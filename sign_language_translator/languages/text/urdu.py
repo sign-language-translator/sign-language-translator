@@ -206,7 +206,7 @@ class Urdu(TextLanguage):
     SYMBOLS: List[str] = PUNCTUATION + QUOTATION_MARKS + BRACKETS + [" ", "-"]
 
     PUNCTUATION_REGEX = r"[" + "".join([re.escape(punc) for punc in PUNCTUATION]) + r"]"
-    DIACRITICS = str(" ٍ ً ٰ َ ُ ِ ").split()
+    DIACRITICS = str(" ٍ ً ٰ َ ُ ِ ّ ").split()
     EXTRA_DIACRITICS = str(" ؐ  ؑ ؒ ؓ").split()
     WORD_REGEX = r"[\w" + "".join(DIACRITICS) + r"]+"
     # TODO: r"[[^\W\d_]"+ "".join(DIACRITICS) + r"]+"
@@ -215,7 +215,7 @@ class Urdu(TextLanguage):
 
     CHARACTER_TO_WORD = {
         "ﷲ": "اللہ",
-        "ﷺ": "صلی اللہ علیہ وسلم",
+        "ﷺ": " صلی اللہ علیہ وسلم",
         "﷽": "بسم اللہ الرحمن الرحیم",
         "–": "-",
         "—": "-",
@@ -387,7 +387,7 @@ class Urdu(TextLanguage):
         # End of the code borrowed from UrduHack
 
     ALLOWED_CHARACTERS = (
-        set(CORRECT_URDU_CHARACTERS_TO_INCORRECT.keys())
+        set("".join(CORRECT_URDU_CHARACTERS_TO_INCORRECT.keys()))
         | set(DIACRITICS)
         | set(SYMBOLS)
         | set(ascii_uppercase)  # acronyms

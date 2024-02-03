@@ -22,6 +22,7 @@ from sign_language_translator.utils.archive import Archive
 from sign_language_translator.utils.arrays import (
     ArrayOps,
     adjust_vector_angle,
+    align_vectors,
     linear_interpolation,
 )
 from sign_language_translator.utils.download import download
@@ -49,6 +50,7 @@ __all__ = [
     "threaded_map",
     "extract_recursive",
     "adjust_vector_angle",
+    "align_vectors",
     # classes
     "Archive",
     "ArrayOps",

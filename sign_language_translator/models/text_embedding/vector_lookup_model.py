@@ -7,7 +7,9 @@ Classes:
 """
 
 from collections import Counter
-from typing import Callable, Iterable, List
+from os.path import basename
+from typing import Callable, Iterable, List, Optional
+from zipfile import ZIP_DEFLATED, ZipFile
 
 import torch
 
@@ -53,7 +55,13 @@ class VectorLookupModel(TextEmbeddingModel):
         ```
     """
 
-    def __init__(self, tokens: List[str], vectors: torch.Tensor):
+    def __init__(
+        self,
+        tokens: List[str],
+        vectors: torch.Tensor,
+        alignment_matrix: Optional[torch.Tensor] = None,
+        description: str = "",
+    ):
         """
         Initializes the VectorLookupModel.
 
@@ -62,11 +70,13 @@ class VectorLookupModel(TextEmbeddingModel):
             vectors (torch.Tensor): A (2D) tensor of vectors in the same order as `tokens`.
         """
 
-        self.__validate_init_args(tokens, vectors)
+        self.__validate_init_args(tokens, vectors, alignment_matrix)
         self.index_to_token = tokens
         self.known_tokens = frozenset(tokens)
         self.token_to_index = {token: index for index, token in enumerate(tokens)}
         self.vectors = vectors
+        self.alignment_matrix = alignment_matrix
+        self.description = description
 
     def update(self, tokens: List[str], vectors: torch.Tensor) -> None:
         """
@@ -75,13 +85,15 @@ class VectorLookupModel(TextEmbeddingModel):
         Args:
             tokens (List[str]): The list of new tokens to be added or updated.
             vectors (torch.Tensor): The tensor of corresponding vectors for the new tokens.
+            alignment_matrix (Optional[torch.Tensor], optional): A 2D Tensor to transform the final vectors. (e.g. some orthogonal matrix can be used to align the word vector to an embedding for some other language or model). Defaults to None.
+            description (str, optional): A description of the model. Defaults to "".
 
         Raises:
             ValueError: If the dimensions of the new vectors do not match the dimensions of the existing vectors.
         """
 
         # validation
-        self.__validate_init_args(tokens, vectors)
+        self.__validate_init_args(tokens, vectors, None)
         if (stored_dims := self.vectors.shape[1:]) != (new_dims := vectors.shape[1:]):
             raise ValueError(f"Dimension mismatch: {stored_dims = }, {new_dims = }.")
 
@@ -115,6 +127,7 @@ class VectorLookupModel(TextEmbeddingModel):
         text: str,
         pre_normalize=False,
         post_normalize=False,
+        align=False,
         tokenizer: Callable[[str], Iterable[str]] = lambda x: x.split(),
     ) -> torch.Tensor:
         """
@@ -124,11 +137,13 @@ class VectorLookupModel(TextEmbeddingModel):
             text (str): The input text to be embedded, (can be in the model vocabulary or be a string of tokens from the model dictionary). If unknown, returns a zero vector.
             pre_normalize (bool, optional): Whether to normalize the vectors of tokens in the text before averaging. Defaults to False.
             post_normalize (bool, optional): Whether to normalize the vector after embedding. Defaults to False.
+            align (bool, optional): Whether to transform the final vector using the alignment matrix. Defaults to False.
             tokenizer (Callable[[str], Iterable[str]], optional): A callable function to tokenize the text. Only used if the text is not present in the model vocabulary. Defaults to splitting on whitespace.
 
         Returns:
             torch.Tensor: The embedded vector representation of the input text.
         """
+        # TODO: Handle batches
 
         # found in the vocabulary
         if text in self.known_tokens:
@@ -158,6 +173,9 @@ class VectorLookupModel(TextEmbeddingModel):
             if norm := vector.norm():
                 vector = vector / norm
 
+        if align and self.alignment_matrix is not None:
+            vector = vector @ self.alignment_matrix
+
         return vector
 
     def __getitem__(self, token: str) -> torch.Tensor:
@@ -180,17 +198,30 @@ class VectorLookupModel(TextEmbeddingModel):
     def save(self, path: str):
         """
         Serialize the tokens list and corresponding vectors to a file.
+        If the path ends with '.zip' the file will be compressed.
 
         Args:
             path (str): The path to save the model file.
         """
 
-        torch.save({"tokens": self.index_to_token, "vectors": self.vectors}, path)
+        data = {
+            "tokens": self.index_to_token,
+            "vectors": self.vectors,
+            "alignment": self.alignment_matrix,
+            "description": self.description,
+        }
+        if path.endswith(".zip"):
+            with ZipFile(path, "w", ZIP_DEFLATED) as archive:
+                with archive.open(basename(path).replace(".zip", ".pt"), "w") as f:
+                    torch.save(data, f)
+        else:
+            torch.save(data, path)
 
     @classmethod
     def load(cls, path: str):
         """
         Load a VectorLookupModel from a saved checkpoint.
+        If the path ends with '.zip' the file will be decompressed.
 
         Args:
             path (str): The path to the saved checkpoint.
@@ -199,20 +230,34 @@ class VectorLookupModel(TextEmbeddingModel):
             VectorLookupModel: The loaded VectorLookupModel instance.
         """
 
-        checkpoint = torch.load(path)
-        return cls(checkpoint["tokens"], checkpoint["vectors"])
+        if path.endswith(".zip"):
+            with ZipFile(path, "r") as archive:
+                with archive.open(basename(path).replace(".zip", ".pt"), "r") as f:
+                    checkpoint = torch.load(f)
+        else:
+            checkpoint = torch.load(path)
+
+        return cls(
+            checkpoint["tokens"],
+            checkpoint["vectors"],
+            alignment_matrix=checkpoint.get("alignment", None),
+            description=checkpoint.get("description", ""),
+        )
 
     # ============= #
     #    Helpers    #
     # ============= #
 
-    def __validate_init_args(self, tokens: List[str], vectors: torch.Tensor):
+    def __validate_init_args(self, tokens: List[str], vectors: torch.Tensor, alignment):
         if len(tokens) != vectors.shape[0]:
             raise ValueError(f"Size mismatch: {len(tokens) = }, {len(vectors) = }.")
         if vectors.shape[1] == 0:
             raise ValueError("Expected at least one dimension in vectors.")
         if repeated := {t: c for t, c in Counter(tokens).items() if c > 1}:
             raise ValueError(f"Tokens must be unique. Repeated tokens: {repeated}")
+        if alignment is not None:
+            if alignment.shape[0] != vectors.shape[1]:
+                raise ValueError(f"({alignment.shape[0]= }) != ({vectors.shape[1]= })")
 
     def __len__(self):
         return len(self.index_to_token)

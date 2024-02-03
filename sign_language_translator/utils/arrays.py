@@ -9,6 +9,7 @@ __all__ = [
     "ArrayOps",
     "linear_interpolation",
     "adjust_vector_angle",
+    "align_vectors",
 ]
 
 
@@ -85,6 +86,34 @@ class ArrayOps:
             return x.norm(dim=dim, keepdim=keepdim)
         else:
             raise TypeError(f"Invalid type for norm: {type(x)}")
+
+    @staticmethod
+    def svd(
+        x: Union[NDArray, Tensor, List, Iterable]
+    ) -> Tuple[Union[NDArray, Tensor], Union[NDArray, Tensor], Union[NDArray, Tensor]]:
+        """
+        Compute the singular value decomposition of a given array or tensor.
+
+        Args:
+            x (Union[NDArray, Tensor, List, Iterable]): The input array or tensor.
+
+        Returns:
+            Tuple[Union[NDArray, Tensor], Union[NDArray, Tensor], Union[NDArray, Tensor]]: The (Rotation, coordinate scaling, reflection) matrices of the input array or tensor.
+
+        Raises:
+            TypeError: If the input type is not supported.
+        """
+
+        if not isinstance(x, (List, Iterable)):
+            x = np.array(x)
+
+        if isinstance(x, np.ndarray):
+            return np.linalg.svd(x)
+        if isinstance(x, Tensor):
+            U, S, V = x.svd()
+            return U, S, V.T
+
+        raise TypeError(f"Invalid type for svd: {type(x)}")
 
 
 def linear_interpolation(
@@ -267,3 +296,48 @@ def adjust_vector_angle(
     # new_v2 = v1 - (-1) * (v1 - v2) = 2 * v1 - v2    # more v1, less v2.
 
     return new_v1, new_v2
+
+
+def align_vectors(
+    source_matrix: Union[NDArray, Tensor],
+    target_matrix: Union[NDArray, Tensor],
+    pre_normalize: bool = True,
+) -> Union[NDArray, Tensor]:
+    """
+    Align the source matrix to the target matrix using the orthogonal transformation.
+
+    Args:
+        source_matrix (NDArray | Tensor): A 2D array of shape (dictionary_length, embedding_dimension) containing word vectors from source model (or language).
+        target_matrix (NDArray | Tensor): A 2D array of shape (dictionary_length, embedding_dimension) containing word vectors from target model (or language).
+        normalize_vectors (bool, optional): Whether to normalize the training vectors before SVD. Defaults to True.
+
+    Returns:
+        NDArray | Tensor: An orthogonal transformation which aligns the source language to the target language.
+
+    Note:
+        This function supports both NumPy arrays and PyTorch tensors as input.
+
+    """
+    # https://github.com/babylonhealth/fastText_multilingual
+
+    if not isinstance(source_matrix, (np.ndarray, Tensor)):
+        source_matrix = np.array(source_matrix)
+    if not isinstance(target_matrix, (np.ndarray, Tensor)):
+        target_matrix = np.array(target_matrix)
+
+    # optionally normalize the training vectors
+    if pre_normalize:
+        src_norm = ArrayOps.norm(source_matrix, dim=1, keepdim=True)
+        src_norm[src_norm == 0] = 1
+        source_matrix = source_matrix / src_norm
+
+        tgt_norm = ArrayOps.norm(target_matrix, dim=1, keepdim=True)
+        tgt_norm[tgt_norm == 0] = 1
+        target_matrix = target_matrix / tgt_norm
+
+    # perform the SVD
+    product = source_matrix.T @ target_matrix
+    U, _, V = ArrayOps.svd(product)
+
+    # return orthogonal transformation which aligns source language to the target
+    return U @ V

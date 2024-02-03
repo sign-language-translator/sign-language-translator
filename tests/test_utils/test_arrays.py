@@ -3,8 +3,9 @@ import torch
 
 from sign_language_translator.utils.arrays import (
     ArrayOps,
-    linear_interpolation,
     adjust_vector_angle,
+    align_vectors,
+    linear_interpolation,
 )
 
 
@@ -129,3 +130,31 @@ def test_adjust_vector_angle():
 
     R = rotation_matrix_2d(15 / 180 * np.pi)
     assert np.isclose(new_v2, R @ v2).all()
+
+
+def test_align_vectors():
+    # Define source and target matrices
+    source_matrix = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
+    target_matrix = np.array([[2.0, 1.0], [4.0, 3.0], [6.0, 5.0]])
+
+    # Call the function
+    alignment = align_vectors(source_matrix, target_matrix, pre_normalize=True)
+
+    # Check if the result matrix has the correct shape
+    assert tuple(alignment.shape) == (source_matrix.shape[1], target_matrix.shape[1])
+
+    # Check if the result matrix is orthogonal (U @ V should be an identity matrix)
+    assert np.allclose(alignment @ alignment.T, np.eye(2), rtol=1e-5)
+
+    # Check if the transformation is a reflection in y=x
+    assert np.allclose(alignment, np.array([[0, 1], [1, 0]]), rtol=1e-5)
+
+    # Check if the applied transformation is correct
+    assert np.allclose(source_matrix @ alignment, target_matrix, rtol=1e-5)
+
+    # Check for torch tensors
+    source_matrix = torch.tensor(source_matrix, dtype=torch.float32)
+    target_matrix = torch.tensor(target_matrix, dtype=torch.float32)
+    alignment = align_vectors(source_matrix, target_matrix, pre_normalize=True)
+    assert tuple(alignment.shape) == (2, 2)
+    assert alignment.allclose(torch.tensor([[0.0, 1.0], [1.0, 0.0]]), atol=1e-6)  # type: ignore

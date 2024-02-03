@@ -178,7 +178,7 @@ See these [docs](https://sign-language-translator.readthedocs.io/en/latest/datas
 ### Goals
 
 1. Enable integration of sign language into existing applications.
-2. Improve education quality for the deaf and increase litracy rates.
+2. Improve education quality for the deaf and increase literacy rates.
 3. Promote communication inclusivity of the deaf.
 
 ## How to install the package
@@ -227,12 +227,11 @@ sign = model.translate(text) # tokenize, map, download & concatenate
 sign.show()
 # sign.save(f"{text}.mp4")
 
-# model.text_language = "hindi"
-# sign = model.translate("पाँच घंटे।") # "5 hours."
+model.text_language = "hindi"  # slt.TextLanguageCodes.HINDI  # slt.languages.text.Hindi()
+sign_2 = model.translate("पाँच घंटे।") # "5 hours."
 ```
 <!-- model.text_language = slt.TextLanguageCodes.ENGLISH
 sign = model.translate("Hello World!") -->
-
 
 ![this very good is](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/7f4ff312-df03-4b11-837b-5fb895c9f08e)
 
@@ -518,7 +517,7 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
     │   │
     │   ├── text_embedding
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_embedding/text_embedding_model.py">text_embedding_model.py</a> <sub><sup>Base class</sup></sub>
-    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_embedding/vector_lookup_model.py">vector_lookup_model.py</a> <sub><sup>retrieved word embedding from a vector database</sup></sub>
+    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_embedding/vector_lookup_model.py">vector_lookup_model.py</a> <sub><sup>retrieves word embedding from a vector database</sup></sub>
     │   │
     │   └── video_embedding
     │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py">mediapipe_landmarks_model.py</a> <sub><sup>3D coordinates of points on body</sup></sub>
@@ -702,7 +701,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-01-22.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-02-03.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -719,7 +718,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **10,372** + Tests: **1,723**):
+Count total number of **lines of code** (Package: **10,580** + Tests: **1,802**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
@@ -735,6 +734,12 @@ A: Communication skills
 <details>
 <summary><b>Star History</b></summary>
 
-[![Star History Chart](https://api.star-history.com/svg?repos=sign-language-translator/sign-language-translator&type=Timeline)](https://star-history.com/#sign-language-translator/sign-language-translator&Timeline)
+<a href="https://star-history.com/#sign-language-translator/sign-language-translator&Timeline">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=sign-language-translator/sign-language-translator&type=Timeline&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=sign-language-translator/sign-language-translator&type=Timeline" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=sign-language-translator/sign-language-translator&type=Timeline" />
+  </picture>
+</a>
 
 </details>

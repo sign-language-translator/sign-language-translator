@@ -14,12 +14,13 @@ def test_vector_lookup_model():
     assert (model["hello"] == torch.tensor([1, 2, 3])).all()
     assert (model.embed("hello world") == torch.tensor([2.5, 3.5, 4.5])).all()
 
-    model.update(["world", "sign"], torch.tensor([[7., 8., 9.], [10., 11., 12.]]))
+    model.update(["world", "sign"], torch.tensor([[7.0, 8.0, 9.0], [10.0, 11.0, 12.0]]))
 
     assert (model["world"] == torch.tensor([7, 8, 9])).all()
     assert (model["sign"] == torch.tensor([10, 11, 12])).all()
     assert (model.embed("hello world sign") == torch.tensor([6, 7, 8])).all()
 
+    # Test saving and loading
     model.save("temp/model.pt")
     assert os.path.exists("temp/model.pt")
 
@@ -27,3 +28,14 @@ def test_vector_lookup_model():
     assert (loaded_model["hello"] == torch.tensor([1, 2, 3])).all()
     assert (loaded_model["world"] == torch.tensor([7, 8, 9])).all()
     assert (loaded_model["world sign"] == torch.tensor([8.5, 9.5, 10.5])).all()
+
+    # Test alignment
+    model.alignment_matrix = torch.eye(3).flip(0)
+    assert (model.embed("hello world", align=True) == torch.tensor([6, 5, 4])).all()
+
+    # Compressed storage
+    model.save("temp/model.zip")
+    assert os.path.exists("temp/model.zip")
+
+    loaded_model = VectorLookupModel.load("temp/model.zip")
+    assert (loaded_model["hello"] == torch.tensor([1, 2, 3])).all()
