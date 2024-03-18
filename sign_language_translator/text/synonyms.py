@@ -12,8 +12,6 @@ Classes:
 from collections import Counter
 from typing import List, Optional
 
-from deep_translator import GoogleTranslator
-from deep_translator.exceptions import NotValidPayload
 from urllib3.exceptions import MaxRetryError, SSLError
 
 from sign_language_translator.utils.parallel import threaded_map
@@ -52,26 +50,44 @@ class SynonymFinder:
             print(f"Synonyms by Similarity: {synonyms}")
     """
 
-    def __init__(self, language: str) -> None:
+    def __init__(self, language: str = "en") -> None:
         """
         Initialize a SynonymFinder object.
 
         Args:
-            language (str): The target language for translation based synonyms. Use 2-letter codes (ISO 639-1).
+            language (str): The target language for translation based synonyms. Use 2-letter codes (ISO 639-1). Defaults to "en".
         """
-        self.language = language
+        self._language = language
 
         self._translator = None
         self._intermediate_languages = None
         self._embedding_model = None
 
     @property
+    def language(self) -> str:
+        """The target language for translation. Use 2-letter codes (ISO 639-1)."""
+        return self._language
+
+    @language.setter
+    def language(self, language: str) -> None:
+        self._language = language
+        self._embedding_model = None
+
+    @property
     def translator(self):
         """
-        The GoogleTranslator object with the source language as "auto" and the
+        The deep_translator.GoogleTranslator object with the source language as "auto" and the
         target language as the __init__ argument or according to the current state.
         """
         if self._translator is None:
+            try:
+                from deep_translator import GoogleTranslator
+            except ImportError as exc:
+                raise ImportError(
+                    "The 'deep_translator' package is required for translation-based synonym finding. "
+                    "Install it using `pip install sign-language-translator[synonyms]`."
+                ) from exc
+
             self._translator = GoogleTranslator(source="auto", target=self.language)
         return self._translator
 
@@ -82,18 +98,10 @@ class SynonymFinder:
         They are used to find synonyms by translation and back-translation. These are 2-letter codes (ISO 639-1).
         """
         if not self._intermediate_languages:
-            self._intermediate_languages = [
-                lang
-                for lang in self.translator.get_supported_languages(as_dict=True).values()  # type: ignore
-                if lang != self.language
-            ]
+            self._intermediate_languages = list(
+                self.translator.get_supported_languages(as_dict=True).values()  # type: ignore
+            )
         return self._intermediate_languages
-
-    @property
-    def embedding_model(self):
-        if self._embedding_model is None:
-            pass  # "paraphrase-distilroberta-base-v1"
-        return self._embedding_model
 
     def synonyms_by_translation(
         self,
@@ -191,18 +199,45 @@ class SynonymFinder:
         try:
             self.translator.target = target_language
             return self.translator.translate(text)
-        except (NotValidPayload, MaxRetryError, SSLError):
+        except (MaxRetryError, SSLError):
             return ""
 
-    def synonyms_by_similarity(self, text: str, threshold=0.8) -> List[str]:
+    @property
+    def embedding_model(self):
+        if self._embedding_model is None:
+            from sign_language_translator.models._utils import get_model
+
+            self._embedding_model = get_model(f"lookup-{self.language}-fasttext-cc.pt")
+        return self._embedding_model
+
+    def synonyms_by_similarity(
+        self, text: str, top_k=10, min_similarity=0.5
+    ) -> List[str]:
         """Looks into a vector database and returns the closest matches to the input text.
 
         Args:
             text (str): The input text to find synonyms for.
-            threshold (float, optional): Cut off value for similarity between embedding vectors. Words with greater similarity score than this value are returned as synonyms. Defaults to 0.8.
+            top_k (int, optional): The maximum number of synonyms to return. Defaults to 10.
+            min_similarity (float, optional): Cut off value for similarity between embedding vectors. Words with greater similarity score than this value are returned as synonyms. Defaults to 0.8.
 
         Returns:
             List[str]: A list of synonyms for the input text.
+
+        Example:
+            .. code-block:: python
+                # Instantiate SynonymFinder with the target language
+                synonym_finder = SynonymFinder("ur")
+
+                # Find synonyms using similarity based on embedding vectors
+                text = "تعلیم"
+                synonyms = synonym_finder.synonyms_by_similarity(text, 3)
+                print(synonyms)
+                # ["تعلیم", "تربیت", "تعلیمی"]
         """
-        # TODO: Implement
-        return []
+
+        # TODO: search with a different language or by vector
+
+        vector = self.embedding_model.embed(text)  # type: ignore
+        synonyms, scores = self.embedding_model.similar(vector, k=top_k)  # type: ignore
+
+        return [syn for syn, score in zip(synonyms, scores) if score > min_similarity]

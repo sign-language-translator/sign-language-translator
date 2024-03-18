@@ -19,7 +19,12 @@ Classes:
 """
 
 from sign_language_translator.utils.archive import Archive
-from sign_language_translator.utils.arrays import ArrayOps, linear_interpolation
+from sign_language_translator.utils.arrays import (
+    ArrayOps,
+    adjust_vector_angle,
+    align_vectors,
+    linear_interpolation,
+)
 from sign_language_translator.utils.download import download
 from sign_language_translator.utils.parallel import threaded_map
 from sign_language_translator.utils.tree import tree
@@ -44,6 +49,8 @@ __all__ = [
     "linear_interpolation",
     "threaded_map",
     "extract_recursive",
+    "adjust_vector_angle",
+    "align_vectors",
     # classes
     "Archive",
     "ArrayOps",

@@ -3,11 +3,11 @@
     {
       "description": "word-mapping-dataset",
       "file_to_url": {
+        "mapping-schema.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/schemas/mapping-schema.json",
         "pk-dictionary-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-dictionary-mapping.json",
         "pk-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-sentence-mapping.json",
         "pk-synthetic-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-synthetic-sentence-mapping.json",
-        "text-preprocessing.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/a62449e395140c0e3bb0f87ed586b28f0a8f193b/text-preprocessing.json",
-        "mapping-schema.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/schemas/mapping-schema.json"
+        "text-preprocessing.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/a62449e395140c0e3bb0f87ed586b28f0a8f193b/text-preprocessing.json"
       }
     },
     {
@@ -67,6 +67,12 @@
       }
     },
     {
+      "description": "text-embedding-models",
+      "file_to_url": {
+        "models/lookup-ur-fasttext-cc.pt": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/lookup-ur-fasttext-cc.pt"
+      }
+    },
+    {
       "description": "text-to-sign-models",
       "file_to_url": {}
     },
@@ -87,6 +93,12 @@
       "file_to_url": {
         "archive-urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/asset_urls/archive-urls.json",
         "extra-urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/asset_urls/extra-urls.json"
+      }
+    },
+    {
+      "description": "testing-assets",
+      "file_to_url": {
+        "models/lookup-test-model.pt": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/lookup-test-model.pt"
       }
     }
   ]

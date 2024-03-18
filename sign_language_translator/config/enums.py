@@ -172,6 +172,7 @@ class ModelCodes(Enum, metaclass=PrintableEnumMeta):
     MEDIAPIPE_POSE_V0_HAND_V1 = "mediapipe-pose-0-hand-1"
 
     # text-embedding-models
+    LOOKUP_UR_FASTTEXT_CC = "lookup-ur-fasttext-cc.pt"
 
 
 class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
@@ -215,6 +216,12 @@ class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
         ModelCodes.MEDIAPIPE_POSE_V0_HAND_V1.value,
     }
     ALL_VIDEO_EMBEDDING_MODELS = ALL_MEDIAPIPE_EMBEDDING_MODELS
+
+    # text embedding models
+    ALL_VECTOR_LOOKUP_MODELS = {
+        ModelCodes.LOOKUP_UR_FASTTEXT_CC.value,
+    }
+    ALL_TEXT_EMBEDDING_MODELS = ALL_VECTOR_LOOKUP_MODELS
 
 
 # TODO: move the mapping list outside of the function. maybe convert it to a class variable.
@@ -285,6 +292,16 @@ def normalize_short_code(short_code: Union[str, Enum]) -> str:
         },
         ModelCodes.MEDIAPIPE_POSE_V2_HAND_V1.value: {
             "mediapipe",
+        },
+        ModelCodes.LOOKUP_UR_FASTTEXT_CC.value: {
+            "lookup-ur-ft-cc",
+            "lookup-ur-fasttext-cc",
+            "ur-lookup-fasttext-cc",
+            "ur-lookup-ftcc",
+            "ur-lookup-ft-cc",
+            "urdu-lookup-fasttext-cc",
+            "urdu-lookup-ftcc",
+            "urdu-lookup-ft-cc",
         },
     }
     normalized_to_codes = {

@@ -87,5 +87,11 @@ def get_model(model_code: Union[str, Enum], *args, **kwargs):
             # hand_model_name=f"hand_landmarker_{names[hand_version]}.task",
             # number_of_persons=1,
         )
+    if model_code in ModelCodeGroups.ALL_VECTOR_LOOKUP_MODELS.value:
+        from sign_language_translator.models import VectorLookupModel
+
+        asset_id = f"models/{model_code}"
+        Assets.download(asset_id, progress_bar=True, leave=False, chunk_size=1048576)
+        return VectorLookupModel.load(Assets.get_path(asset_id)[0])
 
     return None

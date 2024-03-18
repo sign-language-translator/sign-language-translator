@@ -1,9 +1,11 @@
 import os
 
+import torch
 from click.testing import CliRunner
 
 from sign_language_translator.cli import slt
 from sign_language_translator.config.assets import Assets
+from sign_language_translator.config.enums import ModelCodeGroups
 
 
 def test_slt():
@@ -51,7 +53,7 @@ def test_slt():
 #     assert os.path.exists(f"temp/{text}.mkv")
 
 
-def test_slt_embed():
+def test_slt_embed_video():
     runner = CliRunner()
 
     video_id = "videos/wordless_wordless.mp4"
@@ -75,6 +77,42 @@ def test_slt_embed():
     )
     assert result.exit_code == 0
     assert os.path.exists("temp/wordless_wordless.mp4.npy")
+
+
+def test_slt_embed_text():
+    test_model_code = "lookup-test-model.pt"
+    ModelCodeGroups.ALL_TEXT_EMBEDDING_MODELS.value.add(test_model_code)
+    ModelCodeGroups.ALL_VECTOR_LOOKUP_MODELS.value.add(test_model_code)
+
+    runner = CliRunner()
+
+    with open(token_path := os.path.join("temp", "tokens.txt"), "w") as f:
+        f.write("sign hello\nworld hello")
+
+    result = runner.invoke(
+        slt,
+        [
+            "embed",
+            "hello",
+            token_path,
+            "world",
+            "--model-code",
+            test_model_code,
+            "--embedding-type",
+            "normalized",
+            "--output-dir",
+            "temp",
+            "--overwrite",
+            "true",
+        ],
+    )
+    assert result.exit_code == 0
+    output = "temp" + os.sep + result.output.splitlines()[-1].split("temp" + os.sep)[-1]
+    assert os.path.exists(output)
+
+    checkpoint = torch.load(output)
+    assert checkpoint["tokens"] == ["hello", "sign hello", "world hello", "world"]
+    assert checkpoint["vectors"].shape[0] == 4
 
 
 def test_slt_complete():

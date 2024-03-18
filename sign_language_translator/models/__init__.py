@@ -23,6 +23,11 @@ Video Embedding:
 - VideoEmbeddingModel: An abstract model that embeds video frames into a vector space.
 - MediaPipeLandmarksModel: A video embedding model that utilizes MediaPipe for pose and hand landmark extraction.
 
+Text Embedding:
+---------------
+- TextEmbeddingModel: An abstract model that embeds text into a vector space.
+- VectorLookupModel: A text embedding model that looks up vectors from a pre-trained embedding matrix.
+
 Utilities:
 ----------
 - get_model: A utility function to get any model by string name.
@@ -32,6 +37,7 @@ Utilities:
 from sign_language_translator.models import (
     language_models,
     sign_to_text,
+    text_embedding,
     text_to_sign,
     utils,
     video_embedding,
@@ -43,6 +49,10 @@ from sign_language_translator.models.language_models import (
     MixerLM,
     NgramLanguageModel,
     TransformerLanguageModel,
+)
+from sign_language_translator.models.text_embedding import (
+    TextEmbeddingModel,
+    VectorLookupModel,
 )
 from sign_language_translator.models.text_to_sign import ConcatenativeSynthesis
 from sign_language_translator.models.text_to_sign.t2s_model import TextToSignModel
@@ -58,6 +68,7 @@ __all__ = [
     "text_to_sign",
     "utils",
     "video_embedding",
+    "text_embedding",
     "ConcatenativeSynthesis",
     "NgramLanguageModel",
     "TransformerLanguageModel",
@@ -67,4 +78,6 @@ __all__ = [
     "TextToSignModel",
     "MediaPipeLandmarksModel",
     "VideoEmbeddingModel",
+    "TextEmbeddingModel",
+    "VectorLookupModel",
 ]
