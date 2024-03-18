@@ -190,10 +190,12 @@ pip install sign-language-translator
 <details>
 <summary>Editable mode (<code>git clone</code>):</summary>
 
+The package ships with some optional dependencies as well (e.g. deep_translator for synonym finding and mediapipe for a pretrained pose extraction model). Install them by appending [all], [full], [mediapipe], [synonyms] to the project name in the command (e.g `pip install sign-langauge-translator[full]`).
+
 ```bash
 git clone https://github.com/sign-language-translator/sign-language-translator.git
 cd sign-language-translator
-pip install -e .
+pip install -e ".[all]"
 ```
 
 ```bash
@@ -710,7 +712,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **10,713** + Tests: **1,822**):
+Count total number of **lines of code** (Package: **10,731** + Tests: **1,822**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

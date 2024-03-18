@@ -85,7 +85,7 @@ class SynonymFinder:
             except ImportError as exc:
                 raise ImportError(
                     "The 'deep_translator' package is required for translation-based synonym finding. "
-                    "Install it using 'pip install deep-translator'."
+                    "Install it using `pip install sign-language-translator[synonyms]`."
                 ) from exc
 
             self._translator = GoogleTranslator(source="auto", target=self.language)

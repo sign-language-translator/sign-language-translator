@@ -12,6 +12,11 @@ def test_mediapipe_embedding():
     model = MediaPipeLandmarksModel()
     landmarks = model.embed(frames, landmark_type="all")
 
+    try:
+        landmarks = model.embed(frames, landmark_type="3D")
+    except ValueError:
+        pass
+
     assert landmarks.shape[0] == len(frames)
     assert landmarks.shape[-1] == (33 + 21 * 2) * 5 * 2
     assert not (landmarks == 0).all()

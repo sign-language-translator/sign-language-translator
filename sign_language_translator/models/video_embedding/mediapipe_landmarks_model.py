@@ -22,7 +22,11 @@ Example:
 from os.path import join
 from typing import Dict, Iterable, List, Optional, Union
 
-import mediapipe
+try:
+    import mediapipe
+except ImportError:
+    mediapipe = None
+
 import numpy as np
 import torch
 from numpy.typing import NDArray
@@ -56,6 +60,12 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
         hand_model_name="hand_landmarker.task",
         number_of_persons: int = 1,
     ) -> None:
+        if mediapipe is None:
+            raise ImportError(
+                "The 'mediapipe' package is required to use the 'MediaPipeLandmarksModel'. "
+                "Install it using `pip install sign-language-translator[mediapipe]`."
+            )
+
         self._pose_class = mediapipe.tasks.vision.PoseLandmarker
         self._hand_class = mediapipe.tasks.vision.HandLandmarker
 
@@ -95,7 +105,16 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
             torch.Tensor: A tensor containing the frame embeddings.
         """
 
-        assert landmark_type in ("world", "image", "all"), "landmark type not supported"
+        if mediapipe is None:
+            raise ImportError(
+                "The 'mediapipe' package is required to use the 'MediaPipeLandmarksModel'. "
+                "Install it using `pip install sign-language-translator[mediapipe]`."
+            )
+
+        if landmark_type not in ("world", "image", "all"):
+            raise ValueError(
+                "landmark_type not supported, use 'world', 'image' or 'all'."
+            )
 
         # TODO: Pose only or hands only
         if hasattr(frame_sequence, "__len__"):

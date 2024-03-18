@@ -13,14 +13,20 @@ keywords = ["sign-language", "sign-language-translation", "nlp", "computer-visio
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
 matplotlib = "^3.7.4"
-mediapipe = "==0.10.*"
 numpy = "==1.24.*"
 torch = "==2.1.*"
 opencv-contrib-python = "^4.8.0.74"
 tqdm = "^4.65.0"
 click = "^8.1.4"
 requests = "^2.31.0"
-deep-translator = "^1.11.4"
+mediapipe = {version = "0.10.9", optional = true}
+deep-translator = { version = "^1.11.4", optional = true }
+
+[tool.poetry.extras]
+mediapipe = ["mediapipe"]
+synonyms = ["deep-translator"]
+full = ["mediapipe", "deep-translator"]
+all = ["mediapipe", "deep-translator"]
 
 [build-system]
 requires = ["poetry-core"]
@@ -43,6 +49,8 @@ exclude_also = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
     "@(abc\\.)?abstractmethod",
+    "except ImportError",
+    "if mediapipe is None:"
 ]
 
 [tool.coverage.run]
