@@ -11,3 +11,8 @@ def test_translation_synonyms():
     word = "happy"
     synonyms = synonymizer.synonyms_by_translation(word, lower_case=True)
     assert set(synonyms) & {"happy", "glad", "cheerful", "joyful", "merry", "delighted"}
+
+    synonymizer.language = "ur"
+    word = "اشارہ"
+    synonyms = synonymizer.synonyms_by_similarity(word, top_k=10, min_similarity=0.5)
+    assert set(synonyms) & {"اشارہ", "اشارے"}

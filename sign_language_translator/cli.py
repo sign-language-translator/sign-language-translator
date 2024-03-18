@@ -362,12 +362,12 @@ def complete(
 @click.option(
     "--processes",
     default=1,
-    help="Number of processes to launch to embed using multiprocessing.",
+    help="Number of processes to launch to embed videos using multiprocessing.",
 )
 @click.option(
     "--embedding-type",
     default="all",
-    help="Optional parameter to filter down embeddings if model can return various types.",
+    help="Optional parameter to filter down embeddings if model can return various types. possible values depend on the model. (e.g. 'all', 'world', 'image', 'normalized', 'aligned', 'normalized-aligned')'",
 )
 @click.option(
     "--output-dir",
@@ -377,7 +377,7 @@ def complete(
 @click.option(
     "--save-format",
     default="pt",
-    help="What format to save the generated embeddings in. (e.g. pt, csv, npy, npz). Defaults to 'pt'.",
+    help="What format to save the generated video embeddings in. (e.g. pt, csv, npy, npz). Defaults to 'pt'.",
 )
 @click.option(
     "--overwrite",
@@ -401,32 +401,100 @@ def embed(
     overwrite,
 ):
     """
-    Embed Videos Using Selected Model.
+    Embed Videos or Text using selected Model.
 
-    This function processes input videos using a selected embedding model to generate video embeddings.
+    (Video)\n
+    Convert video files using a selected embedding model into video embeddings.
     It supports multiple input videos using path patterns and multiprocessing for efficiency.
-    Currently you can use the following model-codes:\n
+    --model-codes:\n
     1. mediapipe-pose-2-hand-1\n
     2. mediapipe-pose-1-hand-1\n
     3. mediapipe-pose-0-hand-1\n
     Example:\n
-        $ slt embed dataset/*.mp4 --model-code mediapipe-pose-2-hand-1 --embedding-type all --processes 4 --save-format csv
+        $ slt embed dataset/*.mp4 --model-code mediapipe-pose-2-hand-1 --embedding-type all --processes 4 --save-format csv\n
+
+    (Text)\n
+    Convert text tokens passed as multiple arguments into embedding vectors using the selected model.
+    The input args ending with '.txt' are read and split on newline characters.
+    Input args ending with '.json' are parsed expected to be an array of strings.
+    The output is a pytorch pickled state dict file containing {"tokens": list_of_strings, "vectors": embeddings}\n
+    1. lookup-ur-fasttext-cc.pt\n
+    Example:\n
+        $ slt embed "text" "words" "other-tokens.txt" --model-code en_lookup_ft_cc
     """
 
+    from warnings import warn
+
     from sign_language_translator import get_model
-    from sign_language_translator.models.utils import VideoEmbeddingPipeline
+    from sign_language_translator.models import TextEmbeddingModel, VideoEmbeddingModel
 
     model = get_model(model_code)
-    pipeline = VideoEmbeddingPipeline(model)  # type: ignore
 
-    pipeline.process_videos_parallel(
-        inputs,
-        n_processes=processes,
-        output_dir=output_dir,
-        save_format=save_format,
-        landmark_type=embedding_type,
-        overwrite=overwrite,
-    )
+    if isinstance(model, VideoEmbeddingModel):
+        from sign_language_translator.models.utils import VideoEmbeddingPipeline
+
+        pipeline = VideoEmbeddingPipeline(model)  # type: ignore
+
+        pipeline.process_videos_parallel(
+            inputs,
+            n_processes=processes,
+            output_dir=output_dir,
+            save_format=save_format,
+            landmark_type=embedding_type,
+            overwrite=overwrite,
+        )
+    elif isinstance(model, TextEmbeddingModel):
+        import json
+
+        import torch
+
+        from sign_language_translator.config.enums import normalize_short_code
+
+        # fix args
+        if isinstance(inputs, str):
+            inputs = [inputs]
+        norm = embedding_type in ("normalized", "normalized-aligned")
+        aligned = embedding_type in ("aligned", "normalized-aligned")
+        model_code = normalize_short_code(model_code)
+
+        # Parse tokens from inputs
+        tokens = []
+        for inp in inputs:
+            if inp.endswith(".txt"):
+                with open(inp, "r") as f:
+                    tokens.extend(f.read().splitlines())
+            elif inp.endswith(".json"):
+                with open(inp, "r") as f:
+                    tokens.extend(json.load(f))
+            else:
+                tokens.append(inp)
+
+        # filter tokens & embed
+        filtered_tokens = []
+        embeddings = []
+        for token in tokens:
+            embedding = model.embed(token, pre_normalize=norm, post_normalize=norm, align=aligned)  # type: ignore
+            if (embedding == 0).all():
+                warn(f"Skipped '{token}' because its not in {model_code} known_tokens.")
+            else:
+                filtered_tokens.append(token)
+                embeddings.append(embedding)
+
+        # save
+        embeddings = torch.stack(embeddings)
+        target_path = os.path.join(
+            output_dir,
+            f"{model_code}_{tuple(embeddings.shape)}_embedding.pt".replace(" ", ""),
+        )
+        if os.path.exists(target_path) and not overwrite:
+            raise FileExistsError(f"'{target_path = }' already exists")
+
+        torch.save({"tokens": filtered_tokens, "vectors": embeddings}, target_path)
+        click.echo(f"Saved 'tokens' & 'vectors' at {target_path}")
+
+        # TODO: if save_format == "csv":
+    else:
+        raise ValueError("ERROR: Model loading failed!")
 
 
 if __name__ == "__main__":
