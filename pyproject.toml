@@ -16,10 +16,11 @@ matplotlib = "^3.7.4"
 mediapipe = "==0.10.*"
 numpy = "==1.24.*"
 torch = "==2.1.*"
-deep-translator = "^1.11.4"
 opencv-contrib-python = "^4.8.0.74"
 tqdm = "^4.65.0"
 click = "^8.1.4"
+requests = "^2.31.0"
+deep-translator = "^1.11.4"
 
 [build-system]
 requires = ["poetry-core"]

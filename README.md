@@ -602,14 +602,6 @@ Stay Tuned!
 
 ## Upcoming/Roadmap
 
-<details>
-<summary>TEXT_EMBEDDING: v0.7</summary>
-
-```python
-# synonyms by similarity
-```
-
-</details>
 
 <details>
 <summary>LANDMARKS_WRAPPER: v0.8</summary>
@@ -701,7 +693,7 @@ Stay Tuned!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-02-03.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-03-18.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -718,7 +710,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **10,580** + Tests: **1,802**):
+Count total number of **lines of code** (Package: **10,713** + Tests: **1,822**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

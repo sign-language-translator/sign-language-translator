@@ -8,9 +8,10 @@ Classes:
 
 from collections import Counter
 from os.path import basename
-from typing import Callable, Iterable, List, Optional
+from typing import Callable, Iterable, List, Optional, Tuple
 from zipfile import ZIP_DEFLATED, ZipFile
 
+import numpy as np
 import torch
 
 from sign_language_translator.models.text_embedding.text_embedding_model import (
@@ -78,6 +79,9 @@ class VectorLookupModel(TextEmbeddingModel):
         self.alignment_matrix = alignment_matrix
         self.description = description
 
+        self._normalized_vectors = None
+        self._tokens_array = None
+
     def update(self, tokens: List[str], vectors: torch.Tensor) -> None:
         """
         Update the vector lookup model with new tokens and their corresponding vectors.
@@ -117,6 +121,17 @@ class VectorLookupModel(TextEmbeddingModel):
         self.index_to_token = self.index_to_token + new_tokens
         self.known_tokens = frozenset(self.index_to_token)
         self.token_to_index.update({t: i + old_len for i, t in enumerate(new_tokens)})
+
+        if self._tokens_array is not None:
+            self._tokens_array = np.concatenate(
+                [self._tokens_array, np.array(new_tokens)]
+            )
+        if self._normalized_vectors is not None:
+            _norms = vectors[remaining_mask].norm(dim=1, keepdim=True)
+            _norms[_norms == 0] = 1
+            self._normalized_vectors = torch.cat(
+                [self._normalized_vectors, vectors[remaining_mask] / _norms]
+            )
 
     # =============== #
     #    embedding    #
@@ -190,6 +205,53 @@ class VectorLookupModel(TextEmbeddingModel):
         """
 
         return self.embed(token)
+
+    # ============ #
+    #    Search    #
+    # ============ #
+
+    @property
+    def normalized_vectors(self):
+        if self._normalized_vectors is None:
+            _norms = self.vectors.norm(dim=1, keepdim=True)
+            _norms[_norms == 0] = 1
+            self._normalized_vectors = self.vectors / _norms
+
+        return self._normalized_vectors
+
+    @property
+    def tokens_array(self):
+        if self._tokens_array is None:
+            self._tokens_array = np.array(self.index_to_token)
+        return self._tokens_array
+
+    def similar(
+        self, vector: torch.Tensor, k: int = 1
+    ) -> Tuple[List[str], List[float]]:
+        """
+        Find the k most similar tokens to the given vector.
+
+        Args:
+            vector (torch.Tensor): The 1D vector for which to find similar tokens.
+            k (int, optional): The number of similar tokens to return. Defaults to 1.
+
+        Returns:
+            Tuple[List[str], List[float]]: A tuple containing the k most similar tokens and their corresponding cosine similarities.
+        """
+
+        # normalize the query vector
+        _norm = vector.norm(keepdim=True)
+        _norm[_norm == 0] = 1
+
+        # calculate cosine similarities
+        similarities = (vector / _norm) @ self.normalized_vectors.T
+        top_k_similarities, top_k_indexes = similarities.topk(k)
+
+        # return the top k similar tokens and their similarities
+        return (
+            self.tokens_array[top_k_indexes.numpy()].tolist(),
+            top_k_similarities.tolist(),
+        )
 
     # =============== #
     #    load/save    #

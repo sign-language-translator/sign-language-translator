@@ -89,6 +89,15 @@ def test_array_ops():
 
     assert ArrayOps.norm(torch.Tensor([1, 1])) == torch.Tensor([2]).sqrt()
 
+    # test ArrayOps.top_k
+    tensor = torch.tensor([1, 2, 3, 4, 5])
+    _, indices = ArrayOps.top_k(tensor, 3)
+    assert set(indices.tolist()) == {4, 3, 2}
+
+    array = np.array([3, 5, 1, 2, 4])
+    _, indices = ArrayOps.top_k(array, 3)
+    assert set(indices.tolist()) == {1, 4, 0}
+
 
 def test_adjust_vector_angle():
     v1 = np.array([1, 1])

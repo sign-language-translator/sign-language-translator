@@ -115,6 +115,39 @@ class ArrayOps:
 
         raise TypeError(f"Invalid type for svd: {type(x)}")
 
+    @staticmethod
+    def top_k(
+        x: Union[NDArray, Tensor, List, Iterable], k: int, dim: int = -1, largest=True
+    ) -> Tuple[Union[NDArray, Tensor], Union[NDArray, Tensor]]:
+        """
+        Compute the top k values and their indices along a specified dimension of a given array or tensor.
+
+        Args:
+            x (Union[NDArray, Tensor, List, Iterable]): The input array or tensor.
+            k (int): The number of top values to return.
+            dim (int, optional): The dimension along which to compute the top k values. Default is -1.
+            largest (bool, optional): Whether to return the largest or smallest k values. Default is True.
+
+        Returns:
+            Tuple[Union[NDArray, Tensor], Union[NDArray, Tensor]]: The top k values and their indices along the specified dimension.
+
+        Raises:
+            TypeError: If the input type is not supported.
+        """
+
+        if isinstance(x, np.ndarray):
+            indices = (
+                np.argpartition(x, -k, axis=dim)[-k:]
+                if largest
+                else np.argpartition(x, k, axis=dim)[:k]
+            )
+            return x.take(indices, axis=dim), indices
+        if isinstance(x, Tensor):
+            values, indices = x.topk(k, dim=dim, largest=largest, sorted=True)
+            return values, indices
+
+        raise TypeError(f"Invalid type for topk: {type(x)}")
+
 
 def linear_interpolation(
     array: Union[NDArray[np.float64], Tensor, List],
