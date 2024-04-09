@@ -11,11 +11,12 @@
 
 [![python](https://img.shields.io/pypi/pyversions/sign-language-translator?logo=python)](https://pypi.org/project/sign-language-translator/)
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator?logo=pypi)](https://pypi.org/project/sign-language-translator/)
-[![Downloads](https://img.shields.io/pepy/dt/sign_language_translator?color=purple&logoColor=white&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIiBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiMwMDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTkuMiAyLjhjLS4yLjMtLjIuOC0uMiAxLjZWMTFINy44Yy0uOSAwLTEuMyAwLTEuNS4yYS44LjggMCAwIDAtLjMuNmMwIC4zLjMuNiAxIDEuMmw0LjEgNC40LjcuNmEuNy43IDAgMCAwIC40IDBsLjctLjZMMTcgMTNjLjYtLjYuOS0xIC45LTEuMmEuOC44IDAgMCAwLS4zLS42Yy0uMi0uMi0uNi0uMi0xLjUtLjJIMTVWNC40YzAtLjggMC0xLjMtLjItMS42YTEuNSAxLjUgMCAwIDAtLjYtLjZjLS4zLS4yLS44LS4yLTEuNi0uMmgtMS4yYy0uOCAwLTEuMyAwLTEuNi4yYTEuNSAxLjUgMCAwIDAtLjYuNnpNNSAyMWExIDEgMCAwIDAgMSAxaDEyYTEgMSAwIDEgMCAwLTJINmExIDEgMCAwIDAtMSAxeiIgY2xpcC1ydWxlPSJldmVub2RkIi8+PC9zdmc+)](https://pepy.tech/project/sign-language-translator/)
+[![Downloads](https://img.shields.io/pepy/dt/sign_language_translator?color=purple&logoColor=white&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIiBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiMwMDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTkuMiAyLjhjLS4yLjMtLjIuOC0uMiAxLjZWMTFINy44Yy0uOSAwLTEuMyAwLTEuNS4yYS44LjggMCAwIDAtLjMuNmMwIC4zLjMuNiAxIDEuMmw0LjEgNC40LjcuNmEuNy43IDAgMCAwIC40IDBsLjctLjZMMTcgMTNjLjYtLjYuOS0xIC45LTEuMmEuOC44IDAgMCAwLS4zLS42Yy0uMi0uMi0uNi0uMi0xLjUtLjJIMTVWNC40YzAtLjggMC0xLjMtLjItMS42YTEuNSAxLjUgMCAwIDAtLjYtLjZjLS4zLS4yLS44LS4yLTEuNi0uMmgtMS4yYy0uOCAwLTEuMyAwLTEuNi4yYTEuNSAxLjUgMCAwIDAtLjYuNnpNNSAyMWExIDEgMCAwIDAgMSAxaDEyYTEgMSAwIDEgMCAwLTJINmExIDEgMCAwIDAtMSAxeiIgY2xpcC1ydWxlPSJldmVub2RkIi8+PC9zdmc+)](https://pepy.tech/projects/sign-language-translator/)
 ![Release Workflow Status](https://img.shields.io/github/actions/workflow/status/sign-language-translator/sign-language-translator/release.yml?branch=main&logo=pytest)
 [![codecov](https://codecov.io/gh/sign-language-translator/sign-language-translator/branch/main/graph/badge.svg)](https://codecov.io/gh/sign-language-translator/sign-language-translator)
 [![Documentation Status](https://img.shields.io/readthedocs/sign-language-translator?logo=readthedocs&)](https://sign-language-translator.readthedocs.io/)
 [![GitHub Repo stars](https://img.shields.io/github/stars/sign-language-translator/sign-language-translator?logo=github)](https://github.com/sign-language-translator/sign-language-translator/stargazers)
+[![HuggingFace Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20hf.co%2FsltAI-Web%20Demos-mediumslateblue)](https://huggingface.co/sltAI)
 
 </div>
 
@@ -327,11 +328,11 @@ Available Functions:
 
 <!-- [Available Trained models]() -->
 
-| Name                                                                                                                                                                              | Architecture        | Description                                                                                                                                            | Input  | Output   |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | -------- |
-| [Concatenative Synthesis](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py) | Rules + Hash Tables | The Core Rule-Based translator mainly used to synthesize translation dataset.<br/>Initialize it using TextLanguage, SignLanguage & SignFormat objects. | string | slt.Sign |
+| Name                                                                                                                                                                              | Architecture        | Description                                                                                                                                            | Input  | Output   | Web Demo |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | -------- | -------- |
+| [Concatenative Synthesis](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py) | Rules + Hash Tables | The Core Rule-Based translator mainly used to synthesize translation dataset.<br/>Initialize it using TextLanguage, SignLanguage & SignFormat objects. | string | slt.Sign | [![Open in Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-sm.svg)](https://huggingface.co/spaces/sltAI/ConcatenativeSynthesis) |
 
-<!--                                                                                                                                                                              | [pose-gen]()        | Encoder-Decoder Transformers (Seq2Seq)                                                                                                              | Generates a sequence of pose vectors conditioned on input text. | torch.Tensor<br/>(batch, token_ids) | torch.Tensor<br/>(batch, n_frames, n_landmarks*3) | -->
+<!--                                                                                                                                                                              | [pose-gen]()        | Encoder-Decoder Transformers (Seq2Seq)                                                                                                              | Generates a sequence of pose vectors conditioned on input text. | torch.Tensor<br/>(batch, token_ids) | torch.Tensor<br/>(batch, n_frames, n_landmarks*3) |  | -->
 
 </details>
 
@@ -462,10 +463,7 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
 
 <pre>
 <b style="font-size:large;">sign-language-translator</b>
-├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/.readthedocs.yaml">.readthedocs.yaml</a>
-├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/MANIFEST.in">MANIFEST.in</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/README.md">README.md</a>
-├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/poetry.lock">poetry.lock</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/pyproject.toml">pyproject.toml</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/requirements.txt">requirements.txt</a>
 ├── <b>docs</b>
@@ -489,9 +487,9 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/utils.py">utils.py</a>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/vocab.p">vocab.py</a> <sub><sup>reads word mapping datasets</sup></sub>
     │   ├── sign
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/mapping_rules.py">mapping_rules.py</a> <sub><sup>strategy design-pattern for word mapping</sup></sub>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/mapping_rules.py">mapping_rules.py</a> <sub><sup>strategy design-pattern for word to sign mapping</sup></sub>
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py">pakistan_sign_language.py</a>
-    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/sign_language.py">sign_language.py</a> <sub><sup>Base class for sign mapping and sentence restructuring</sup></sub>
+    │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/sign_language.py">sign_language.py</a> <sub><sup>Base class for text to sign mapping and sentence restructuring</sup></sub>
     │   │
     │   └── text
     │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/english.py">english.py</a>
@@ -505,7 +503,7 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
     │   ├── language_models
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/abstract_language_model.py">abstract_language_model.py</a>
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/beam_sampling.py">beam_sampling.py</a>
-    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/mixer.py">mixer.py</a> <sub><sup>wrap multiple models into a single object</sup></sub>
+    │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/mixer.py">mixer.py</a> <sub><sup>wrap multiple language models into a single object</sup></sub>
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/ngram_language_model.py">ngram_language_model.py</a> <sub><sup>uses hash-tables & frequency to predict next token</sup></sub>
     │   │   └── transformer_language_model
     │   │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/language_models/transformer_language_model/layers.py">layers.py</a>
@@ -584,6 +582,7 @@ See our datasets & conventions [here](https://github.com/sign-language-translato
 <details>
 <summary><b>Existing Code</b>:</summary>
 
+- Implement the `# ToDo` from the code or anything from the [roadmap](#upcomingroadmap).
 - Optimize the codebase by implementing techniques like parallel processing and batching.
 - Strengthen the project's documentation with clear docstrings, illustrative usage scenarios, and robust test coverage.
 - Contribute to the documentation for [sign-language-translator ReadTheDocs](https://github.com/sign-language-translator/sign-language-translator/blob/main/docs/index.rst) to empower users with comprehensive insights. Currently it needs a template for auto-generated pages.
@@ -594,7 +593,7 @@ See our datasets & conventions [here](https://github.com/sign-language-translato
 <summary><b>Product Development</b>:
 </summary>
 
-- Engage in the development efforts across [MLOps](), [backend](), [web](), and [mobile]() domains, depending on your expertise and interests.
+- Engage in the development efforts across [MLOps](https://hf.co/sltAI), [backend](), [web](), and [mobile]() domains, depending on your expertise and interests.
 
 </details>
 
@@ -604,18 +603,16 @@ Stay Tuned!
 
 ## Upcoming/Roadmap
 
-
 <details>
 <summary>LANDMARKS_WRAPPER: v0.8</summary>
 
 ```python
-# landmarks wrapper class
-# landmark augmentation
+# 0.8.0: landmarks wrapper class (load, save, convert, display, copy)
+# 0.8.1: landmark augmentation (zoom, rotate, move, noise, duration, rectify, stabilize)
+# 0.8.2: trim signs before concatenation, insert transition frames
 
-# subtitles
-# trim signs before concatenation
-
-# stabilize video batch using landmarks
+# 0.8.3: subtitles/captions
+# 0.8.4: stabilize video batch using landmarks
 ```
 
 </details>
@@ -624,9 +621,32 @@ Stay Tuned!
 <summary>LANGUAGES: v0.9</summary>
 
 ```python
-# improve Urdu code
+# clean-up slt.languages.text.Urdu code
 # implement NLP class for English
+
 # expand dictionary video data by scraping everything
+# upload landmark dataset
+```
+
+</details>
+
+<details>
+<summary>DEEP_TRANSLATION: v0.9 - v1.2</summary>
+
+```python
+# 0.9.1: TransformerLanguageModel - Drop space tokens, bidirectional prediction & train on max vocab but mask with supported only when inferring.
+# 0.9.2: sign to text with custom seq2seq transformer
+# 0.9.3: pose vector generation from text with custom seq2seq transformer
+# 0.9.4: sign to text with fine-tuned whisper
+# 0.9.5: pose vector generation with fine-tuned mBERT
+# 0.9.6: custom 3DLandmark model (training data = mediapipe's output on activity recognition or any dataset)
+# 1.0.0: all models trained on custom landmark model
+# 🎉
+# 1.0.1: video to text model (connect custom landmark model with sign2text model and finetune)
+# 1.1.0: motion transfer
+# 1.1.1: custom pose2video: stable diffusion or GAN?
+# 1.2.0: speech to sign
+# 1.2.1: sign to speech
 ```
 
 </details>
@@ -634,43 +654,28 @@ Stay Tuned!
 <details>
 <summary>MISCELLANEOUS</summary>
 
-```python
-# bugfix: inaccurate num_frames in video file metadata
-# improvement: video wrapper class uses list of sources instead of linked list of videos
-# video transformations
+Issues
 
+```python
+# bugfix:      inaccurate num_frames in video file metadata
+# bugfix:      Expression of type "Literal[False]" cannot be assigned to member "SHOW_DOWNLOAD_PROGRESS" of class "Settings"
+# bugfix:      OpenCV VideoWriter fails in ubuntu docker container (use mp4v but its not browser supported)
+# improvement: video wrapper class should use list of sources instead of a linked-list of videos
+# feature:     video transformations (e.g. stabilization with image pose landmarks, watermark text/logo)
+```
+
+Miscellaneous
+
+```python
+# parallel text corpus
 # clean demonstration notebooks
 # * host video dataset online, descriptive filenames, zip extraction
 # dataset info table
 # sequence diagram for creating a translator
-# make deep_translator optional.
-# GUI with gradio
+# GUI with gradio or something
 ```
 
-[![Total Views](https://u8views.com/api/v1/github/profiles/118578823/views/total-count.svg)](https://u8views.com/github/mdsrqbl)
-
-</details>
-
-<details>
-<summary>DEEP_TRANSLATION: v1.X</summary>
-
-```python
-# parallel text corpus
-# LanguageModel: Dropping space tokens, bidirectional prediction & train on max vocab but mask with supported only when inferring.
-# sign to text with custom seq2seq transformer
-# sign to text with fine-tuned whisper
-# pose vector generation with fine-tuned mBERT
-# custom 3DLandmark model (training data = mediapipe's output on activity recognition or any dataset)
-# motion transfer
-# pose2video: stable diffusion or GAN?
-# speech to text
-# text to speech
-```
-
-</details>
-
-<details>
-<summary>RESEARCH PAPERs</summary>
+Research Papers
 
 ```python
 # datasets: clips, text, sentences, disambiguation
@@ -679,23 +684,24 @@ Stay Tuned!
 # deep text-to-sign: pipeline + experiments
 ```
 
-</details>
-
-<details>
-<summary>PRODUCT DEVELOPMENT</summary>
+Servers / Product
 
 ```python
+# HuggingFace Spaces: log requests that generate errors (out of vocab tokens)
+
 # ML inference server
 # Django backend server
 # React Frontend
 # React Native mobile app
 ```
 
+[![Total Views](https://u8views.com/api/v1/github/profiles/118578823/views/total-count.svg)](https://u8views.com/github/mdsrqbl)
+
 </details>
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-03-18.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-04-09.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
