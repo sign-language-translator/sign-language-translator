@@ -1,9 +1,9 @@
-from typing import Iterable, List, Optional, Sequence, Tuple, Type, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Type, Union
 
 import numpy as np
+import torch
 from numpy.typing import NDArray
 from torch import Tensor
-from torch import long as torch_long
 
 __all__ = [
     "ArrayOps",
@@ -15,53 +15,69 @@ __all__ = [
 
 class ArrayOps:
     @staticmethod
-    def floor(array: Union[NDArray, Tensor]) -> Union[NDArray, Tensor]:
-        if isinstance(array, np.ndarray):
+    def floor(
+        array: Union[NDArray, Tensor, Sequence[Union[float, int]], float, int]
+    ) -> Union[NDArray, Tensor]:
+        if isinstance(array, (np.ndarray, list, tuple, float, int)):
             return np.floor(array)
-        elif isinstance(array, Tensor):
+
+        if isinstance(array, Tensor):
             return array.floor()
-        else:
-            raise TypeError(f"Invalid type for flooring: {type(array)}")
+
+        raise TypeError(f"Invalid type for flooring: {type(array)}")
 
     @staticmethod
-    def ceil(array: Union[NDArray, Tensor]) -> Union[NDArray, Tensor]:
-        if isinstance(array, np.ndarray):
+    def ceil(
+        array: Union[NDArray, Tensor, Sequence[Union[float, int]], float, int]
+    ) -> Union[NDArray, Tensor]:
+        if isinstance(array, (np.ndarray, list, tuple, float, int)):
             return np.ceil(array)
-        elif isinstance(array, Tensor):
+
+        if isinstance(array, Tensor):
             return array.ceil()
-        else:
-            raise TypeError(f"Invalid type for ceiling: {type(array)}")
+
+        raise TypeError(f"Invalid type for ceiling: {type(array)}")
 
     @staticmethod
     def take(
-        array: Union[NDArray, Tensor], index: Union[NDArray, Tensor, List], dim: int = 0
+        array: Union[NDArray, Tensor, List],
+        index: Union[NDArray, Tensor, List, int],
+        dim: int = 0,
     ) -> Union[NDArray, Tensor]:
-        if isinstance(array, np.ndarray):
+        if isinstance(array, (np.ndarray, list, tuple)):
             if not isinstance(index, np.ndarray):
                 index = np.array(index)
             return np.take(array, index.astype(int), axis=dim)
-        elif isinstance(array, Tensor):
+
+        if isinstance(array, Tensor):
             if not isinstance(index, Tensor):
-                index = Tensor(index)
-            return array.index_select(dim, index.type(torch_long))
-        else:
-            raise TypeError(f"Invalid type for taking: {type(array)}")
+                index = torch.tensor(index)
+            return array.index_select(dim, index.type(torch.long))
+
+        raise TypeError(f"Invalid type for taking: {type(array)}")
 
     @staticmethod
     def cast(
-        x: Union[NDArray, Tensor, List, Iterable],
+        x: Union[NDArray, Tensor, Sequence[Union[float, int]]],
         data_type: Type[Union[np.ndarray, Tensor]],
+        _dtype: Optional[Union[Type[torch.dtype], Type[np.dtype], Type]] = None,
     ) -> Union[NDArray, Tensor]:
+
         if data_type == np.ndarray:
-            return np.array(x)
-        elif data_type == Tensor:
-            return Tensor(x)
-        else:
-            raise TypeError(f"Invalid type for array casting: {data_type}")
+            return np.array(x, dtype=_dtype)
+
+        if data_type == Tensor:
+            if isinstance(x, Tensor):
+                type_map: Dict = {int: torch.int64, float: torch.float64}
+                _dtype = type_map.get(_dtype, _dtype)
+                return x.type(_dtype)  # type: ignore
+            return torch.tensor(x, dtype=_dtype)  # type: ignore
+
+        raise ValueError(f"Invalid data_type for array casting: {data_type}")
 
     @staticmethod
     def norm(
-        x: Union[NDArray, Tensor, List, Iterable],
+        x: Union[NDArray, Tensor, Sequence[Union[float, int]]],
         dim: Optional[int] = None,
         keepdim=False,
     ) -> Union[NDArray, Tensor]:
@@ -69,7 +85,7 @@ class ArrayOps:
         Compute the norm of a given array or tensor along a specified dimension.
 
         Args:
-            x (Union[NDArray, Tensor, List, Iterable]): The input array or tensor.
+            x (Union[NDArray, Tensor, Sequence[Union[float, int]]]): The input array or tensor.
             dim (Optional[int]): The dimension along which to compute the norm. If None, the norm is computed over the entire array or tensor. Default is None.
             keepdim (bool): Whether to keep the dimension of the input array or tensor after computing the norm. Default is False.
 
@@ -80,22 +96,23 @@ class ArrayOps:
             TypeError: If the input type is not supported.
         """
 
-        if isinstance(x, np.ndarray):
+        if isinstance(x, (np.ndarray, list, tuple)):
             return np.linalg.norm(x, axis=dim, keepdims=keepdim)  # type: ignore
-        elif isinstance(x, Tensor):
+
+        if isinstance(x, Tensor):
             return x.norm(dim=dim, keepdim=keepdim)
-        else:
-            raise TypeError(f"Invalid type for norm: {type(x)}")
+
+        raise TypeError(f"Invalid type for norm: {type(x)}")
 
     @staticmethod
     def svd(
-        x: Union[NDArray, Tensor, List, Iterable]
+        x: Union[NDArray, Tensor, Sequence[Sequence[Union[float, int]]]]
     ) -> Tuple[Union[NDArray, Tensor], Union[NDArray, Tensor], Union[NDArray, Tensor]]:
         """
         Compute the singular value decomposition of a given array or tensor.
 
         Args:
-            x (Union[NDArray, Tensor, List, Iterable]): The input array or tensor.
+            x (Union[NDArray, Tensor, Sequence[Sequence[Union[float, int]]]]): The input array or tensor.
 
         Returns:
             Tuple[Union[NDArray, Tensor], Union[NDArray, Tensor], Union[NDArray, Tensor]]: The (Rotation, coordinate scaling, reflection) matrices of the input array or tensor.
@@ -104,11 +121,9 @@ class ArrayOps:
             TypeError: If the input type is not supported.
         """
 
-        if not isinstance(x, (List, Iterable)):
-            x = np.array(x)
-
-        if isinstance(x, np.ndarray):
+        if isinstance(x, (np.ndarray, list, tuple)):
             return np.linalg.svd(x)
+
         if isinstance(x, Tensor):
             U, S, V = x.svd()
             return U, S, V.T
@@ -117,13 +132,16 @@ class ArrayOps:
 
     @staticmethod
     def top_k(
-        x: Union[NDArray, Tensor, List, Iterable], k: int, dim: int = -1, largest=True
+        x: Union[NDArray, Tensor, Sequence[Union[float, int]]],
+        k: int,
+        dim: int = -1,
+        largest=True,
     ) -> Tuple[Union[NDArray, Tensor], Union[NDArray, Tensor]]:
         """
         Compute the top k values and their indices along a specified dimension of a given array or tensor.
 
         Args:
-            x (Union[NDArray, Tensor, List, Iterable]): The input array or tensor.
+            x (Union[NDArray, Tensor, Sequence[Union[float, int]]]): The input array or tensor.
             k (int): The number of top values to return.
             dim (int, optional): The dimension along which to compute the top k values. Default is -1.
             largest (bool, optional): Whether to return the largest or smallest k values. Default is True.
@@ -148,6 +166,56 @@ class ArrayOps:
 
         raise TypeError(f"Invalid type for topk: {type(x)}")
 
+    @staticmethod
+    def concatenate(
+        arrays: Union[Sequence[NDArray], Sequence[Tensor]], dim: int = 0
+    ) -> Union[NDArray, Tensor]:
+        """
+        Concatenate a sequence of arrays or tensors along a specified dimension.
+
+        Args:
+            arrays (Union[Sequence[NDArray], Sequence[Tensor]]): The sequence of arrays or tensors to concatenate.
+            dim (int, optional): The dimension along which to concatenate the arrays or tensors. Default is 0.
+
+        Returns:
+            Union[NDArray, Tensor]: The concatenated array or tensor.
+
+        Raises:
+            TypeError: If the input type is not supported.
+        """
+
+        if isinstance(arrays[0], np.ndarray):
+            return np.concatenate(arrays, axis=dim)
+        if isinstance(arrays[0], Tensor):
+            return torch.concatenate(
+                [(x if isinstance(x, Tensor) else torch.tensor(x)) for x in arrays],
+                dim=dim,
+            )
+
+        raise TypeError(f"Invalid type for concatenation: {type(arrays[0])}")
+
+    @staticmethod
+    def abs(x: Union[NDArray, Tensor]) -> Union[NDArray, Tensor]:
+        """
+        Compute the absolute value of a given array or tensor.
+
+        Args:
+            x (Union[NDArray, Tensor]): The input array or tensor.
+
+        Returns:
+            Union[NDArray, Tensor]: The absolute value of the input array or tensor.
+
+        Raises:
+            TypeError: If the input type is not supported.
+        """
+
+        if isinstance(x, np.ndarray):
+            return np.abs(x)
+        if isinstance(x, Tensor):
+            return x.abs()
+
+        raise TypeError(f"Invalid type for absolute value: {type(x)}")
+
 
 def linear_interpolation(
     array: Union[NDArray[np.float64], Tensor, List],
@@ -166,12 +234,9 @@ def linear_interpolation(
 
     Parameters:
         array (NDArray[np.float64] | Tensor): The input array or tensor to interpolate.
-        new_indexes (Sequence[int | float] | None, optional): The new indexes at which to interpolate the data.
-            If None, it infers new_indexes from `old_x` and `new_x`.
-        old_x (Sequence[int | float] | None, optional): The old coordinate values corresponding to the data in `array`.
-            If None, it uses `new_indexes` argument.
-        new_x (Sequence[int | float] | None, optional): The new coordinate values corresponding to the .
-            If None, it uses `new_indexes` argument.
+        new_indexes (Sequence[int | float] | None, optional): The new indexes at which to interpolate the data. If None, it infers new_indexes from `old_x` and `new_x` arguments.
+        old_x (Sequence[int | float] | None, optional): The old coordinate values corresponding to the data in `array`. If None, it uses `new_indexes` argument.
+        new_x (Sequence[int | float] | None, optional): The new coordinate values corresponding to the data in `array`. If None, it uses `new_indexes` argument.
         dim (int, optional): The dimension along which to perform interpolation. Default is 0.
 
     Returns:
@@ -197,41 +262,37 @@ def linear_interpolation(
 
     Note:
         This function supports both NumPy arrays and PyTorch tensors as input.
-
     """
     if isinstance(array, list):
         array = np.array(array)
 
-    indexes_, dim = __validate_linear_interpolation_args(
-        array, new_indexes, old_x, new_x, dim
-    )
+    indexes_, dim = __validate_lin_interp_args(array, new_indexes, old_x, new_x, dim)
 
     # interpolate
-    floor_values = ArrayOps.floor(indexes_)
-    ceiling_values = ArrayOps.ceil(indexes_)
-    fraction = (indexes_ - floor_values).reshape(
+    floored_indexes = ArrayOps.floor(indexes_)
+    ceiled_indexes = ArrayOps.ceil(indexes_)
+    fraction = (indexes_ - floored_indexes).reshape(
         [len(indexes_) if axis == dim else 1 for axis in range(array.ndim)]
     )
 
-    interpolated = ArrayOps.take(array, floor_values, dim) * (1 - fraction)
-    interpolated += ArrayOps.take(array, ceiling_values, dim) * fraction
+    interpolated = ArrayOps.take(array, floored_indexes, dim) * (1 - fraction)
+    interpolated = interpolated + ArrayOps.take(array, ceiled_indexes, dim) * fraction
 
     return interpolated
 
 
-def __validate_linear_interpolation_args(array, new_indexes, old_x, new_x, dim):
+def __validate_lin_interp_args(array, new_indexes, old_x, new_x, dim):
     if (new_indexes is None and (old_x is None or new_x is None)) or (
         new_indexes is not None and (old_x is not None or new_x is not None)
     ):
-        raise ValueError(
-            "Either `new_indexes` or both `old_x` and `new_x` must be provided."
-        )
+        raise ValueError("Provide either `new_indexes` or both `old_x` & `new_x`")
+
     if new_indexes is None:
-        new_indexes = np.interp(new_x, old_x, np.arange(len(old_x)))  # type: ignore
+        new_indexes = np.interp(new_x, old_x, np.arange(len(old_x)))
 
     if not isinstance(array, (np.ndarray, Tensor)):
         array = np.array(array)
-    indexes_ = ArrayOps.cast(new_indexes, type(array))  # type: ignore
+    indexes_ = ArrayOps.cast(new_indexes, type(array))
 
     if indexes_.ndim != 1:
         raise ValueError(
@@ -349,9 +410,8 @@ def align_vectors(
 
     Note:
         This function supports both NumPy arrays and PyTorch tensors as input.
-
+        (Based on: https://github.com/babylonhealth/fastText_multilingual)
     """
-    # https://github.com/babylonhealth/fastText_multilingual
 
     if not isinstance(source_matrix, (np.ndarray, Tensor)):
         source_matrix = np.array(source_matrix)

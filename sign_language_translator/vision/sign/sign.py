@@ -5,10 +5,10 @@ __all__ = [
 ]
 
 from abc import ABC, abstractmethod
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Optional, Union
 
+import torch
 from numpy.typing import NDArray
-from torch import Tensor
 
 
 class Sign(ABC):
@@ -18,7 +18,7 @@ class Sign(ABC):
     @staticmethod
     @abstractmethod
     def name() -> str:
-        """return the name of the sign format"""
+        """the string code of the sign format"""
 
     @abstractmethod
     def show(self, **kwargs) -> None:
@@ -28,11 +28,16 @@ class Sign(ABC):
     def _from_path(self, path: str):
         """load the sign from a path"""
 
-    # _from_dataset
+    # ToDo: def load_asset(cls, label: str, **kwargs) -> Sign:
 
     @abstractmethod
     def _from_data(self, sign_data):
         """load the sign from an object"""
+
+    @classmethod
+    @abstractmethod
+    def load(cls, path: str, **kwargs) -> Sign:
+        """read the sign from a path"""
 
     @staticmethod
     @abstractmethod
@@ -44,7 +49,11 @@ class Sign(ABC):
         """return the sign as a numpy array"""
 
     @abstractmethod
-    def torch(self, *args, **kwargs) -> Tensor:
+    def torch(
+        self,
+        dtype: Optional[torch.dtype] = None,
+        device: Union[torch.device, str, None] = None,
+    ) -> torch.Tensor:
         """return the sign as a torch tensor"""
 
     @abstractmethod
@@ -52,5 +61,5 @@ class Sign(ABC):
         """apply some transformation to the sign to change its appearance"""
 
     @abstractmethod
-    def save(self, path: str, *args, **kwargs) -> None:
+    def save(self, path: str, **kwargs) -> None:
         """save the sign to a path"""

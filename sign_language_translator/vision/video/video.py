@@ -50,12 +50,11 @@ class Video(Sign, VideoFrames):
 
         # ToDo: use list of sources instead of linked list of videos.
         # source
-        self.source: VideoFrames
+        self._source = None
         self.__next: Optional[Video] = None
 
         # play
         self._source_start_index: int = 0
-        self._source_end_index: int
         # TODO: handle len & end_index for ||step|| > 1
         self._default_step_size: int = 1
         self.transformations: List[Callable] = []
@@ -63,9 +62,9 @@ class Video(Sign, VideoFrames):
         # properties
         self.fps: float = 30.0
         self.fourcc: int = cv2.VideoWriter_fourcc(*"XVID")  # type: ignore
-        self._height: int
-        self._width: int
-        self._n_channels: int
+        self._height = None
+        self._width = None
+        self._n_channels = None
 
         self.__initialize_from_arguments(sign, **kwargs)
         # TODO: from URL
@@ -269,12 +268,6 @@ class Video(Sign, VideoFrames):
         """
 
         return torch.tensor(self.numpy(), *args, **kwargs)
-
-    def __torch_function__(self, func, types, args=(), kwargs=None):
-        if func is torch.Tensor or func is torch.tensor:
-            dtype = kwargs.pop("dtype", torch.uint8)  # type: ignore
-            return torch.tensor(self.numpy(), dtype=dtype, *args, **kwargs)  # type: ignore
-        return NotImplemented
 
     # ========================== #
     #    Display / show frame    #
@@ -486,14 +479,20 @@ class Video(Sign, VideoFrames):
 
     @property
     def height(self) -> int:
+        if self._height is None:
+            raise ValueError("self._height is not defined.")
         return self._height
 
     @property
     def width(self) -> int:
+        if self._width is None:
+            raise ValueError("self._width is not defined.")
         return self._width
 
     @property
     def n_channels(self) -> int:
+        if self._n_channels is None:
+            raise ValueError("self._n_channels is not defined.")
         return self._n_channels
 
     @property
@@ -506,7 +505,8 @@ class Video(Sign, VideoFrames):
         return len(self) / self.fps if self.fps else float("inf")
 
     @property
-    def length(self) -> int:
+    def n_frames(self) -> int:
+        """The number of frames in the video."""
         return len(self)
 
     # ================== #
@@ -647,8 +647,8 @@ class Video(Sign, VideoFrames):
     #    Initialize Video object    #
     # ============================= #
 
-    @staticmethod
-    def load(path: str, **kwargs) -> Video:
+    @classmethod
+    def load(cls, path: str, **kwargs) -> Video:
         """
         Load a video from the specified path.
 
@@ -659,7 +659,7 @@ class Video(Sign, VideoFrames):
         Returns:
             Video: The loaded video object.
         """
-        return Video(path, **kwargs)
+        return cls(path, **kwargs)
 
     def __initialize_from_arguments(self, sign, **kwargs):
         if isinstance(sign, str):
@@ -746,6 +746,21 @@ class Video(Sign, VideoFrames):
         """load the frames from a read-once iterable such as a generator."""
         self.source = IterableFrames(frames_iterable, total_frames, **kwargs)
         self.__extract_properties_from_source(self.source)
+
+    @property
+    def source(self) -> VideoFrames:
+        """A VideoFrames object which wraps around a frame sequence."""
+        if self._source is None:
+            raise ValueError("Video source is not set.")
+        return self._source
+
+    @source.setter
+    def source(self, source: VideoFrames):
+        if not isinstance(source, VideoFrames):
+            raise ValueError(
+                f"Invalid source type: {type(source)}. Should be slt.vision.video.VideoFrames"
+            )
+        self._source = source
 
     # ============================= #
     #    Cleaning / with _ as _:    #

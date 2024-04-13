@@ -22,9 +22,11 @@ def get_sign_wrapper_class(sign_code: str) -> Type[Sign]:
         ValueError: If no Sign wrapper class is known for the provided code.
     """
 
+    from sign_language_translator.vision.landmarks.landmarks import Landmarks
     from sign_language_translator.vision.video.video import Video
 
     code_to_class = {
+        SignFormats.LANDMARKS.value: Landmarks,
         SignFormats.VIDEO.value: Video,
     }
 

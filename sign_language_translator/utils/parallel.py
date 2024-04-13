@@ -18,7 +18,7 @@ def threaded_map(
     args_list: Iterable,
     time_delay=0.02,
     timeout: Optional[float] = None,
-    max_n_threads=None,
+    max_n_threads: Optional[int] = None,
     progress_bar=True,
     leave=True,
 ):

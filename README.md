@@ -544,6 +544,8 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
         ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/_utils.py">_utils.py</a>
         ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/utils.py">utils.py</a>
         ├── landmarks
+        │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/landmarks/landmarks.py">landmarks.py</a> <sub><sup>wrapper for sequence of collection of points on body</sup></sub>
+        │
         ├── sign
         │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/sign/sign.py">sign.py</a> <sub><sup>Base class to wrap around sign clips</sup></sub>
         │
@@ -607,7 +609,7 @@ Stay Tuned!
 <summary>LANDMARKS_WRAPPER: v0.8</summary>
 
 ```python
-# 0.8.0: landmarks wrapper class (load, save, convert, display, copy)
+# 0.8.0: landmarks wrapper class (load_asset, display, copy, docs_theme)
 # 0.8.1: landmark augmentation (zoom, rotate, move, noise, duration, rectify, stabilize)
 # 0.8.2: trim signs before concatenation, insert transition frames
 
@@ -701,7 +703,7 @@ Servers / Product
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-04-09.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-04-13.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
@@ -718,7 +720,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **10,731** + Tests: **1,822**):
+Count total number of **lines of code** (Package: **11,339** + Tests: **2,100**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

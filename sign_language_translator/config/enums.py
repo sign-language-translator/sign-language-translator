@@ -113,17 +113,21 @@ class SignFormats(Enum, metaclass=PrintableEnumMeta):
 
     Attributes:
         - VIDEO (str): Short code for raw video.
+        - LANDMARKS (str): Short code for body landmarks.
         - MEDIAPIPE_LANDMARKS (str): Short code for MediaPipe Pose & Hand landmarks.
         ...
     """
 
     # raw video
     VIDEO = "video"
-    """sequence of numpy frames (num_frames, height, width, num_channels)"""
+    """sequence of RGB frames (num_frames, height, width, num_channels)"""
 
     # Body Landmarks
-    MEDIAPIPE_LANDMARKS = "mediapipe-landmarks"
-    """3d world coordinates (x,y,z,[visibility, presence]) and/or 2d image coordinates (x,y,depth,[visibility, presence])"""
+    LANDMARKS = "landmarks"
+    """3D coordinates of points on the body (n_frames, n_points, n_coordinates)"""
+
+    # MEDIAPIPE_LANDMARKS = "mediapipe-landmarks"
+    # """3d world coordinates (x,y,z,[visibility, presence]) and/or 2d image coordinates (x,y,depth,[visibility, presence])"""
 
     # Body Mesh Grid
 
@@ -270,6 +274,11 @@ def normalize_short_code(short_code: Union[str, Enum]) -> str:
             "vid",
             "videos",
             "vids",
+        },
+        SignFormats.LANDMARKS.value: {
+            "landmark",
+            "lmrks",
+            "lmrk",
         },
         ModelCodes.NGRAM_LM_UNIGRAM_NAMES.value: {
             "unigram-names",

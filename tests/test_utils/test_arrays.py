@@ -10,20 +10,18 @@ from sign_language_translator.utils.arrays import (
 
 
 def test_linear_interpolation():
-    array = np.array(
+    array = [
         [
-            [
-                [0, 1, 2, 3],
-                [4, 5, 6, 7],
-                [8, 9, 10, 11],
-            ],
-            [
-                [12, 13, 14, 15],
-                [16, 17, 18, 19],
-                [20, 21, 22, 23],
-            ],
-        ]
-    )
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+            [8, 9, 10, 11],
+        ],
+        [
+            [12, 13, 14, 15],
+            [16, 17, 18, 19],
+            [20, 21, 22, 23],
+        ],
+    ]
 
     # test intermediate frames
     indices = [0, 0.2, 0.5]
@@ -53,22 +51,21 @@ def test_linear_interpolation():
     old_x = np.array([3, 5, 9])
     new_x = [4, 7.7, 9]
     new_array = linear_interpolation(torch.Tensor(array), old_x=old_x, new_x=new_x, dim=1)  # type: ignore
-    assert new_array.isclose(  # type: ignore
-        torch.Tensor(
+    expected_array = torch.Tensor(
+        [
             [
-                [
-                    [2.0, 3.0, 4.0, 5.0],
-                    [6.7, 7.7, 8.7, 9.7],
-                    [8.0, 9.0, 10.0, 11.0],
-                ],
-                [
-                    [14.0, 15.0, 16.0, 17.0],
-                    [18.7, 19.7, 20.7, 21.7],
-                    [20.0, 21.0, 22.0, 23.0],
-                ],
-            ]
-        )
-    ).all()
+                [2.0, 3.0, 4.0, 5.0],
+                [6.7, 7.7, 8.7, 9.7],
+                [8.0, 9.0, 10.0, 11.0],
+            ],
+            [
+                [14.0, 15.0, 16.0, 17.0],
+                [18.7, 19.7, 20.7, 21.7],
+                [20.0, 21.0, 22.0, 23.0],
+            ],
+        ]
+    )
+    assert (ArrayOps.abs(new_array - expected_array) < 1e-4).all()
 
     try:
         linear_interpolation(array, new_indexes=indices, old_x=old_x, dim=2)  # type: ignore
@@ -98,10 +95,29 @@ def test_array_ops():
     _, indices = ArrayOps.top_k(array, 3)
     assert set(indices.tolist()) == {1, 4, 0}
 
+    # test abs
+    assert (ArrayOps.abs(torch.Tensor([-1, 0, 1])) == torch.Tensor([1, 0, 1])).all()
+    assert (ArrayOps.abs(np.array([-1, 0, 1.1])) == np.array([1, 0, 1.1])).all()
+
+    # test concatenate
+    tensor_1 = torch.Tensor([1, 2])
+    tensor_2 = torch.Tensor([3, 4])
+    assert (ArrayOps.concatenate([tensor_1, tensor_2]) == torch.arange(1, 5)).all()
+
+    # test svd
+    original = [[1, 2], [3, 4]]
+    U, S, V = ArrayOps.svd(original)
+    reconstructed = U @ np.diag(S) @ V
+    assert (np.abs(reconstructed - np.array(original)) < 1e-4).all()
+
+    # test take
+    assert (ArrayOps.take([1, 2, 3], [0, 2]) == [1, 3]).all()
+    assert (ArrayOps.take(torch.Tensor([1, 2, 3]), 0) == torch.Tensor([1])).all()
+
 
 def test_adjust_vector_angle():
-    v1 = np.array([1, 1])
-    v2 = np.array([1, -1])
+    v1 = [1, 1]
+    v2 = [1, -1]
 
     #   |  ,· (1, 1)           [v1]
     #   | /,· (1, 1/sqrt(3))   [new_v1]
@@ -143,11 +159,13 @@ def test_adjust_vector_angle():
 
 def test_align_vectors():
     # Define source and target matrices
-    source_matrix = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
-    target_matrix = np.array([[2.0, 1.0], [4.0, 3.0], [6.0, 5.0]])
+    source_vectors = [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]
+    target_vectors = [[2.0, 1.0], [4.0, 3.0], [6.0, 5.0]]
+    source_matrix = np.array(source_vectors)
+    target_matrix = np.array(target_vectors)
 
     # Call the function
-    alignment = align_vectors(source_matrix, target_matrix, pre_normalize=True)
+    alignment = align_vectors(source_vectors, target_vectors, pre_normalize=True)  # type: ignore
 
     # Check if the result matrix has the correct shape
     assert tuple(alignment.shape) == (source_matrix.shape[1], target_matrix.shape[1])
@@ -167,3 +185,49 @@ def test_align_vectors():
     alignment = align_vectors(source_matrix, target_matrix, pre_normalize=True)
     assert tuple(alignment.shape) == (2, 2)
     assert alignment.allclose(torch.tensor([[0.0, 1.0], [1.0, 0.0]]), atol=1e-6)  # type: ignore
+
+
+def test_array_ops_validation():
+
+    try:
+        ArrayOps.floor("4.5")  # type: ignore
+    except TypeError:
+        pass
+    try:
+        ArrayOps.ceil("4.5")  # type: ignore
+    except TypeError:
+        pass
+
+    try:
+        ArrayOps.take("[1, 2]", 1)  # type: ignore
+    except TypeError:
+        pass
+
+    try:
+        ArrayOps.cast([1, 2, 3], str)  # type: ignore
+    except ValueError:
+        pass
+    try:
+        ArrayOps.norm("str")  # type: ignore
+    except TypeError:
+        pass
+
+    try:
+        ArrayOps.svd("[[1,2],[3,4]]")  # type: ignore
+    except TypeError:
+        pass
+
+    try:
+        ArrayOps.top_k("str", 2)  # type: ignore
+    except TypeError:
+        pass
+
+    try:
+        ArrayOps.concatenate([1, 2])  # type: ignore
+    except TypeError:
+        pass
+
+    try:
+        ArrayOps.abs(1)  # type: ignore
+    except TypeError:
+        pass
