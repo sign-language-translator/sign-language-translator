@@ -28,8 +28,6 @@ class Sign(ABC):
     def _from_path(self, path: str):
         """load the sign from a path"""
 
-    # ToDo: def load_asset(cls, label: str, **kwargs) -> Sign:
-
     @abstractmethod
     def _from_data(self, sign_data):
         """load the sign from an object"""
@@ -39,10 +37,17 @@ class Sign(ABC):
     def load(cls, path: str, **kwargs) -> Sign:
         """read the sign from a path"""
 
+    @classmethod
+    @abstractmethod
+    def load_asset(
+        cls, label: str, archive_name: Optional[str] = None, **kwargs
+    ) -> Sign:
+        """load a sign asset from a dataset"""
+
     @staticmethod
     @abstractmethod
     def concatenate(objects: Iterable[Sign]) -> Sign:
-        """concatenate multiple signs"""
+        """concatenate multiple signs in time dimension"""
 
     @abstractmethod
     def numpy(self, *args, **kwargs) -> NDArray:

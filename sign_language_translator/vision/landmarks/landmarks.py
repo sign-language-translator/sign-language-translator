@@ -20,16 +20,22 @@ Example:
 
 from __future__ import annotations
 
+__all__ = [
+    "Landmarks",
+]
+
 import os
 from os.path import basename
 from string import ascii_letters, digits
 from typing import Callable, Iterable, List, Optional, Sequence, Tuple, Union
+from warnings import warn
 
 import numpy as np
 import torch
 from numpy.typing import NDArray
 from torch import Tensor
 
+from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import SignFormats
 from sign_language_translator.utils.arrays import ArrayOps
 from sign_language_translator.vision.sign.sign import Sign
@@ -127,6 +133,14 @@ class Landmarks(Sign):
 
         Returns:
             NDArray: The sign data as a NumPy array.
+
+        Example:
+            .. code-block:: python
+            import sign_language_translator as slt
+
+            landmarks = slt.Landmarks([[[0,1,2], [1,2,3]]])
+            landmarks.numpy()
+            # array([[[0, 1, 2], [1, 2, 3]]])
         """
         return np.array(self, *args, **kwargs)
 
@@ -222,8 +236,8 @@ class Landmarks(Sign):
         if not overwrite and os.path.exists(path):
             raise FileExistsError(f"File already exists: '{path}' (Use overwrite=True)")
 
-        if (dir_name := os.path.dirname(path)) not in ("", ".", ".."):
-            os.makedirs(dir_name, exist_ok=True)
+        path = os.path.abspath(path)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
 
         if (file_format := path.rsplit(".", 1)[-1].lower()) == "csv":
             np.savetxt(
@@ -246,6 +260,84 @@ class Landmarks(Sign):
     # ========== #
     #    Load    #
     # ========== #
+
+    @classmethod
+    def load(cls, path: str, **kwargs) -> Landmarks:
+        """Class method to load landmarks data from a file and return a new Landmarks object.
+        The supported file extensions are `.npy` & `.pt` with must contain 3D arrays (n_frames, n_landmarks, n_features)
+        and `.csv` which must have `n_frames` rows and `n_landmarks * n_features` columns.
+
+        The header row in `.csv` is optional if the filename contains the name of a supported embedding model (see `load_asset` function for example models).
+        The columns in the .csv are expected to be in the format: [<axis-letter><landmark-number>,...] (e.g. x0, y0, z0, x1, y1, z1, ..., xn, yn, zn).
+        Possible axis-letters: x, y, z, a-w, aa-zz, ... (only the first 3 are required to be in that order).
+
+        Args:
+            path (str): The file path to load the data from.
+
+        Returns:
+            Landmarks: A new Landmarks object containing the loaded data.
+        """
+        return cls(path, **kwargs)
+
+    @classmethod
+    def load_asset(
+        cls,
+        label: str,
+        archive_name: Optional[str] = None,
+        overwrite=False,
+        progress_bar=True,
+        leave=True,
+        **kwargs,
+    ) -> Landmarks:
+        """Class method to load a landmarks file from a one-time-auto-downloaded dataset archive
+        and return a new Landmarks object.
+
+        Args:
+            label (str): The filename of the landmarks asset to load. 'landmarks/' is prepended to the label if it does not start with it. An example is 'landmarks/pk-hfad-1_airport.landmarks-mediapipe.csv') for embedding of a dictionary video. General syntax is `landmarks/country-organization-number_text[_person_camera].landmarks-model.extension`.
+            archive_name (Optional[str], optional): The name of the archive which contains the landmarks asset. If None, the archive name is inferred from the label. An example is `datasets/pk-hfad-1.landmarks-mediapipe-csv.zip`. General syntax is `datasets/country-organization-number[_person_camera].landmarks-model-extension.zip`. Defaults to None.
+            overwrite (bool, optional): Whether to overwrite the landmarks asset if it is already extracted. Defaults to False.
+            progress_bar (bool, optional): Whether to display a progress bar while downloading the archive or extracting the asset. Defaults to True.
+            leave (bool, optional): Whether to leave the progress bar after the operation is complete. Defaults to True.
+            **kwargs: Additional keyword arguments to be passed to the Landmarks constructor.
+
+        Raises:
+            FileNotFoundError: If no landmarks assets are found for the given label.
+
+        Warns:
+            UserWarning: If multiple landmarks assets match the given label and the only first asset is used.
+
+        Returns:
+            Landmarks: An instance of the Landmarks class representing the dataset video embedding that matched the label.
+
+        Example:
+            .. code-block:: python
+                import sign_language_translator as slt
+
+                # Load a dictionary video's landmark embedding asset
+                landmarks = slt.Landmarks.load_asset("pk-hfad-1_airplane.landmarks-mediapipe.csv")
+
+                # Load a replication video's landmarks from the built-in datasets
+                landmarks = slt.Landmarks.load_asset("landmarks/pk-hfad-1_airplane_dm0001_front.landmarks-mediapipe.csv", archive_name="datasets/pk-hfad-1_dm0001_front.landmarks-mediapipe-csv.zip")
+        """
+
+        if "/" not in label:
+            label = f"landmarks/{label}"
+
+        paths = Assets.extract(
+            label,
+            archive_name_or_regex=archive_name,
+            download_archive=True,
+            overwrite=overwrite,
+            progress_bar=progress_bar,
+            leave=leave,
+        )
+
+        if len(paths) == 0:
+            raise FileNotFoundError(f"No landmarks assets found for '{label}'")
+        if len(paths) > 1:
+            warn(f"Multiple landmarks assets matched '{label}'. Using first of:{paths}")
+
+        return cls.load(paths[0], **kwargs)
 
     def __initialize_from_arguments(
         self,
@@ -281,29 +373,6 @@ class Landmarks(Sign):
                 "Unsupported type for sign argument. provide a path (csv, npy, pt, pth)"
                 " or an array of shape (n_frames, n_landmarks, n_coordinates)"
             )
-
-    @classmethod
-    def load(cls, path: str, **kwargs) -> Landmarks:
-        """Class method to load landmarks data from a file and return a new Landmarks object.
-        The supported file extensions are `.npy` & `.pt` with must contain 3D arrays (n_frames, n_landmarks, n_features)
-        and `.csv` which must have `n_frames` rows and `n_landmarks * n_features` columns.
-
-        The header row in `.csv` is optional if the filename contains the name of a supported embedding model (see our `load_asset` for examples).
-        The columns in the .csv are expected to be in the format: [<axis-letter><landmark-number>,...] (e.g. x0, y0, z0, x1, y1, z1, ..., xn, yn, zn).
-        Possible axis-letters: x, y, z, a-w, aa-zz, ... (only the first 3 are required to be in that order).
-
-        Args:
-            path (str): The file path to load the data from.
-
-        Returns:
-            Landmarks: A new Landmarks object containing the loaded data.
-        """
-        return cls(path, **kwargs)
-
-    @classmethod
-    def load_asset(cls, label: str, **kwargs) -> Landmarks:
-        # ToDo: [down]load from dataset | extract from archive
-        raise NotImplementedError()
 
     def _from_path(self, path: str):
         """Read the file specified by the provided path and load all required data into the current object.

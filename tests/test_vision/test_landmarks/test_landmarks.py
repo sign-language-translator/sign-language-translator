@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import pytest
 import torch
 
 from sign_language_translator.config.assets import Assets
@@ -19,7 +20,8 @@ def test_landmarks_initialization_from_data():
     _ = Landmarks(np.array(data))
     _ = Landmarks(torch.tensor(data))
     _ = Landmarks([np.array(data[0])])
-    _ = Landmarks([torch.tensor(data[0])])
+    x = Landmarks([torch.tensor(data[0])])
+    assert ((x.torch(torch.float32) - torch.Tensor([data[0]])).abs() < 1e-6).all()
 
     # test casting
     assert landmarks.tolist() == data
@@ -104,6 +106,13 @@ def test_landmarks_load_and_save():
         assert header[-1][-1] == "4"
         assert header[27] == "ab0"
 
+    # .load_asset
+    loaded_landmarks = Landmarks.load_asset(
+        "xx-shapes-1_square.landmarks-testmodel.csv", overwrite=True
+    )
+    assert loaded_landmarks.n_landmarks == 4
+    assert loaded_landmarks.n_features == 3
+
     # NPY
     landmarks.save(npy_path := os.path.join("temp", "landmarks.npy"), overwrite=True)
     loaded_landmarks = Landmarks.load(npy_path)
@@ -143,59 +152,51 @@ def test_landmarks_validation():
         f.write("1,0,2,1,3,2,4,3\n")
         f.write("1,0,2,1,3,2,4,3\n")
 
-    try:
+    with pytest.raises(FileExistsError):
         landmarks.save(path, overwrite=False)
-    except FileExistsError:
-        pass
 
-    try:
+    with pytest.raises(ValueError) as exc_info:  # unsupported extension
         landmarks.save("landmarks.tar.gz")
-    except ValueError:  # unsupported extension
-        pass
+    assert "unsupported file format" in str(exc_info.value).lower()
 
     # LOAD
 
-    try:
+    with pytest.raises(ValueError):  # no header or model name in filename
         _ = Landmarks(path)
-    except ValueError:  # no header or model name in filename
-        pass
 
-    try:
+    with pytest.raises(ValueError) as exc_info:  # unsupported extension
         _ = Landmarks("landmarks.tar.gz")
-    except ValueError:  # unsupported extension
-        pass
+    assert "unsupported file format" in str(exc_info.value).lower()
 
-    try:
+    with pytest.raises(TypeError):
         _ = Landmarks({"frame_1": [1, 2, 3], "frame_2": [4, 5, 6]})  # type: ignore
-    except TypeError:
-        pass
 
-    try:
+    with pytest.raises(ValueError):  # unknown format
         _ = Landmarks([["1,2,3", "2,3,4"]])  # type: ignore
-    except ValueError:  # unknown format
-        pass
-    try:
+
+    with pytest.raises(ValueError):
         _ = Landmarks(
             [
                 {"landmark_1": "1,2,3", "landmark_2": "4,2,3"},
                 {"landmark_1": "2,3,4", "landmark_2": "5,2,3"},  # type: ignore
             ]
         )
-    except ValueError:
-        pass
 
     four_d_data = np.array([[[[1, 2, 3], [2, 3, 4]], [[1, 2, 3], [2, 3, 4]]]])
-    try:
+    with pytest.raises(ValueError):
         _ = Landmarks(four_d_data)  # type: ignore
-    except ValueError:
-        pass
-    try:
-        landmarks.data = four_d_data
-    except ValueError:
-        pass
 
-    try:
+    with pytest.raises(ValueError):
+        landmarks.data = four_d_data
+
+    with pytest.raises(ValueError):  # no data
         setattr(landmarks, "_data", None)
         getattr(landmarks, "data")
-    except ValueError:  # no data
-        pass
+
+    with pytest.warns(UserWarning) as record:
+        Landmarks.load_asset(r"xx-shapes-1_.*.landmarks-testmodel.csv", overwrite=True)
+    assert len(record) == 1
+    assert "multiple" in str(record[0].message).lower()
+
+    with pytest.raises(FileNotFoundError):
+        Landmarks.load_asset(r"xx-shapes-1_.^.landmarks-testmodel.csv", overwrite=True)

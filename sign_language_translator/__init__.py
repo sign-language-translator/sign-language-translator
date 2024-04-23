@@ -19,7 +19,7 @@ Usage
     # (by default, resources are auto-downloaded within the install directory)
     # slt.Assets.set_root_dir("path/to/folder")  # Helps preventing duplication across environments or using cloud synced data
     # slt.Assets.download(r".*.json")  # downloads into asset_dir
-    # print(slt.Settings.FILE_TO_URL.keys())  # All downloadable resources
+    # print(slt.Assets.FILE_TO_URL.keys())  # All downloadable resources
 
     print("All available models:")
     print(list(slt.ModelCodes))  # slt.ModelCodeGroups
@@ -44,7 +44,8 @@ Usage
 
     # -------------------------- TRANSLATE: sign to text --------------------------
 
-    sign = slt.Video("video.mp4")
+    sign = slt.Video("path/to/video.mp4")
+    sign = slt.Video.load_asset("videos/pk-hfad-1_program.mp4")  # downloads, reads and displays a dataset file
     sign.show_frames_grid()
 
     # Extract Pose Vector for feature reduction

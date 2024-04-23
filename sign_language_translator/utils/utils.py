@@ -143,6 +143,9 @@ class PrintableEnumMeta(EnumMeta):
     def __repr__(cls) -> str:
         return str(cls)
 
+    def __contains__(cls, item) -> bool:
+        return item in cls._value2member_map_
+
 
 class ProgressStatusCallback:
     """

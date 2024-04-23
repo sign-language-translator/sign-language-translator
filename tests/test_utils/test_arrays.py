@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import torch
 
 from sign_language_translator.utils.arrays import (
@@ -67,14 +68,12 @@ def test_linear_interpolation():
     )
     assert (ArrayOps.abs(new_array - expected_array) < 1e-4).all()
 
-    try:
-        linear_interpolation(array, new_indexes=indices, old_x=old_x, dim=2)  # type: ignore
-    except ValueError:
-        pass
-    try:
-        linear_interpolation(array, new_indexes=indices, dim=6)  # type: ignore
-    except ValueError:
-        pass
+    with pytest.raises(ValueError):
+        linear_interpolation(array, new_indexes=indices, old_x=old_x, dim=2)
+
+    with pytest.raises(ValueError) as exc_info:
+        linear_interpolation(array, new_indexes=indices, dim=6)
+    assert "invalid dim" in str(exc_info.value).lower()
 
 
 def test_array_ops():
@@ -189,45 +188,29 @@ def test_align_vectors():
 
 def test_array_ops_validation():
 
-    try:
+    with pytest.raises(TypeError):
         ArrayOps.floor("4.5")  # type: ignore
-    except TypeError:
-        pass
-    try:
+
+    with pytest.raises(TypeError):
         ArrayOps.ceil("4.5")  # type: ignore
-    except TypeError:
-        pass
 
-    try:
+    with pytest.raises(TypeError):
         ArrayOps.take("[1, 2]", 1)  # type: ignore
-    except TypeError:
-        pass
 
-    try:
+    with pytest.raises(ValueError):
         ArrayOps.cast([1, 2, 3], str)  # type: ignore
-    except ValueError:
-        pass
-    try:
+
+    with pytest.raises(TypeError):
         ArrayOps.norm("str")  # type: ignore
-    except TypeError:
-        pass
 
-    try:
+    with pytest.raises(TypeError):
         ArrayOps.svd("[[1,2],[3,4]]")  # type: ignore
-    except TypeError:
-        pass
 
-    try:
+    with pytest.raises(TypeError):
         ArrayOps.top_k("str", 2)  # type: ignore
-    except TypeError:
-        pass
 
-    try:
+    with pytest.raises(TypeError):
         ArrayOps.concatenate([1, 2])  # type: ignore
-    except TypeError:
-        pass
 
-    try:
+    with pytest.raises(TypeError):
         ArrayOps.abs(1)  # type: ignore
-    except TypeError:
-        pass

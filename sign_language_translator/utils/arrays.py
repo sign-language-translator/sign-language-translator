@@ -218,10 +218,10 @@ class ArrayOps:
 
 
 def linear_interpolation(
-    array: Union[NDArray[np.float64], Tensor, List],
-    new_indexes: Optional[Sequence[Union[int, float]]] = None,
-    old_x: Optional[Sequence[Union[int, float]]] = None,
-    new_x: Optional[Sequence[Union[int, float]]] = None,
+    array: Union[NDArray[np.number], Tensor, List],
+    new_indexes: Union[Sequence[Union[int, float]], NDArray, Tensor, None] = None,
+    old_x: Union[Sequence[Union[int, float]], NDArray[np.number], Tensor, None] = None,
+    new_x: Union[Sequence[Union[int, float]], NDArray[np.number], Tensor, None] = None,
     dim: int = 0,
 ) -> Union[NDArray, Tensor]:
     """
@@ -233,10 +233,10 @@ def linear_interpolation(
     and a dimension along which to perform interpolation.
 
     Parameters:
-        array (NDArray[np.float64] | Tensor): The input array or tensor to interpolate.
-        new_indexes (Sequence[int | float] | None, optional): The new indexes at which to interpolate the data. If None, it infers new_indexes from `old_x` and `new_x` arguments.
-        old_x (Sequence[int | float] | None, optional): The old coordinate values corresponding to the data in `array`. If None, it uses `new_indexes` argument.
-        new_x (Sequence[int | float] | None, optional): The new coordinate values corresponding to the data in `array`. If None, it uses `new_indexes` argument.
+        array (NDArray[np.number] | Tensor | List): The input array or tensor to interpolate.
+        new_indexes (Sequence[int | float] | NDArray[np.number] | Tensor | None, optional): The new indexes at which to interpolate the data. If None, it infers new_indexes from `old_x` and `new_x` arguments.
+        old_x (Sequence[int | float] | NDArray[np.number] | Tensor | None, optional): The old coordinate values corresponding to the data in `array`. If None, it uses `new_indexes` argument.
+        new_x (Sequence[int | float] | NDArray[np.number] | Tensor | None, optional): The new coordinate values corresponding to the data in `array`. If None, it uses `new_indexes` argument.
         dim (int, optional): The dimension along which to perform interpolation. Default is 0.
 
     Returns:

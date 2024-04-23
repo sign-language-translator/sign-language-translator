@@ -109,5 +109,5 @@ def download(
         return True
 
     except requests.exceptions.RequestException as e:
-        warn(f"Download Failed: {str(e)}")
+        warn(f"Download of '{file_path}' failed: ({str(e)})")
         return False

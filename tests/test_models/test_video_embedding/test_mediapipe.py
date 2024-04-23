@@ -1,3 +1,5 @@
+import pytest
+
 from sign_language_translator.config.assets import Assets
 from sign_language_translator.models import MediaPipeLandmarksModel
 from sign_language_translator.vision.utils import read_frames_with_opencv
@@ -12,10 +14,8 @@ def test_mediapipe_embedding():
     model = MediaPipeLandmarksModel()
     landmarks = model.embed(frames, landmark_type="all")
 
-    try:
+    with pytest.raises(ValueError):
         landmarks = model.embed(frames, landmark_type="3D")
-    except ValueError:
-        pass
 
     assert landmarks.shape[0] == len(frames)
     assert landmarks.shape[-1] == (33 + 21 * 2) * 5 * 2
