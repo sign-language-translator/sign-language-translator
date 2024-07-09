@@ -2,7 +2,7 @@
 sign_language_translator
 ========================
 Code: https://github.com/sign-language-translator/sign-language-translator
-Help: https://sign-language-translator.readthedocs.io
+Help: https://slt.readthedocs.io
 Demo: https://huggingface.co/sltAI
 
 This project is an effort to bridge the communication gap between the hearing and the hearing-impaired community using Artificial Intelligence.

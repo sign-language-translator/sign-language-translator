@@ -26,7 +26,7 @@ def test_linear_interpolation():
 
     # test intermediate frames
     indices = [0, 0.2, 0.5]
-    new_array = linear_interpolation(array, new_indexes=indices, dim=0)
+    new_array = linear_interpolation(array, indices, dim=0)
     expected_array = np.array(
         [
             [
@@ -51,7 +51,7 @@ def test_linear_interpolation():
     # test intermediate rows
     old_x = np.array([3, 5, 9])
     new_x = [4, 7.7, 9]
-    new_array = linear_interpolation(torch.Tensor(array), old_x=old_x, new_x=new_x, dim=1)  # type: ignore
+    new_array = linear_interpolation(torch.Tensor(array), new_x, old_x=old_x, dim=1)  # type: ignore
     expected_array = torch.Tensor(
         [
             [
@@ -68,11 +68,64 @@ def test_linear_interpolation():
     )
     assert (ArrayOps.abs(new_array - expected_array) < 1e-4).all()
 
-    with pytest.raises(ValueError):
-        linear_interpolation(array, new_indexes=indices, old_x=old_x, dim=2)
+    # test negative dimension
+    new_array = linear_interpolation(torch.Tensor(array), new_x, old_x=old_x, dim=-2)  # type: ignore
+    assert (ArrayOps.abs(new_array - expected_array) < 1e-4).all()
 
+    # test negative indexes
+    indexes = torch.Tensor([0, -1, 1, -2, 0, -1.5])
+    new_array = linear_interpolation(np.array(array), indexes, dim=-3)
+    assert (new_array[:-1] == np.array(array)[indexes[:-1].long()]).all()
+    assert (new_array[-1] == (np.array(array)[-2] + np.array(array)[-1]) / 2).all()
+
+    # test negative x
+    old_x = np.array([-4, 4])
+    new_x = np.array([0, -2, 2])
+    new_array = linear_interpolation(array, new_x, old_x=old_x, dim=0)
+    expected_array = np.array(
+        [
+            [[6, 7, 8, 9], [10, 11, 12, 13], [14, 15, 16, 17]],
+            [[3, 4, 5, 6], [7, 8, 9, 10], [11, 12, 13, 14]],
+            [[9, 10, 11, 12], [13, 14, 15, 16], [17, 18, 19, 20]],
+        ]
+    )
+    assert (new_array == expected_array).all()
+
+    # test descending x
+    old_x = np.array([3, 2, 1, 0])
+    new_x = np.array([0.5, 2.5, 1.5])
+    new_array = linear_interpolation(array, new_x, old_x=old_x, dim=2)
+    expected_array = np.array(
+        [
+            [[2.5, 0.5, 1.5], [6.5, 4.5, 5.5], [10.5, 8.5, 9.5]],
+            [[14.5, 12.5, 13.5], [18.5, 16.5, 17.5], [22.5, 20.5, 21.5]],
+        ]
+    )
+    assert (new_array == expected_array).all()
+
+    # test unordered old_x
+    old_x = np.array([3, 1, 2])
+    new_x = np.array([2.5, 1.5])
     with pytest.raises(ValueError) as exc_info:
-        linear_interpolation(array, new_indexes=indices, dim=6)
+        linear_interpolation(array, new_x, old_x=old_x, dim=1)
+    assert "sorted" in str(exc_info.value).lower()
+
+    # test out of range index
+    indices = [0, 1, 2, -2, -3]
+    with pytest.raises(ValueError) as exc_info:
+        linear_interpolation(array, indices, dim=0)
+    assert "range" in str(exc_info.value).lower()
+
+    # test out of range x
+    old_x = np.array([0, 1, 2])
+    new_x = np.array([2.5, 1.5, -1])
+    with pytest.raises(ValueError) as exc_info:
+        linear_interpolation(array, new_x, old_x=old_x, dim=1)
+    assert "range" in str(exc_info.value).lower()
+
+    # test out of range dim
+    with pytest.raises(ValueError) as exc_info:
+        linear_interpolation(array, indices, dim=6)
     assert "invalid dim" in str(exc_info.value).lower()
 
 

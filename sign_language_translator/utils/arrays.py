@@ -67,10 +67,10 @@ class ArrayOps:
             return np.array(x, dtype=_dtype)
 
         if data_type == Tensor:
-            if isinstance(x, Tensor):
-                type_map: Dict = {int: torch.int64, float: torch.float64}
-                _dtype = type_map.get(_dtype, _dtype)
-                return x.type(_dtype)  # type: ignore
+            type_map: Dict = {int: torch.int64, float: torch.float64}
+            _dtype = type_map.get(_dtype, _dtype)
+            if isinstance(x, np.ndarray):
+                x = torch.from_numpy(x)
             return torch.tensor(x, dtype=_dtype)  # type: ignore
 
         raise ValueError(f"Invalid data_type for array casting: {data_type}")
@@ -218,10 +218,9 @@ class ArrayOps:
 
 
 def linear_interpolation(
-    array: Union[NDArray[np.number], Tensor, List],
-    new_indexes: Union[Sequence[Union[int, float]], NDArray, Tensor, None] = None,
+    array: Union[NDArray[np.number], Tensor, Sequence],
+    new_x: Union[Sequence[Union[int, float]], NDArray[np.number], Tensor],
     old_x: Union[Sequence[Union[int, float]], NDArray[np.number], Tensor, None] = None,
-    new_x: Union[Sequence[Union[int, float]], NDArray[np.number], Tensor, None] = None,
     dim: int = 0,
 ) -> Union[NDArray, Tensor]:
     """
@@ -229,22 +228,20 @@ def linear_interpolation(
 
     This function essentially connects all consecutive values in a multidimensional array with
     straight lines along a specified dimension, so that intermediate values can be calculated.
-    It takes the input array, a set of new indexes or alternatively old & new coordinate axes,
+    It takes the input array, a set of new indexes or alternatively new & old coordinate values,
     and a dimension along which to perform interpolation.
 
     Parameters:
         array (NDArray[np.number] | Tensor | List): The input array or tensor to interpolate.
-        new_indexes (Sequence[int | float] | NDArray[np.number] | Tensor | None, optional): The new indexes at which to interpolate the data. If None, it infers new_indexes from `old_x` and `new_x` arguments.
-        old_x (Sequence[int | float] | NDArray[np.number] | Tensor | None, optional): The old coordinate values corresponding to the data in `array`. If None, it uses `new_indexes` argument.
-        new_x (Sequence[int | float] | NDArray[np.number] | Tensor | None, optional): The new coordinate values corresponding to the data in `array`. If None, it uses `new_indexes` argument.
+        new_x (Sequence[int | float] | NDArray[np.number] | Tensor): The new index values or coordinate values at which to calculate the intermediate values from `array`. Must be 1D. Order of values does not matter. if `old_x` is not provided, these values are relative to the index of the data in `array` i.e. [0, 1, 2, ...] and negative indexes are allowed. If `old_x` is provided, all `new_x` values must be within it's bounds.
+        old_x (Sequence[int | float] | NDArray[np.number] | Tensor | None, optional): The old *coordinate* values corresponding to the data in `array` along the `dim`. Must be 1D and strictly sorted. Can contain negative numbers. If None, method assumes it to be a linear sequence starting at 0 and growing with step +1 i.e. `[0, 1, 2, ...]` like the index of `array`.
         dim (int, optional): The dimension along which to perform interpolation. Default is 0.
 
     Returns:
         NDArray | Tensor: The result of linear interpolation along the specified dimension.
 
     Raises:
-        ValueError: If both or neither of `new_indexes` and `old_x` & `new_x` are provided.
-        If `new_indexes` is not 1 dimensional.
+        ValueError: If `new_x` or `old_x` is not 1 dimensional.
 
     Examples:
         .. code-block: python
@@ -256,23 +253,23 @@ def linear_interpolation(
 
             old_x = [0, 4, 4.5, 5]
             new_x = [0, 1, 2, 2.5, 3, 4, 5]
-            interpolated_data = linear_interpolation(data, old_x=old_x, new_x=new_x)
+            interpolated_data = linear_interpolation(data, new_x, old_x=old_x)
             print(interpolated_data)
             # array([1.   , 1.25 , 1.5  , 1.625, 1.75 , 2.   , 5.   ])
 
     Note:
-        This function supports both NumPy arrays and PyTorch tensors as input.
+        This function supports both NumPy arrays and PyTorch tensors as input and preserves gradient.
     """
-    if isinstance(array, list):
+    if not isinstance(array, (np.ndarray, Tensor)):
         array = np.array(array)
 
-    indexes_, dim = __validate_lin_interp_args(array, new_indexes, old_x, new_x, dim)
+    indexes, dim = __validate_lin_interp_args(array, new_x, old_x, dim)
 
-    # interpolate
-    floored_indexes = ArrayOps.floor(indexes_)
-    ceiled_indexes = ArrayOps.ceil(indexes_)
-    fraction = (indexes_ - floored_indexes).reshape(
-        [len(indexes_) if axis == dim else 1 for axis in range(array.ndim)]
+    # interpolate (Magic!)
+    floored_indexes = ArrayOps.floor(indexes)
+    ceiled_indexes = ArrayOps.ceil(indexes)
+    fraction = (indexes - floored_indexes).reshape(
+        [len(indexes) if d == dim else 1 for d in range(array.ndim)]
     )
 
     interpolated = ArrayOps.take(array, floored_indexes, dim) * (1 - fraction)
@@ -281,36 +278,50 @@ def linear_interpolation(
     return interpolated
 
 
-def __validate_lin_interp_args(array, new_indexes, old_x, new_x, dim):
-    if (new_indexes is None and (old_x is None or new_x is None)) or (
-        new_indexes is not None and (old_x is not None or new_x is not None)
-    ):
-        raise ValueError("Provide either `new_indexes` or both `old_x` & `new_x`")
+def __validate_lin_interp_args(array: Union[NDArray, Tensor], new_x, old_x, dim: int):
+    if dim < -1 * array.ndim or dim >= array.ndim:
+        raise ValueError(f"Invalid dim: {dim} use -{array.ndim} <= d <= {array.ndim-1}")
+    if dim < 0:
+        dim = dim + array.ndim
 
-    if new_indexes is None:
-        new_indexes = np.interp(new_x, old_x, np.arange(len(old_x)))
+    if old_x is not None:
+        if len(old_x) != array.shape[dim]:
+            raise ValueError(f"Invalid old_x: ({len(old_x)=}) != ({array.shape[dim]=})")
 
-    if not isinstance(array, (np.ndarray, Tensor)):
-        array = np.array(array)
-    indexes_ = ArrayOps.cast(new_indexes, type(array))
+        old_x, new_x = np.array(old_x), np.array(new_x)
+        if (out_of_bounds := (new_x < old_x.min()) | (new_x > old_x.max())).any():
+            raise ValueError(
+                f"Invalid values in new_x: {new_x[out_of_bounds].tolist()}. "
+                f"Must be in range {old_x.min()} <= x <= {old_x.max()}."
+            )
 
-    if indexes_.ndim != 1:
-        raise ValueError(
-            f"Invalid indexes shape: {indexes_.shape}. Must be 1-dimensional."
+        differences = old_x[:-1] - old_x[1:]
+        if not ((is_descending := (differences > 0).all()) or (differences < 0).all()):
+            raise ValueError("Provide sorted `old_x` (otherwise rearrange the array)")
+
+        indexes = (
+            np.interp(new_x, old_x[::-1], np.arange(len(old_x))[::-1])
+            if is_descending
+            else np.interp(new_x, old_x, np.arange(len(old_x)))
         )
-    if dim >= array.ndim:
-        raise ValueError(f"Invalid dim: {dim}. Must be between 0 and {array.ndim-1}.")
 
-    out_of_bounds = (indexes_ < 0) & (indexes_ > array.shape[dim] - 1)
-    if out_of_bounds.any():
-        raise ValueError(
-            f"Invalid indexes for interpolation: {indexes_[out_of_bounds.tolist()]}. "
-            f"Must be between >= 0 and <= {array.shape[0]-1}."
-        )
-    if dim < 0 or dim >= array.ndim:
-        raise ValueError(f"Invalid dim: {dim}. Must be between 0 and {array.ndim-1}.")
+    else:
+        if not isinstance(new_x, (np.ndarray, Tensor)):
+            new_x = np.array(new_x)
+        if (
+            out_of_bounds := (new_x < -array.shape[dim]) | (new_x >= array.shape[dim])
+        ).any():
+            raise ValueError(
+                f"Invalid new indexes: {new_x[out_of_bounds.tolist()].tolist()}. "
+                f"Must be in range {-array.shape[dim]} <= x <= {array.shape[dim]-1}."
+            )
+        indexes = new_x
 
-    return indexes_, dim
+    indexes = ArrayOps.cast(indexes, type(array))
+    if indexes.ndim != 1:
+        raise ValueError(f"Invalid indexes shape: {indexes.shape}. Must be 1D.")
+
+    return indexes, dim
 
 
 def adjust_vector_angle(

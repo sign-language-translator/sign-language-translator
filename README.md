@@ -11,13 +11,16 @@
 
 [![python](https://img.shields.io/pypi/pyversions/sign-language-translator?logo=python)](https://pypi.org/project/sign-language-translator/)
 [![PyPi](https://img.shields.io/pypi/v/sign-language-translator?logo=pypi)](https://pypi.org/project/sign-language-translator/)
-![Release Workflow Status](https://img.shields.io/github/actions/workflow/status/sign-language-translator/sign-language-translator/release.yml?branch=main&logo=pytest)
+![GitHub branch check runs](https://img.shields.io/github/check-runs/sign-language-translator/sign-language-translator/main?logo=pytest)
 [![codecov](https://codecov.io/gh/sign-language-translator/sign-language-translator/branch/main/graph/badge.svg)](https://codecov.io/gh/sign-language-translator/sign-language-translator)
 [![Documentation Status](https://img.shields.io/readthedocs/sign-language-translator?logo=readthedocs&)](https://sign-language-translator.readthedocs.io/)<br>
 [![GitHub Repo stars](https://img.shields.io/github/stars/sign-language-translator/sign-language-translator?logo=github)](https://github.com/sign-language-translator/sign-language-translator/stargazers)
 [![Repository Views per Month](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fu8views.com%2Fapi%2Fv1%2Fgithub%2Fprofiles%2F118578823%2Fviews%2Fday-week-month-total-count.svg&query=%2F*%5Blocal-name()%3D'svg'%5D%2F*%5Blocal-name()%3D'g'%5D%5B3%5D%2F*%5Blocal-name()%3D'g'%5D%2F*%5Blocal-name()%3D'text'%5D%5B2%5D&label=%F0%9F%91%81%EF%B8%8F%20views%2Fmonth&color=6d96ff&cacheSeconds=5000)](https://u8views.com/github/mdsrqbl)
 [![Downloads](https://img.shields.io/pepy/dt/sign_language_translator?color=purple&logoColor=white&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIiBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiMwMDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTkuMiAyLjhjLS4yLjMtLjIuOC0uMiAxLjZWMTFINy44Yy0uOSAwLTEuMyAwLTEuNS4yYS44LjggMCAwIDAtLjMuNmMwIC4zLjMuNiAxIDEuMmw0LjEgNC40LjcuNmEuNy43IDAgMCAwIC40IDBsLjctLjZMMTcgMTNjLjYtLjYuOS0xIC45LTEuMmEuOC44IDAgMCAwLS4zLS42Yy0uMi0uMi0uNi0uMi0xLjUtLjJIMTVWNC40YzAtLjggMC0xLjMtLjItMS42YTEuNSAxLjUgMCAwIDAtLjYtLjZjLS4zLS4yLS44LS4yLTEuNi0uMmgtMS4yYy0uOCAwLTEuMyAwLTEuNi4yYTEuNSAxLjUgMCAwIDAtLjYuNnpNNSAyMWExIDEgMCAwIDAgMSAxaDEyYTEgMSAwIDEgMCAwLTJINmExIDEgMCAwIDAtMSAxeiIgY2xpcC1ydWxlPSJldmVub2RkIi8+PC9zdmc+)](https://pepy.tech/projects/sign-language-translator/)<br>
 [![HuggingFace Spaces](https://img.shields.io/badge/%F0%9F%8C%90%20Web%20Demo-%F0%9F%A4%97%20hf.co%2FsltAI-mediumpurple)](https://huggingface.co/sltAI)
+
+| **Support Us** ❤️ | <!-- [![Stripe](https://img.shields.io/badge/Stripe-626CD9?logo=Stripe&logoColor=white)]() --> [![PayPal](https://img.shields.io/badge/PayPal-00457C?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=7SNGNSKUQXQW2) |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 
 </div>
 
@@ -37,7 +40,7 @@
 6. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
 7. [Directory Tree](#directory-tree)
 8. [How to Contribute](#how-to-contribute)
-9. [Research Papers & Citation](#research-papers--citation)
+9. [Citation, License & Research Papers](#citation-licence--research-papers)
 10. [Credits and Gratitude](#credits-and-gratitude)
 
 ## Overview
@@ -61,7 +64,7 @@ Unlike most other projects, this python library can translate full sentences and
 This package comes with an *extensible rule-based* text-to-sign translation system that can be used to generate training data for *Deep Learning* models for both sign to text & text to sign translation. <!-- Pipelines for fine-tuning our deep learning models are also available. -->
 
 > [!Tip]
-> To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. To write sample texts of supported words, you can use our language models. Then, you can use that system to fine-tune our [deep learning models](#models).
+> To create a rule-based translation system for your regional language, you can inherit the TextLanguage and SignLanguage classes and pass them as arguments to the ConcatenativeSynthesis class. To write sample texts of supported words, you can use our language models. Then, you can use that system to fine-tune our deep learning models.
 
 See the <kbd>[documentation](https://sign-language-translator.readthedocs.io)</kbd> and our <kbd>[datasets](https://github.com/sign-language-translator/sign-language-datasets)</kbd> for details.
 
@@ -75,7 +78,7 @@ Sign language to Text
 </b></summary>
 
 1. Extract features from sign language videos
-   1. See the [`slt.models.video_embedding`](https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/video_embedding) sub-package and the [`$ slt embed`](https://sign-language-translator.readthedocs.io/en/latest/#embed-videos) command.
+   1. See the [`slt.models.video_embedding`](https://github.com/sign-language-translator/sign-language-translator/tree/main/sign_language_translator/models/video_embedding) sub-package and the [`$ slt embed`](https://slt.readthedocs.io/en/latest/#embed-videos) command.
    2. Currently Mediapipe 3D landmarks are being used for deep learning.
 2. Transcribe and translate signs into multiple text languages to generalize the model.
 3. To train for word-for-word gloss writing task, also use a synthetic dataset made by concatenating signs for each word in a text. (See [`slt.models.ConcatenativeSynthesis`](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_to_sign/concatenative_synthesis.py))
@@ -140,7 +143,7 @@ Datasets
 </b></summary>
 
 For our datasets & conventions, see the [*sign-language-datasets* repo](https://github.com/sign-language-translator/sign-language-datasets) and its [releases](https://github.com/sign-language-translator/sign-language-datasets/releases).
-See this [documentation](https://sign-language-translator.readthedocs.io/en/latest/datasets.html) for more on building a dataset of Sign Language videos (or motion capture gloves' output features).
+See this [documentation](https://slt.readthedocs.io/en/latest/datasets.html) for more on building a dataset of Sign Language videos (or motion capture gloves' output features).
 
 **Your data should include**:
 
@@ -202,7 +205,7 @@ pip install -e git+https://github.com/sign-language-translator/sign-language-tra
 
 ## Usage
 
-Head over to [sign-language-translator.**readthedocs**.io](https://sign-language-translator.readthedocs.io) to see the detailed usage in Python, CLI and gradio GUI.
+Head over to [slt.**readthedocs**.io](https://slt.readthedocs.io) to see the detailed usage in Python, CLI and gradio GUI.
 See the [*test cases*](https://github.com/sign-language-translator/sign-language-translator/blob/main/tests) or the [*notebooks* repo](https://github.com/sign-language-translator/notebooks) to see the internal code in action.
 
 ### Web GUI
@@ -244,7 +247,7 @@ sign = slt.Video.load_asset("pk-hfad-1_آپ-کا-نام-کیا(what)-ہے")  #
 sign.show_frames_grid()
 
 # Extract Pose Vector for feature reduction
-embedding_model = slt.models.MediaPipeLandmarksModel()
+embedding_model = slt.models.MediaPipeLandmarksModel()      # pip install "sign_language_translator[mediapipe]"  # (or [all])
 embedding = embedding_model.embed(sign.iter_frames())
 # slt.Landmarks(embedding, connections="mediapipe-world").show()
 
@@ -255,7 +258,7 @@ embedding = embedding_model.embed(sign.iter_frames())
 ```
 
 ```python
-# custom translator (https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators)
+# custom translator (https://slt.readthedocs.io/en/latest/#building-custom-translators)
 help(slt.languages.SignLanguage)
 help(slt.languages.text.Urdu)
 help(slt.models.ConcatenativeSynthesis)
@@ -485,7 +488,7 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
     │
     ├── <b>languages</b>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/utils.py">utils.py</a>
-    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/vocab.p">vocab.py</a> <sub><sup>reads word mapping datasets</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/vocab.p">vocab.py</a> <sub><sup>reads word mapping <a href="https://github.com/sign-language-translator/sign-language-datasets/tree/main/parallel_texts">datasets</a></sup></sub>
     │   ├── sign
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/mapping_rules.py">mapping_rules.py</a> <sub><sup>strategy design-pattern for word to sign mapping</sup></sub>
     │   │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py">pakistan_sign_language.py</a>
@@ -520,7 +523,7 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
     │   │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/text_embedding/vector_lookup_model.py">vector_lookup_model.py</a> <sub><sup>retrieves word embedding from a vector database</sup></sub>
     │   │
     │   └── video_embedding
-    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py">mediapipe_landmarks_model.py</a> <sub><sup>3D coordinates of points on body</sup></sub>
+    │       ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/mediapipe_landmarks_model.py">mediapipe_landmarks_model.py</a> <sub><sup>2D & 3D coordinates of points on body</sup></sub>
     │       └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/models/video_embedding/video_embedding_model.py">video_embedding_model.py</a> <sub><sup>Base class</sup></sub>
     │
     ├── <b>text</b>
@@ -598,9 +601,22 @@ See our datasets & conventions [here](https://github.com/sign-language-translato
 
 </details>
 
-## Research Papers & Citation
+## Citation, Licence & Research Papers
 
-Stay Tuned!
+```bibtex
+@software{mdsr2023slt,
+  author = {Mudassar Iqbal <mdsriqb@gmail.com>},
+  title = {Sign Language Translator: Python Library & Framework},
+  year = {2023},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/sign-language-translator/sign-language-translator}}
+}
+```
+
+This project is licensed under the [Apache 2.0 License](https://github.com/sign-language-translator/sign-language-translator/blob/main/LICENSE). You are permitted to use the library, create modified versions, or incorporate pieces of the code into your own work. Your product or research, whether commercial or non-commercial, must provide appropriate credit to the original author(s) by citing this repository.
+
+Stay Tuned for research Papers!
 
 ## Upcoming/Roadmap
 
@@ -608,7 +624,7 @@ Stay Tuned!
 <summary>LANDMARKS_WRAPPER: v0.8</summary>
 
 ```python
-# 0.8.0: landmarks wrapper class (display, copy), licence/citation, rename 'country' to 'region' & rename wordless_wordless to wordless.mp4
+# 0.8.0: landmarks wrapper class (display, copy), rename 'country' to 'region' & rename wordless_wordless to wordless.mp4
 # 0.8.1: landmark augmentation (zoom, rotate, move, noise, duration, rectify, stabilize, __repr__)
 # 0.8.2: trim signs before concatenation, insert transition frames
 
@@ -624,6 +640,7 @@ Stay Tuned!
 ```python
 # clean-up slt.languages.text.Urdu code
 # implement NLP class for English
+# rename `enums.py` to `constants.py` and use frozen dataclasses
 # add progress bar to slt.models.MediaPipeLandmarksModel
 
 # expand dictionary video data by scraping everything
@@ -705,16 +722,16 @@ Servers / Product
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-04-24.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-07-10.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
 
 - [Mudassar Iqbal](https://github.com/mdsrqbl) for coding the project so far.
-- [Rabbia Arshad](https://github.com/Rabbia-Arshad) for help in initial R&D and web development.
+- [Rabbia Arshad](https://github.com/Rabbia-Arshad) for help in initial R&D.
 - [Waqas Bin Abbas](https://github.com/Waqas-Bin-Abbas) for assistance in initial video data collection process.
-- Kamran Malik for setting the initial project scope, idea of motion transfer and connecting us with Hamza Foundation.
-- [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing to collaborate and providing their sign dictionary, hearing-impaired performers for data creation, and creating the text2gloss dataset.
+- Kamran Malik for connecting us with Hamza Foundation.
+- [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing to collaborate and providing their sign dictionary, hearing-impaired performers for data creation, and creating a text2gloss dataset.
 - [UrduHack](https://github.com/urduhack/urduhack) for their work on Urdu character normalization.
 - [Telha Bilal](https://github.com/TelhaBilal) for help in designing the architecture of some modules.
 
@@ -722,7 +739,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **11,882** + Tests: **2,321**):
+Count total number of **lines of code** (Package: **11,943** + Tests: **2,371**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
