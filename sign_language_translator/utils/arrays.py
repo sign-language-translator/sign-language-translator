@@ -71,6 +71,8 @@ class ArrayOps:
             _dtype = type_map.get(_dtype, _dtype)
             if isinstance(x, np.ndarray):
                 x = torch.from_numpy(x)
+            if isinstance(x, Tensor):
+                return x.to(dtype=_dtype)  # type: ignore
             return torch.tensor(x, dtype=_dtype)  # type: ignore
 
         raise ValueError(f"Invalid data_type for array casting: {data_type}")
@@ -215,6 +217,28 @@ class ArrayOps:
             return x.abs()
 
         raise TypeError(f"Invalid type for absolute value: {type(x)}")
+
+    @staticmethod
+    def copy(x: Union[NDArray, Tensor]) -> Union[NDArray, Tensor]:
+        """
+        Create a copy of a given array or tensor.
+
+        Args:
+            x (Union[NDArray, Tensor]): The input array or tensor.
+
+        Returns:
+            Union[NDArray, Tensor]: A deep copy of the input array or tensor.
+
+        Raises:
+            TypeError: If the input type is not supported.
+        """
+
+        if isinstance(x, np.ndarray):
+            return np.copy(x)
+        if isinstance(x, Tensor):
+            return torch.clone(x)
+
+        raise TypeError(f"Invalid type for copying array: {type(x)}")
 
 
 def linear_interpolation(

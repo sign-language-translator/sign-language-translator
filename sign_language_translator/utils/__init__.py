@@ -36,6 +36,7 @@ from sign_language_translator.utils.utils import (
     is_regex,
     sample_one_index,
     search_in_values_to_retrieve_key,
+    validate_path_exists,
 )
 
 __all__ = [
@@ -51,6 +52,7 @@ __all__ = [
     "extract_recursive",
     "adjust_vector_angle",
     "align_vectors",
+    "validate_path_exists",
     # classes
     "Archive",
     "ArrayOps",

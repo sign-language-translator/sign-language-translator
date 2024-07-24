@@ -20,7 +20,7 @@
 [![HuggingFace Spaces](https://img.shields.io/badge/%F0%9F%8C%90%20Web%20Demo-%F0%9F%A4%97%20hf.co%2FsltAI-mediumpurple)](https://huggingface.co/sltAI)
 
 | **Support Us** ❤️ | <!-- [![Stripe](https://img.shields.io/badge/Stripe-626CD9?logo=Stripe&logoColor=white)]() --> [![PayPal](https://img.shields.io/badge/PayPal-00457C?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=7SNGNSKUQXQW2) |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| - | - |
 
 </div>
 
@@ -230,14 +230,23 @@ text = "یہ بہت اچھا ہے۔" # "This very good is."
 sign = model.translate(text) # tokenize, map, download & concatenate
 sign.show()
 
-model.text_language = "hindi"  # slt.TextLanguageCodes.HINDI  # slt.languages.text.Hindi()
+
+model.text_language = slt.TextLanguageCodes.HINDI     # slt.languages.text.English()
+model.sign_format = slt.SignFormatCodes.LANDMARKS
+model.sign_embedding_model = "mediapipe-world"
+
 sign_2 = model.translate("कैसे हैं आप?") # "How are you?"
-sign_2.save("how-are-you.mp4", overwrite=True)
+sign_2.save("how-are-you.csv", overwrite=True)
+sign_2.save_animation("how-are-you.gif", overwrite=True)
 ```
-<!-- model.text_language = slt.TextLanguageCodes.ENGLISH
+<!-- model.text_language = slt.languages.text.English()
 sign = model.translate("Hello World!") -->
 
-![this very good is](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/7f4ff312-df03-4b11-837b-5fb895c9f08e)
+| ![this very good is](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/7f4ff312-df03-4b11-837b-5fb895c9f08e) | <picture><source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/4d54a197-d723-4cc4-a3ba-cae98e681003" /><source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/45e71098-7a94-4a9e-ad24-1773369b65d5" /><img alt="how are you (landmark 3d plot)" /></picture> |
+| :-: | :-: |
+| "یہ بہت اچھا ہے۔" (this very good is) | "कैसे हैं आप?" (how are you) |
+
+</br>
 
 ```python
 import sign_language_translator as slt
@@ -249,7 +258,9 @@ sign.show_frames_grid()
 # Extract Pose Vector for feature reduction
 embedding_model = slt.models.MediaPipeLandmarksModel()      # pip install "sign_language_translator[mediapipe]"  # (or [all])
 embedding = embedding_model.embed(sign.iter_frames())
-# slt.Landmarks(embedding, connections="mediapipe-world").show()
+
+slt.Landmarks(embedding.reshape((-1, 75, 5)),
+              connections="mediapipe-world").show()
 
 # # Load sign-to-text model (pytorch) (COMING SOON!)
 # translation_model = slt.get_model(slt.ModelCodes.Gesture)
@@ -481,6 +492,7 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
     │
     ├── <b>config</b>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/assets.py">assets.py</a> <sub><sup>download, extract and remove models & datasets</sup></sub>
+    │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/colors.py">colors.py</a> <sub><sup>named RGB tuples for visualization</sup></sub>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/enums.py">enums.py</a> <sub><sup>string short codes to identify models & classes</sup></sub>
     │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/settings.py">settings.py</a> <sub><sup>global variables in repository design-pattern</sup></sub>
     │   ├── <i><a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/config/urls.json">urls.json</a></i>
@@ -547,6 +559,8 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
         ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/_utils.py">_utils.py</a>
         ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/utils.py">utils.py</a>
         ├── landmarks
+        │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/landmarks/connections.py">connections.py</a> <sub><sup>drawing configurations for different landmarks models</sup></sub>
+        │   ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/landmarks/display.py">display.py</a> <sub><sup>visualize points & lines on 3D plot</sup></sub>
         │   └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/landmarks/landmarks.py">landmarks.py</a> <sub><sup>wrapper for sequence of collection of points on body</sup></sub>
         │
         ├── sign
@@ -605,12 +619,11 @@ See our datasets & conventions [here](https://github.com/sign-language-translato
 
 ```bibtex
 @software{mdsr2023slt,
-  author = {Mudassar Iqbal <mdsriqb@gmail.com>},
-  title = {Sign Language Translator: Python Library & Framework},
-  year = {2023},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/sign-language-translator/sign-language-translator}}
+  author       = {Mudassar Iqbal},
+  title        = {Sign Language Translator: Python Library and AI Framework},
+  year         = {2023},
+  publisher    = {GitHub},
+  howpublished = {\url{https://github.com/sign-language-translator/sign-language-translator}},
 }
 ```
 
@@ -624,7 +637,7 @@ Stay Tuned for research Papers!
 <summary>LANDMARKS_WRAPPER: v0.8</summary>
 
 ```python
-# 0.8.0: landmarks wrapper class (display, copy), rename 'country' to 'region' & rename wordless_wordless to wordless.mp4
+# 0.8.0: landmarks wrapper class
 # 0.8.1: landmark augmentation (zoom, rotate, move, noise, duration, rectify, stabilize, __repr__)
 # 0.8.2: trim signs before concatenation, insert transition frames
 
@@ -643,6 +656,8 @@ Stay Tuned for research Papers!
 # rename `enums.py` to `constants.py` and use frozen dataclasses
 # add progress bar to slt.models.MediaPipeLandmarksModel
 
+# rename 'country' to 'region' & rename wordless_wordless to wordless.mp4
+# decide mediapipe-all = world & image concactenated in landmark dim or feature dim?
 # expand dictionary video data by scraping everything
 # upload 12 person dictionary replication landmark dataset
 ```
@@ -722,14 +737,14 @@ Servers / Product
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-07-10.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-07-25.
 
 <details>
 <summary> Immense gratitude towards: (click to expand)</summary>
 
 - [Mudassar Iqbal](https://github.com/mdsrqbl) for coding the project so far.
 - [Rabbia Arshad](https://github.com/Rabbia-Arshad) for help in initial R&D.
-- [Waqas Bin Abbas](https://github.com/Waqas-Bin-Abbas) for assistance in initial video data collection process.
+- [Waqas Bin Abbas](https://github.com/Waqas-Bin-Abbas) for assistance in initial video data collection.
 - Kamran Malik for connecting us with Hamza Foundation.
 - [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing to collaborate and providing their sign dictionary, hearing-impaired performers for data creation, and creating a text2gloss dataset.
 - [UrduHack](https://github.com/urduhack/urduhack) for their work on Urdu character normalization.
@@ -739,17 +754,22 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **11,943** + Tests: **2,371**):
+Count total number of **lines of code** (Package: **12,926** + Tests: **2,461**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
 ```
 
-**Just for *fun***
+**Just for *fun* 🙃**
 
 ```text
 Q: What was the deaf student's favorite course?
 A: Communication skills
+```
+
+```text
+Q: Why was the ML engineer sad?
+A: Triplet loss
 ```
 
 <details>

@@ -30,7 +30,7 @@ from tqdm.auto import tqdm
 
 from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import SignFormats
-from sign_language_translator.utils import in_jupyter_notebook
+from sign_language_translator.utils import in_jupyter_notebook, validate_path_exists
 from sign_language_translator.vision.sign.sign import Sign
 from sign_language_translator.vision.utils import (
     _normalize_args_index_and_timestamp,
@@ -778,10 +778,7 @@ class Video(Sign, VideoFrames):
         Raises:
             FileExistsError: If a file already exists at the output path and `overwrite` is False.
         """
-        path = abspath(path)
-        if isfile(path) and not overwrite:
-            raise FileExistsError(f"File '{path}' already exists. (Use overwrite=True)")
-        makedirs(dirname(path), exist_ok=True)
+        path = validate_path_exists(path, overwrite=overwrite)
 
         _frames_iterable = iter(
             frames_iterable
@@ -865,13 +862,7 @@ class Video(Sign, VideoFrames):
             ValueError: If both or neither `timestamp` and `index` are provided or If the specified timestamp or index is out of range.
             FileExistsError: If a file already exists at the output path and `overwrite` is False.
         """
-
-        path = abspath(path)
-        if isfile(path) and not overwrite:
-            raise FileExistsError(
-                f"File '{path}' already exists. Use overwrite=True to overwrite."
-            )
-        makedirs(dirname(path), exist_ok=True)
+        path = validate_path_exists(path, overwrite=overwrite)
 
         frame = self.get_frame(timestamp=timestamp, index=index)
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
@@ -901,12 +892,7 @@ class Video(Sign, VideoFrames):
         Raises:
             FileExistsError: If a file already exists at the output path and `overwrite` is False.
         """
-        path = abspath(path)
-        if isfile(path) and not overwrite:
-            raise FileExistsError(
-                f"File '{path}' already exists. Use overwrite=True to overwrite."
-            )
-        makedirs(dirname(path), exist_ok=True)
+        path = validate_path_exists(path, overwrite=overwrite)
 
         grid = self.frames_grid(rows=rows, columns=columns, width=width, height=height)
         grid = cv2.cvtColor(grid, cv2.COLOR_RGB2BGR)

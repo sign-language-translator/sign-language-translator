@@ -11,5 +11,7 @@ def test_lambda_landmarks_transform():
     data = np.array(data)
     landmarks = Landmarks(data)
 
-    landmarks.transform(lambda x: x + 5)
+    landmarks.transform(lambda x: x + 5, inplace=True)
+    new_landmarks = landmarks.transform(lambda x: x + 5, inplace=False)
+    assert (np.array(new_landmarks) == (data + 10)).all()
     assert (np.array(landmarks) == (data + 5)).all()

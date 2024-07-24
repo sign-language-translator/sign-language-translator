@@ -1,4 +1,5 @@
 import os
+from copy import copy
 
 import numpy as np
 import pytest
@@ -57,6 +58,30 @@ def test_landmarks_initialization_from_data():
     for i, frame_ in enumerate(landmarks[:2]):  # drops a dimension
         assert frame_.tolist() == data[i]
 
+    # test .connections
+    with pytest.raises(ValueError) as exc_info:
+        landmarks.connections
+    assert "defined" in str(exc_info.value).lower()
+
+    with pytest.raises(TypeError):
+        landmarks.connections = []  # type: ignore
+
+    with pytest.raises(ValueError) as exc_info:
+        landmarks.connections = "mediapipe-world"
+    assert "expected" in str(exc_info.value).lower()
+
+    with pytest.raises(ValueError):
+        landmarks.connections = "unknown"
+
+    # test copy
+    landmarks_copy = copy(landmarks)
+    assert landmarks_copy.data.tolist() == landmarks.data.tolist()
+    assert landmarks_copy._connections == landmarks._connections
+
+    landmarks_copy.data[:] = 0
+    assert (landmarks_copy.data == 0).all()
+    assert not (landmarks.data == 0).all()
+
 
 def test_landmarks_load_and_save():
     data = [
@@ -108,10 +133,11 @@ def test_landmarks_load_and_save():
 
     # .load_asset
     loaded_landmarks = Landmarks.load_asset(
-        "xx-shapes-1_square.landmarks-testmodel.csv", overwrite=True
+        fname := "xx-shapes-1_square.landmarks-testmodel.csv", overwrite=True
     )
     assert loaded_landmarks.n_landmarks == 4
     assert loaded_landmarks.n_features == 3
+    assert os.path.exists(os.path.join(Assets.ROOT_DIR, "landmarks", fname))
 
     # NPY
     landmarks.save(npy_path := os.path.join("temp", "landmarks.npy"), overwrite=True)
@@ -133,6 +159,16 @@ def test_landmarks_concatenation():
     landmarks_2 = Landmarks(data[1:])
 
     assert Landmarks.concatenate([landmarks_1, landmarks_2]).data.tolist() == data
+
+    with pytest.raises(ValueError):
+        Landmarks.concatenate([])
+
+    path = Assets.download("landmarks/test-landmarks.mediapipe-world.csv")[0]
+    landmarks_3 = Landmarks.load(path)
+
+    with pytest.raises(ValueError) as exc_info:
+        Landmarks.concatenate([landmarks_1, landmarks_3])
+    assert "same connections" in str(exc_info.value).lower()
 
 
 def test_landmarks_validation():

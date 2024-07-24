@@ -1,4 +1,5 @@
-from typing import Type
+from enum import Enum
+from typing import Type, Union
 
 from sign_language_translator.config.enums import SignFormats, normalize_short_code
 from sign_language_translator.vision.sign.sign import Sign
@@ -8,7 +9,7 @@ __all__ = [
 ]
 
 
-def get_sign_wrapper_class(sign_code: str) -> Type[Sign]:
+def get_sign_wrapper_class(sign_code: Union[str, Enum]) -> Type[Sign]:
     """
     Retrieves a Sign wrapping class based on the provided string code.
 

@@ -84,7 +84,7 @@ class ConcatenativeSynthesis(TextToSignModel):
         return self._sign_format
 
     @sign_format.setter
-    def sign_format(self, sign_format: Union[str, Type[Sign]]) -> None:
+    def sign_format(self, sign_format: Union[str, Type[Sign], Enum]) -> None:
         self._sign_format = self.__get_sign_format_class(sign_format)
 
         if self._sign_format.name() == SignFormats.VIDEO.value:
@@ -218,7 +218,7 @@ class ConcatenativeSynthesis(TextToSignModel):
         raise TypeError(f"Expected str or SignLanguage, got {type(sign_language) = }.")
 
     def __get_sign_format_class(
-        self, sign_format: Union[str, Type[Sign]]
+        self, sign_format: Union[str, Type[Sign], Enum]
     ) -> Type[Sign]:
         if isinstance(sign_format, (str, Enum)):
             return get_sign_wrapper_class(sign_format)

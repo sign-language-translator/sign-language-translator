@@ -242,7 +242,7 @@ class Assets:
         content_name = filename_or_regex.split("/")[-1]
         extracted_assets = []
         for archive_id in cls.get_ids(arch):
-            asset_dir = archive_id.split("/")[-1].split("_")[-1].split("-")[0]
+            asset_dir = archive_id.split("/")[-1].split(".")[-2].split("-")[0]
             extracted_assets += Archive.extract(
                 archive_path=cls._abs_path(archive_id),
                 regex=content_name,

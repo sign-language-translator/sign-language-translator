@@ -1,3 +1,4 @@
+import os
 import re
 from enum import EnumMeta
 from random import choices
@@ -13,6 +14,7 @@ __all__ = [
     "is_regex",
     "sample_one_index",
     "search_in_values_to_retrieve_key",
+    "validate_path_exists",
 ]
 
 
@@ -211,3 +213,44 @@ def is_regex(string: Union[str, re.Pattern]) -> bool:
             return False
 
     return False
+
+
+def validate_path_exists(path: str, overwrite: bool = False) -> str:
+    """
+    Validates the existence of a given file path and optionally creates necessary directories.
+
+    This function checks if a file already exists at the specified path. If the file exists
+    and `overwrite` is set to `False`, a `FileExistsError` is raised. If `overwrite` is set
+    to `True`, or if the file does not exist, the function returns the absolute path after
+    ensuring that all necessary directories are created.
+
+    Parameters:
+    ----------
+    path : str
+        The file path to be validated.
+    overwrite : bool, optional
+        Whether to overwrite the file if it already exists (default is False).
+
+    Returns:
+    -------
+    str
+        The absolute path of the validated file.
+
+    Raises:
+    ------
+    FileExistsError
+        If the file already exists at the specified path and `overwrite` is set to `False`.
+
+    Examples:
+    --------
+    >>> validate_path_exists('/path/to/file.txt', overwrite=False)
+    '/absolute/path/to/file.txt'
+    """
+
+    if not overwrite and os.path.exists(path):
+        raise FileExistsError(f"File already exists: '{path}' (Use overwrite=True)")
+
+    path = os.path.abspath(path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    return path
