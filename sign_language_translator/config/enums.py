@@ -204,6 +204,7 @@ class SignEmbeddingModels(Enum, metaclass=PrintableEnumMeta):
 
     # TODO: rename `Models` in class name to avoid confusion with `ModelCodes`
 
+
 class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
     """
     Enumeration class for grouping supported model codes, making it easier to filter various models.

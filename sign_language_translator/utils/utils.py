@@ -83,13 +83,16 @@ def extract_recursive(data: Dict[str, Any], key: str) -> List[Any]:
                    recursively from the input dictionary.
 
     Examples:
-        >>> data = {'a': 1, 'b': {'c': 2, 'd': {'e': 3, 'f': 4}}, 'g': [5, {'h': 6, 'e': 7}]}
-        >>> extract_recursive(data, 'e')
-        [3, 7]
-        >>> extract_recursive(data, 'h')
-        [6]
-        >>> extract_recursive(data, 'x')
-        []  # Key not found, returns an empty list.
+
+    .. code-block:: python
+
+        data = {'a': 1, 'b': {'c': 2, 'd': {'e': 3, 'f': 4}}, 'g': [5, {'h': 6, 'e': 7}]}
+        extract_recursive(data, 'e')
+        # [3, 7]
+        extract_recursive(data, 'h')
+        # [6]
+        extract_recursive(data, 'x')
+        # []  # Key not found, returns an empty list.
     """
 
     extracted_values = []
@@ -164,6 +167,9 @@ class ProgressStatusCallback:
             Update the tqdm progress bar with the provided status information.
 
     Example:
+
+    .. code-block:: python
+
         # Instantiate a tqdm progress bar & callback
         progress_bar = tqdm(total=100, desc='Processing')
         callback = ProgressStatusCallback(tqdm_bar=progress_bar)
@@ -224,27 +230,19 @@ def validate_path_exists(path: str, overwrite: bool = False) -> str:
     to `True`, or if the file does not exist, the function returns the absolute path after
     ensuring that all necessary directories are created.
 
-    Parameters:
-    ----------
-    path : str
-        The file path to be validated.
-    overwrite : bool, optional
-        Whether to overwrite the file if it already exists (default is False).
-
-    Returns:
-    -------
-    str
-        The absolute path of the validated file.
+    Args:
+        path (str): The file path to be validated.
+        overwrite (bool, optional): Whether to overwrite the file if it already exists. Defaults to False.
 
     Raises:
-    ------
-    FileExistsError
-        If the file already exists at the specified path and `overwrite` is set to `False`.
+        FileExistsError: If the file already exists at the specified path and `overwrite` is set to `False`.
+
+    Returns:
+        str: The absolute path of the validated file.
 
     Examples:
-    --------
-    >>> validate_path_exists('/path/to/file.txt', overwrite=False)
-    '/absolute/path/to/file.txt'
+        >>> validate_path_exists('/path/to/file.txt', overwrite=False)
+        '/absolute/path/to/file.txt'
     """
 
     if not overwrite and os.path.exists(path):

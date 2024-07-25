@@ -10,7 +10,9 @@ Classes:
     Landmarks: A class to represent and manipulate landmarks data.
 
 Example:
+
     .. code-block:: python
+
         from sign_language_translator.vision.landmarks.landmarks import Landmarks
 
         landmarks = Landmarks([[[0,1,2], [1,2,3]]])  # 1 frames, 2 landmarks, 3 coordinates
@@ -153,7 +155,9 @@ class Landmarks(Sign):
             NDArray: The sign data as a NumPy array.
 
         Example:
-            .. code-block:: python
+
+        .. code-block:: python
+
             import sign_language_translator as slt
 
             landmarks = slt.Landmarks([[[0,1,2], [1,2,3]]])
@@ -511,7 +515,9 @@ class Landmarks(Sign):
             Landmarks: An instance of the Landmarks class representing the dataset video embedding that matched the label.
 
         Example:
+
             .. code-block:: python
+
                 import sign_language_translator as slt
 
                 # Load a dictionary video's landmark embedding asset

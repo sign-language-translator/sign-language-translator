@@ -1,5 +1,7 @@
 import os
+import sys
 
+import pytest
 import torch
 from click.testing import CliRunner
 
@@ -52,6 +54,9 @@ def test_slt_translate():
 
 
 def test_slt_embed_video():
+    if sys.version_info > (3, 11):
+        pytest.skip("MediaPipe is not supported in Python >3.11")
+
     runner = CliRunner()
 
     video_id = "videos/wordless_wordless.mp4"

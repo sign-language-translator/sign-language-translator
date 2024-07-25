@@ -11,20 +11,23 @@ Classes:
         multi-head self-attention and feedforward neural network layers but no cross-attention.
 
 Example:
-    >>> import torch
-    >>> from sign_language_translator.models.language_models.transformer_language_model.layers import FeedForward, DecoderBlock, CausalMultiHeadSelfAttention
 
-    >>> model = FeedForward(n_embed=256, hidden_size=512, dropout=0.2, activation='relu')
-    >>> input_tensor = torch.randn(32, 256)
-    >>> output_tensor = model(input_tensor)
+.. code-block:: python
 
-    >>> decoder_block = DecoderBlock(n_embed=256, hidden_size=512, n_heads=8, max_seq_len=32, dropout=0.2, activation='relu')
-    >>> input_tensor = torch.randn(16, 32, 256)
-    >>> output_tensor = decoder_block(input_tensor)
+    import torch
+    from sign_language_translator.models.language_models.transformer_language_model.layers import FeedForward, DecoderBlock, CausalMultiHeadSelfAttention
 
-    >>> attention_layer = CausalMultiHeadSelfAttention(n_heads=8, embed_size=256, dropout=0.2)
-    >>> input_tensor = torch.randn(16, 32, 256)
-    >>> output_tensor = attention_layer(input_tensor)
+    model = FeedForward(n_embed=256, hidden_size=512, dropout=0.2, activation='relu')
+    input_tensor = torch.randn(32, 256)
+    output_tensor = model(input_tensor)
+
+    decoder_block = DecoderBlock(n_embed=256, hidden_size=512, n_heads=8, max_seq_len=32, dropout=0.2, activation='relu')
+    input_tensor = torch.randn(16, 32, 256)
+    output_tensor = decoder_block(input_tensor)
+
+    attention_layer = CausalMultiHeadSelfAttention(n_heads=8, embed_size=256, dropout=0.2)
+    input_tensor = torch.randn(16, 32, 256)
+    output_tensor = attention_layer(input_tensor)
 """
 
 import torch
@@ -54,9 +57,12 @@ class CausalMultiHeadSelfAttention(torch.nn.Module):
         torch.Tensor: Output tensor of shape (batch_size, seq_len, embed_size).
 
     Example:
-        >>> model = CausalMultiHeadSelfAttention(n_heads=8, embed_size=256, dropout=0.2)
-        >>> input_tensor = torch.randn(16, 32, 256)
-        >>> output_tensor = model(input_tensor)
+
+    .. code-block:: python
+
+        model = CausalMultiHeadSelfAttention(n_heads=8, embed_size=256, dropout=0.2)
+        input_tensor = torch.randn(16, 32, 256)
+        output_tensor = model(input_tensor)
     """
 
     def __init__(
@@ -114,9 +120,12 @@ class CausalMultiHeadSelfAttention(torch.nn.Module):
             torch.Tensor: Output tensor of shape (batch_size, seq_len, embed_size).
 
         Example:
-            >>> model = CausalMultiHeadSelfAttention(n_heads=8, embed_size=256, dropout=0.2)
-            >>> input_tensor = torch.randn(16, 32, 256)
-            >>> output_tensor = model.forward(input_tensor)
+
+        .. code-block
+
+            model = CausalMultiHeadSelfAttention(n_heads=8, embed_size=256, dropout=0.2)
+            input_tensor = torch.randn(16, 32, 256)
+            output_tensor = model.forward(input_tensor)
         """
 
         # ([batch,] seq_len, embed_size)
@@ -199,9 +208,12 @@ class FeedForward(torch.nn.Module):
         torch.Tensor: Output tensor of shape (batch_size, n_embed).
 
     Example:
-        >>> model = FeedForward(n_embed=256, hidden_size=512, dropout=0.2, activation='relu')
-        >>> input_tensor = torch.randn(32, 256)
-        >>> output_tensor = model(input_tensor)
+
+    .. code-block:: python
+
+        model = FeedForward(n_embed=256, hidden_size=512, dropout=0.2, activation='relu')
+        input_tensor = torch.randn(32, 256)
+        output_tensor = model(input_tensor)
     """
 
     def __init__(self, n_embed, hidden_size, dropout=0.25, activation="gelu"):
@@ -226,9 +238,12 @@ class FeedForward(torch.nn.Module):
             torch.Tensor: Output tensor of shape (batch_size, n_embed).
 
         Example:
-            >>> model = FeedForward(n_embed=256, hidden_size=512, dropout=0.2, activation='relu')
-            >>> input_tensor = torch.randn(32, 256)
-            >>> output_tensor = model.forward(input_tensor)
+
+        .. code-block:: python
+
+            model = FeedForward(n_embed=256, hidden_size=512, dropout=0.2, activation='relu')
+            input_tensor = torch.randn(32, 256)
+            output_tensor = model.forward(input_tensor)
         """
 
         x = self.fully_connected_1(x)
@@ -266,9 +281,11 @@ class DecoderBlock(torch.nn.Module):
         torch.Tensor: Output tensor of shape (batch_size, seq_len, n_embed).
 
     Example:
-        >>> model = DecoderBlock(n_embed=256, hidden_size=512, n_heads=8, max_seq_len=32, dropout=0.2, activation='relu')
-        >>> input_tensor = torch.randn(16, 32, 256)
-        >>> output_tensor = model(input_tensor)
+
+    .. code-block:: python
+        model = DecoderBlock(n_embed=256, hidden_size=512, n_heads=8, max_seq_len=32, dropout=0.2, activation='relu')
+        input_tensor = torch.randn(16, 32, 256)
+        output_tensor = model(input_tensor)
     """
 
     def __init__(

@@ -38,7 +38,9 @@ def threaded_map(
         leave (bool, optional): Whether to leave the progress bar after completion. Default is True.
 
     Example:
+
         .. code-block:: python
+
             import requests
             from sign_language_translator.utils import threaded_map
 

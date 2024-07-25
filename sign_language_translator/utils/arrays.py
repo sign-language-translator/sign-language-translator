@@ -268,7 +268,9 @@ def linear_interpolation(
         ValueError: If `new_x` or `old_x` is not 1 dimensional.
 
     Examples:
+
         .. code-block: python
+
             data = np.array([1, 2, 3, 5])
             new_indexes = np.array([1.5, 0.5, 2.5])
             interpolated_data = linear_interpolation(data, new_indexes)

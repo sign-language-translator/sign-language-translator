@@ -39,7 +39,9 @@ class VectorLookupModel(TextEmbeddingModel):
         - load(cls, path: str): Loads a saved model state (tokens & vectors) from a file.
 
     Usage:
-        ```python
+
+    ..code-block:: python
+
         from sign_language_translator.models import VectorLookupModel
         import torch
 
@@ -53,7 +55,6 @@ class VectorLookupModel(TextEmbeddingModel):
 
         model.save("model.pt")
         loaded_model = VectorLookupModel.load("model.pt")
-        ```
     """
 
     def __init__(

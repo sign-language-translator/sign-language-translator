@@ -87,7 +87,9 @@ class Video(Sign, VideoFrames):
         codec: The video codec used to encode the video.
 
     Example:
+
         .. code-block:: python
+
             import sign_language_translator as slt
 
             # Load a video from a file
@@ -956,7 +958,9 @@ class Video(Sign, VideoFrames):
             Video: An instance of the Video class representing the video that matched the label.
 
         Examples:
+
             .. code-block:: python
+
                 import sign_language_translator as slt
 
                 # Load a dictionary video asset

@@ -57,12 +57,15 @@ def extract_supported_subsequences_indexes(
         List[List[int]]: A list indices of supported subsequences, where each inner list represents a subsequence.
 
     Examples:
-        >>> sequence = [1, 2, 3, 4, 5, 6]
-        >>> tags = ['A', 'A', 'B', 'A', 'A', 'C']
-        >>> supported_tags = {'A'}
-        >>> skipped_items = {2}
-        >>> extract_supported_subsequences(sequence, tags, supported_tags, skipped_items)
-        [[0], [3, 4]]
+
+    .. code-block:: python
+
+        sequence = [1, 2, 3, 4, 5, 6]
+        tags = ['A', 'A', 'B', 'A', 'A', 'C']
+        supported_tags = {'A'}
+        skipped_items = {2}
+        extract_supported_subsequences(sequence, tags, supported_tags, skipped_items)
+        # [[0], [3, 4]]
     """
 
     all_subsequences = []
@@ -99,12 +102,15 @@ def extract_supported_subsequences(
         List[List[Any]]: A list of supported subsequences, where each inner list represents a subsequence.
 
     Examples:
-        >>> sequence = [1, 2, 3, 4, 5, 6]
-        >>> tags = ['A', 'A', 'B', 'A', 'A', 'C']
-        >>> supported_tags = {'A'}
-        >>> skipped_items = {2}
-        >>> extract_supported_subsequences(sequence, tags, supported_tags, skipped_items)
-        [[1], [4, 5]]
+
+    .. code-block:: python
+
+        sequence = [1, 2, 3, 4, 5, 6]
+        tags = ['A', 'A', 'B', 'A', 'A', 'C']
+        supported_tags = {'A'}
+        skipped_items = {2}
+        extract_supported_subsequences(sequence, tags, supported_tags, skipped_items)
+        # [[1], [4, 5]]
     """
 
     indexes = extract_supported_subsequences_indexes(
@@ -137,6 +143,9 @@ def concatenate_sentence_terminals(sentences: List, start_token, end_token):
         List: A new list of sentences with start and end tokens inserted.
 
     Example:
+
+    .. code-block:: python
+
         sentences = ["Hello!", "How are you?", "Goodbye."]
         start_token = "<start>"
         end_token = "<end>"
@@ -172,26 +181,26 @@ class ListRegex:
     When using a list of patterns, any of the patterns in the list can match an item.
     When using a tuple of pattern and counts, items in the specified range can match the pattern.
 
-    Example usage:
+    Examples:
 
-    ```python
-    items = ["apple", "banana", "orange", "orange", "grape", "melon", "orange", "kiwi"]
+    .. code-block:: python
 
-    # Match the patterns against the items
-    patterns = ["apple", "\\w+"]
-    result = ListRegex.match(items, patterns)
-    # Output: (0, 2)
+        items = ["apple", "banana", "orange", "orange", "grape", "melon", "orange", "kiwi"]
 
-    # Search for the first occurrence of the patterns
-    patterns = [r"ba(na){2}", ("orange", (0,3))]
-    result = ListRegex.search(items, patterns)
-    # Output: (1, 4)
+        # Match the patterns against the items
+        patterns = ["apple", "\\w+"]
+        result = ListRegex.match(items, patterns)
+        # Output: (0, 2)
 
-    # Find all occurrences of the patterns
-    patterns = ["orange", ["grape", "kiwi"]]
-    result = ListRegex.find_all(items, patterns)
-    # Output: [['orange', 'grape'], ['orange', 'kiwi']]
-    ```
+        # Search for the first occurrence of the patterns
+        patterns = [r"ba(na){2}", ("orange", (0,3))]
+        result = ListRegex.search(items, patterns)
+        # Output: (1, 4)
+
+        # Find all occurrences of the patterns
+        patterns = ["orange", ["grape", "kiwi"]]
+        result = ListRegex.find_all(items, patterns)
+        # Output: [['orange', 'grape'], ['orange', 'kiwi']]
     """
 
     @staticmethod

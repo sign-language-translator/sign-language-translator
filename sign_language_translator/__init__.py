@@ -1,6 +1,7 @@
 """
 sign_language_translator
 ========================
+
 Code: https://github.com/sign-language-translator/sign-language-translator
 Help: https://slt.readthedocs.io
 Demo: https://huggingface.co/sltAI
@@ -38,20 +39,27 @@ Usage
     sign = model.translate(text) # tokenize, map, download & concatenate
     sign.show()
 
-    model.text_language = "hindi"  # slt.TextLanguageCodes.HINDI  # slt.languages.text.Hindi()
+
+    model.text_language = slt.TextLanguageCodes.HINDI     # slt.languages.text.English()
+    model.sign_format = slt.SignFormatCodes.LANDMARKS
+    model.sign_embedding_model = "mediapipe-world"
+
     sign_2 = model.translate("कैसे हैं आप?") # "How are you?"
-    sign_2.save("how are you.mp4", overwrite=True)
+    sign_2.save("how-are-you.csv", overwrite=True)
+    sign_2.save_animation("how-are-you.gif", overwrite=True)
 
     # -------------------------- TRANSLATE: sign to text --------------------------
 
-    sign = slt.Video("path/to/video.mp4")
-    sign = slt.Video.load_asset("videos/pk-hfad-1_program.mp4")  # downloads, reads and displays a dataset file
+    # sign = slt.Video("path/to/video.mp4")
+    sign = slt.Video.load_asset("pk-hfad-1_آپ-کا-نام-کیا(what)-ہے")  # your name what is? (auto-downloaded)
     sign.show_frames_grid()
 
     # Extract Pose Vector for feature reduction
-    embedding_model = slt.models.MediaPipeLandmarksModel()
+    embedding_model = slt.models.MediaPipeLandmarksModel()      # pip install "sign_language_translator[mediapipe]"  # (or [all])
     embedding = embedding_model.embed(sign.iter_frames())
-    # slt.Landmarks(embedding, connections="mediapipe-world").show()
+
+    slt.Landmarks(embedding.reshape((-1, 75, 5)),
+                connections="mediapipe-world").show()
 
     # # Load sign-to-text model (pytorch) (COMING SOON!)
     # translation_model = slt.get_model(slt.ModelCodes.Gesture)

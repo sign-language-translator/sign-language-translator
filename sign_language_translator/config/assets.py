@@ -52,6 +52,7 @@ class Assets:
             remove the matching assets from storage and its records from the checksum file.
 
     Example:
+
     .. code-block:: python
 
         import sign_language_translator as slt
