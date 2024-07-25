@@ -615,29 +615,12 @@ See our datasets & conventions [here](https://github.com/sign-language-translato
 
 </details>
 
-## Citation, Licence & Research Papers
-
-```bibtex
-@software{mdsr2023slt,
-  author       = {Mudassar Iqbal},
-  title        = {Sign Language Translator: Python Library and AI Framework},
-  year         = {2023},
-  publisher    = {GitHub},
-  howpublished = {\url{https://github.com/sign-language-translator/sign-language-translator}},
-}
-```
-
-This project is licensed under the [Apache 2.0 License](https://github.com/sign-language-translator/sign-language-translator/blob/main/LICENSE). You are permitted to use the library, create modified versions, or incorporate pieces of the code into your own work. Your product or research, whether commercial or non-commercial, must provide appropriate credit to the original author(s) by citing this repository.
-
-Stay Tuned for research Papers!
-
 ## Upcoming/Roadmap
 
 <details open>
 <summary>LANDMARKS_WRAPPER: v0.8</summary>
 
 ```python
-# 0.8.0: landmarks wrapper class
 # 0.8.1: landmark augmentation (zoom, rotate, move, noise, duration, rectify, stabilize, __repr__)
 # 0.8.2: trim signs before concatenation, insert transition frames
 
@@ -736,6 +719,22 @@ Servers / Product
 
 </details>
 
+## Citation, Licence & Research Papers
+
+```bibtex
+@software{mdsr2023slt,
+  author       = {Mudassar Iqbal},
+  title        = {Sign Language Translator: Python Library and AI Framework},
+  year         = {2023},
+  publisher    = {GitHub},
+  howpublished = {\url{https://github.com/sign-language-translator/sign-language-translator}},
+}
+```
+
+This project is licensed under the [Apache 2.0 License](https://github.com/sign-language-translator/sign-language-translator/blob/main/LICENSE). You are permitted to use the library, create modified versions, or incorporate pieces of the code into your own work. Your product or research, whether commercial or non-commercial, must provide appropriate credit to the original author(s) by citing this repository.
+
+Stay Tuned for research Papers!
+
 ## Credits and Gratitude
 
 This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-07-25.
@@ -755,7 +754,7 @@ This project started in October 2021 as a BS Computer Science final year project
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **12,926** + Tests: **2,461**):
+Count total number of **lines of code** (Package: **13,015** + Tests: **2,475**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
