@@ -21,9 +21,6 @@ Classes:
 
     VideoEmbeddingPipeline(slt.models.VideoEmbeddingModel):
         With optional multiprocessing, reads video files from paths, performs forward pass of a model on them and saves the output in specified format.
-
-Example usage:
-    See the docstrings of individual functions and classes for usage examples.
 """
 
 from __future__ import annotations
@@ -73,17 +70,21 @@ def top_p_top_k_indexes(
     Returns:
         torch.Tensor: The indices of the selected elements.
 
-    Example usage:
-        >>> selected_indices = top_p_top_k_indexes(
-        >>>    probabilities=[0.1, 0.2, 0.15, 0.05, 0.3, 0.2],
-        >>>    top_p=0.75,
-        >>>    top_k=3,
-        >>> )
-        [4, 1, 5]
+    Examples:
 
-        You can then use the `selected_indices` to gather the actual elements from the original tensor.
-        >>> sampled_elements = probs[selected_indices]
-        [0.3, 0.2, 0.2]
+    .. code-block:: python
+
+        selected_indices = top_p_top_k_indexes(
+            probabilities=[0.1, 0.2, 0.15, 0.05, 0.3, 0.2],
+            top_p=0.75,
+            top_k=3,
+        )
+        # [4, 1, 5]
+
+        # You can then use the `selected_indices` to gather
+        # the actual elements from the original tensor.
+        sampled_elements = probs[selected_indices]
+        # [0.3, 0.2, 0.2]
     """
 
     if top_p is None and top_k is None:
@@ -140,15 +141,18 @@ class FullyLambdaLR(torch.optim.lr_scheduler.LRScheduler):
             each update. Default: ``False``.
 
     Example:
-        >>> scheduler = FullyLambdaLR(
-        >>>    optimizer,
-        >>>    lambda step_num, base_lr, last_lr: last_lr * (1.08 if step_num%2 == 0 else 0.8)
-        >>> )
-        >>> for epoch in range(100):
-        >>>     train(...)
-        >>>     validate(...)
-        >>>     scheduler.step()
-        >>>     print(scheduler.get_last_lr()[0])
+
+    .. code-block:: python
+
+        scheduler = FullyLambdaLR(
+            optimizer,
+            lambda step_num, base_lr, last_lr: last_lr * (1.08 if step_num%2 == 0 else 0.8)
+        )
+        for epoch in range(100):
+            train(...)
+            validate(...)
+            scheduler.step()
+            print(scheduler.get_last_lr()[0])
     """
 
     def __init__(
@@ -207,7 +211,9 @@ def plot_lr_scheduler(
         **kwargs: Additional keyword arguments to pass to the lr_scheduler_class when creating a new scheduler.
 
     Example:
-        ```
+
+    .. code-block:: python
+
         # Using an existing learning rate scheduler object
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
         plot_lr_scheduler(lr_scheduler_object=lr_scheduler, n_steps=100)
@@ -219,7 +225,6 @@ def plot_lr_scheduler(
             gamma=0.9,
             n_steps=50,
         )
-        ```
     """
 
     import matplotlib.pyplot as plt
@@ -329,13 +334,16 @@ def set_layers_trainability_(
           `model.named_parameters()`.
 
     Examples:
-        1. To freeze all layers in the model:
+
+    .. code-block:: python
+
+        # To freeze all layers in the model:
         set_layers_trainability_(model, layers_to_freeze=[""])
 
-        2. To unfreeze the layers with names starting with 'classifier' and 'fc':
+        # To unfreeze the layers with names starting with 'classifier' and 'fc':
         set_layers_trainability_(model, layers_to_unfreeze=["classifier", "fc"])
 
-        3. To unfreeze all layers:
+        # To unfreeze all layers:
         set_layers_trainability_(model, layers_to_unfreeze=[""])
     """
 

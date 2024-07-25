@@ -35,7 +35,9 @@ class Archive:
         filtered by file names, patterns, or regex.
 
     Example:
+
     .. code-block:: python
+
         from sign_language_translator.utils import Archive
 
         # Create a ZIP archive with files matching a pattern
@@ -50,8 +52,8 @@ class Archive:
         print(extracted_files)
 
     Note:
-    - For file patterns, this class uses glob-style patterns e.g. "*.mp4".
-    - When extracting files, warnings are issued for skipped files with the same base name.
+        - For file patterns, this class uses glob-style patterns e.g. "*.mp4".
+        - When extracting files, warnings are issued for skipped files with the same base name.
     """
 
     @staticmethod

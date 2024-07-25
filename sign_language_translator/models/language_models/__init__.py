@@ -16,20 +16,20 @@ Usage:
 ------
 To use the language models, import them directly from this module. For example:
 
-```python
-from sign_language_translator.models.language_models import NgramLanguageModel, TransformerLanguageModel
+.. code-block:: python
 
-# Create and use the NgramLanguageModel
-model = NgramLanguageModel(window_size=2, unknown_token="")
-model.fit(["hello", "world"])
-text = "yel"
-next_word, probability = model.next(text)
+    from sign_language_translator.models.language_models import NgramLanguageModel, TransformerLanguageModel
 
-# Create and use the TransformerLanguageModel
-transformer_lm = TransformerLanguageModel.load("tlm.pt")
-tokens = ["how", "are", "you"]
-next_word, probability = transformer_lm.next(tokens)
-```
+    # Create and use the NgramLanguageModel
+    model = NgramLanguageModel(window_size=2, unknown_token="")
+    model.fit(["hello", "world"])
+    text = "yel"
+    next_word, probability = model.next(text)
+
+    # Create and use the TransformerLanguageModel
+    transformer_lm = TransformerLanguageModel.load("tlm.pt")
+    tokens = ["how", "are", "you"]
+    next_word, probability = transformer_lm.next(tokens)
 """
 
 from sign_language_translator.models.language_models import transformer_language_model

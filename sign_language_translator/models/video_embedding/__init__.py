@@ -10,26 +10,27 @@ and sign language translation.
 Available Models:
 -----------------
 
-- `VideoEmbeddingModel`: An abstract base class representing a video embedding model.
-  This class defines common attributes and methods (such as embed()) for video embedding models.
+- **`VideoEmbeddingModel`**: An abstract base class representing a video embedding model.
+    This class defines common attributes and methods (such as embed()) for video embedding models.
 
-- `MediaPipeLandmarksModel`: A model that utilizes MediaPipe's pose & hand solution to generate video embeddings.
-  It detects keypoints representing body joints and estimates their position in 3D world coordinates and in the frame pixels.
+- **`MediaPipeLandmarksModel`**: A model that utilizes MediaPipe's pose & hand solution to generate video embeddings.
+    It detects keypoints representing body joints and estimates their position in 3D world coordinates and in the frame pixels.
 
 Usage:
 ------
-```python
-from sign_language_translator.models import MediaPipeLandmarksModel
 
-model = MediaPipeLandmarksModel()
+.. code-block:: python
 
-# Define 'frames' as a list of numpy arrays (Width, Height, Channels)
-frames = [...]  # Replace with actual video frames
+    from sign_language_translator.models import MediaPipeLandmarksModel
 
-# Generate video embeddings using the MediaPipeLandmarksModel
-embeddings = model.embed(frames, landmark_type = "world")
-print(embeddings.shape) # (n_frames, n_landmarks * 5)
-```
+    model = MediaPipeLandmarksModel()
+
+    # Define 'frames' as a list of numpy arrays (Width, Height, Channels)
+    frames = [...]  # Replace with actual video frames
+
+    # Generate video embeddings using the MediaPipeLandmarksModel
+    embeddings = model.embed(frames, landmark_type = "world")
+    print(embeddings.shape) # (n_frames, n_landmarks * 5)
 """
 
 from sign_language_translator.models.video_embedding.mediapipe_landmarks_model import (

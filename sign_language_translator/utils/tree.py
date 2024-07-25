@@ -46,7 +46,8 @@ def tree(
             ignore = ["__pycache__", "temp"]
 
         # list and sort subdirectories & contained files
-        children_paths = glob(os.path.join(cur_path, "*")) # TODO: use os.listdir to show hidden files
+        children_paths = glob(os.path.join(cur_path, "*"))
+        # TODO: use os.listdir to show hidden files
         child_files = []
         child_dirs = []
         for child in children_paths:

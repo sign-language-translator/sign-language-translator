@@ -1,3 +1,4 @@
+import os
 import re
 from enum import EnumMeta
 from random import choices
@@ -13,6 +14,7 @@ __all__ = [
     "is_regex",
     "sample_one_index",
     "search_in_values_to_retrieve_key",
+    "validate_path_exists",
 ]
 
 
@@ -81,13 +83,16 @@ def extract_recursive(data: Dict[str, Any], key: str) -> List[Any]:
                    recursively from the input dictionary.
 
     Examples:
-        >>> data = {'a': 1, 'b': {'c': 2, 'd': {'e': 3, 'f': 4}}, 'g': [5, {'h': 6, 'e': 7}]}
-        >>> extract_recursive(data, 'e')
-        [3, 7]
-        >>> extract_recursive(data, 'h')
-        [6]
-        >>> extract_recursive(data, 'x')
-        []  # Key not found, returns an empty list.
+
+    .. code-block:: python
+
+        data = {'a': 1, 'b': {'c': 2, 'd': {'e': 3, 'f': 4}}, 'g': [5, {'h': 6, 'e': 7}]}
+        extract_recursive(data, 'e')
+        # [3, 7]
+        extract_recursive(data, 'h')
+        # [6]
+        extract_recursive(data, 'x')
+        # []  # Key not found, returns an empty list.
     """
 
     extracted_values = []
@@ -143,6 +148,9 @@ class PrintableEnumMeta(EnumMeta):
     def __repr__(cls) -> str:
         return str(cls)
 
+    def __contains__(cls, item) -> bool:
+        return item in cls._value2member_map_
+
 
 class ProgressStatusCallback:
     """
@@ -159,6 +167,9 @@ class ProgressStatusCallback:
             Update the tqdm progress bar with the provided status information.
 
     Example:
+
+    .. code-block:: python
+
         # Instantiate a tqdm progress bar & callback
         progress_bar = tqdm(total=100, desc='Processing')
         callback = ProgressStatusCallback(tqdm_bar=progress_bar)
@@ -208,3 +219,36 @@ def is_regex(string: Union[str, re.Pattern]) -> bool:
             return False
 
     return False
+
+
+def validate_path_exists(path: str, overwrite: bool = False) -> str:
+    """
+    Validates the existence of a given file path and optionally creates necessary directories.
+
+    This function checks if a file already exists at the specified path. If the file exists
+    and `overwrite` is set to `False`, a `FileExistsError` is raised. If `overwrite` is set
+    to `True`, or if the file does not exist, the function returns the absolute path after
+    ensuring that all necessary directories are created.
+
+    Args:
+        path (str): The file path to be validated.
+        overwrite (bool, optional): Whether to overwrite the file if it already exists. Defaults to False.
+
+    Raises:
+        FileExistsError: If the file already exists at the specified path and `overwrite` is set to `False`.
+
+    Returns:
+        str: The absolute path of the validated file.
+
+    Examples:
+        >>> validate_path_exists('/path/to/file.txt', overwrite=False)
+        '/absolute/path/to/file.txt'
+    """
+
+    if not overwrite and os.path.exists(path):
+        raise FileExistsError(f"File already exists: '{path}' (Use overwrite=True)")
+
+    path = os.path.abspath(path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    return path

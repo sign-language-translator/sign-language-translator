@@ -2,12 +2,16 @@
 such as datasets and models.
 """
 
+__all__ = [
+    "Assets",
+]
+
 import json
 import os
 import re
 from datetime import datetime
 from os.path import abspath, dirname, exists, isdir, isfile, join, sep
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from tqdm.auto import tqdm
 
@@ -44,32 +48,29 @@ class Assets:
         extract(filename_or_regex: str, archive_name_or_regex: str = None, overwrite=False, download_archive=True) -> List[str]:
             extract the files matching the argument from an archived dataset into the appropriate location.
 
-        fetch(filename_or_regex: str, overwrite=False, archive_name_or_regex: str=None, download_archive=False) -> List[str]:
-            extract the required files if an archive is pre-downloaded otherwise download the files if direct URL is available otherwise download the archive and extract.
-
         delete(filename_or_regex: str) -> None:
             remove the matching assets from storage and its records from the checksum file.
 
     Example:
+
     .. code-block:: python
 
         import sign_language_translator as slt
-        # slt.Assets.set_root_dir("./custom-centralized-assets")
+        # slt.Assets.set_root_dir("~/centralized-slt-assets")
 
         # Archived datasets
         ids = slt.Assets.get_ids(r"datasets/.*\\.zip")
-        paths = slt.Assets.download("datasets/pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-csv.zip")
-        files = slt.Assets.extract(paths[0], r".*\\.csv")
+        paths = slt.Assets.download("datasets/pk-hfad-1.landmarks-mediapipe-world-csv.zip")
+        files = slt.utils.Archive.extract(paths[0], "*.csv")
+
+        # Specific file from archive
+        path = slt.Assets.extract("pk-hfad-1_airplane.landmarks-mediapipe-world.csv", download_archive=True)
 
         # all dictionary videos for numbers
         urls = slt.Assets.get_url(r"videos/[a-z-]+_\\d+\\.mp4")
 
-        # Automatically extract dictionary videos from an archive if its available else download from direct URL
-        # try not to use vague regex anywhere and its best if you manually download needed dataset archive
-        paths = slt.Assets.fetch(r"videos/pk-hfad-1_\\d+\\.mp4")
-
         # download a model
-        paths = slt.Assets.download(r".*/names-stat-lm-w1\\.json")
+        paths = slt.Assets.download(r"models/names-stat-lm-w\\d\\.json")
 
         # add your own dataset
         slt.Assets.FILE_TO_URL.update({"relative/path/to/asset.mp4": "https://...",})
@@ -233,19 +234,16 @@ class Assets:
             List[str]: A list of paths to the extracted assets.
         """
         cls.delete_out_of_date_assets()
+        checksum_asset_ids, checksum_infos = [], []
 
-        archive_regex = archive_name_or_regex or cls._infer_archive_name(
-            filename_or_regex
-        )
+        arch = archive_name_or_regex or cls.infer_archive_name(filename_or_regex)
         if download_archive:
-            cls.download(
-                archive_regex, overwrite=False, progress_bar=progress_bar, leave=leave
-            )
+            cls.download(arch, overwrite=False, progress_bar=progress_bar, leave=leave)
 
         content_name = filename_or_regex.split("/")[-1]
         extracted_assets = []
-        for archive_id in cls.get_ids(archive_regex):
-            asset_dir = archive_id.split("/")[-1].split("_")[-1].split("-")[0]
+        for archive_id in cls.get_ids(arch):
+            asset_dir = archive_id.split("/")[-1].split(".")[-2].split("-")[0]
             extracted_assets += Archive.extract(
                 archive_path=cls._abs_path(archive_id),
                 regex=content_name,
@@ -253,10 +251,20 @@ class Assets:
                 overwrite=overwrite,
                 progress_bar=progress_bar,
                 leave=leave,
+                verbose=False,
             )
 
-        # TODO: checksum
+            for asset_id in extracted_assets:
+                # todo: skip those which were not extracted/overwritten but existed already
+                checksum_asset_ids.append(asset_id)
+                checksum_infos.append(
+                    {
+                        "archive_id": archive_id,
+                        "archive_url": cls.get_url(archive_id)[0],
+                    }
+                )
 
+        cls._update_checksum(checksum_asset_ids, checksum_infos)
         return extracted_assets
 
     @classmethod
@@ -330,60 +338,6 @@ class Assets:
 
         return [path for _, path, _ in id_path_url] + existing_paths
 
-    @classmethod
-    def fetch(
-        cls,
-        filename_or_regex: str,
-        overwrite=False,
-        archive_name_or_regex: Optional[str] = None,
-        download_archive=False,
-        progress_bar=True,
-        leave=True,
-    ) -> List[str]:
-        """Tries to extract the asset from an archive if it is available, otherwise downloads the asset from its direct URL if available.
-        If the archive name is not provided, it will be inferred from the filename_or_regex.
-
-        Note:
-            Only use for dictionary videos because only their direct URLs & archives both are available.
-            Follow the filename structure to avoid false guesses (i.e. use all - and _ in the right places and insert wildcards as required).
-
-        Args:
-            filename_or_regex (str): The filename or regex to match against asset IDs.
-            overwrite (bool, optional): Flag indicating whether to overwrite existing assets. Defaults to False.
-            archive_name_or_regex (str, optional): The name or regex pattern of the archive(s) that contains the assets. If None, the function tries guess it from the content name. Defaults to None.
-            download_archive (bool, optional): Flag indicating whether to download the archive if it is not already downloaded. Defaults to False.
-            progress_bar (bool, optional): Flag indicating whether to show the progress bars or not. Defaults to True.
-            leave (bool, optional): Flag indicating whether to leave the progress_bar behind after completion or not. Defaults to True.
-
-        Returns:
-            List[str]: List of paths to files that were downloaded or extracted.
-
-        Example:
-        .. code-block:: python
-
-            import sign_language_translator as slt
-
-            # extract/download all pakistan-sign-language dictionary videos for numbers
-            paths = slt.Assets.fetch(r"videos/pk-[a-z]+-[0-9]+_\\d+\\.mp4")
-        """
-
-        extracted_assets = cls.extract(
-            filename_or_regex,
-            archive_name_or_regex=archive_name_or_regex,
-            overwrite=overwrite,
-            download_archive=download_archive,
-            progress_bar=progress_bar,
-            leave=leave,
-        )
-        downloaded_assets = cls.download(
-            filename_or_regex,
-            overwrite=False,
-            progress_bar=progress_bar,
-            leave=leave,
-        )
-
-        return list(set(extracted_assets + downloaded_assets))
-
     # ============ #
     #    Delete    #
     # ============ #
@@ -400,9 +354,11 @@ class Assets:
 
         for asset_id, info in checksum.copy().items():
             path = cls._abs_path(asset_id)
+            # false record
             if not exists(path):
                 checksum.pop(asset_id, None)
                 continue
+            # outdated URL
             if (
                 "url" in info
                 and asset_id in cls.FILE_TO_URL  # is loaded
@@ -411,7 +367,15 @@ class Assets:
                 os.remove(path)
                 checksum.pop(asset_id, None)
 
-            # TODO: check info["archive_id"] and delete archive & all extracted_contents
+            # outdated source archive
+            if (
+                "archive_id" in info
+                and "archive_url" in info
+                and info["archive_id"] in cls.FILE_TO_URL
+                and info["archive_url"] != cls.FILE_TO_URL[info["archive_id"]]
+            ):
+                os.remove(cls._abs_path(asset_id))
+                checksum.pop(asset_id, None)
 
         cls._write_checksum(checksum)
 
@@ -466,6 +430,31 @@ class Assets:
     # ============= #
 
     @classmethod
+    def is_dictionary_video(cls, filename: str) -> bool:
+        """Class method to check if the given filename is a dictionary video.
+        Checks the folder name, extension & direct URL.
+
+        Args:
+            filename (str): The asset ID to check. (e.g. 'videos/pk-hfad-1_airplane.mp4')
+
+        Returns:
+            bool: True if the filename represents a dictionary video, False otherwise.
+        """
+        folder, basename = filename.split("/")
+        if folder != "videos":
+            return False
+
+        label, extension = basename.rsplit(".", maxsplit=1)
+        if extension != "mp4":
+            return False
+
+        chunks = label.split(Settings.FILENAME_SEPARATOR)
+        if len(chunks) == 2 and len(cls.get_ids(filename)) == 1:
+            return True
+
+        return False
+
+    @classmethod
     def _abs_path(cls, asset_id: str) -> str:
         return join(
             (cls.urls_file_dir if asset_id.endswith("urls.json") else cls.ROOT_DIR),
@@ -492,19 +481,27 @@ class Assets:
             json.dump(checksum, f, indent=2, ensure_ascii=False, sort_keys=True)
 
     @classmethod
-    def _update_checksum(cls, asset_id: str, info: Dict):
+    def _update_checksum(
+        cls, asset_id: Union[str, List[str]], info: Union[Dict, List[Dict]]
+    ):
+        if not isinstance(asset_id, list):
+            asset_id = [asset_id]
+        if not isinstance(info, list):
+            info = [info]
+
         checksum = cls._read_checksum()
-        if asset_id not in checksum:
-            checksum[asset_id] = {}
-        checksum[asset_id].update(
-            {"date": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), **info}
-        )
+        for _asset_id, _info in zip(asset_id, info):
+            checksum.setdefault(_asset_id, {}).update(
+                {"date": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"), **_info}
+            )
         cls._write_checksum(checksum)
 
     @classmethod
-    def _infer_archive_name(cls, filename_or_regex: str) -> str:
+    def infer_archive_name(cls, filename_or_regex: str) -> str:
         """
         Infers the archive name/regex that should contain the given asset based on the provided filename_or_regex argument.
+        Please follow the naming convention to avoid false guesses
+        i.e. use all allowed special symbols `["/", "-", "_", ".", r"\\."]` in the right places.
 
         Args:
             filename_or_regex (str): The asset filename or regex from which its containing archive name must be inferred.
@@ -517,21 +514,25 @@ class Assets:
             return filename_or_regex
 
         base = filename_or_regex.split("/")[-1]
-        collection = base.split("_", 1)[0] if "_" in base else ".*"
-        extension = ext if (ext := base[-3:]) in ("csv", "npz", "npy", "mp4") else ".*"
+        collection = base.split("_", 1)[0] if "_" in base else r".*"
+        category = r".^"
+        model = r".^"
+        extension = ext if (ext := base[-3:]) in ("csv", "npz", "npy", "mp4") else r".*"
 
-        if "video" in filename_or_regex or extension == "mp4":
-            category = "videos"
-            model = "?"
-            # todo: remove this hack
+        if "landmarks" in filename_or_regex:
+            category = "landmarks" if extension != "mp4" else r".^"  # landmarks/x.mp4
+
+            # assuming the filename structure follows the convention (select the part between two '.'s)
+            sub_extension = re.split(r"(\\\.|\.(?![\*\+\{\?]))", filename_or_regex)[-3]
+            model = sub_extension.split("-", maxsplit=1)[-1]
+            if not model.startswith(("mediapipe", "testmodel")):  # validation
+                model = r".*"
+
+        elif "video" in filename_or_regex or extension == "mp4":
+            category = "videos" if extension in ("mp4", r".*") else r".^"  # video/x.csv
+            model = "?"  # todo: remove this hack
             # todo: make it work for dictionary & replications
-            if extension == ".*":
+            if extension == r".*":
                 extension = "mp4"
-        elif "landmarks" in filename_or_regex:
-            category = "landmarks"
-            model = ".*"
-        else:
-            model = ".^"
-            category = ".^"
 
-        return f"datasets/{collection}_{category}-{model}-{extension}\\.zip"
+        return f"datasets/{collection}\\.{category}-{model}-{extension}\\.zip$"

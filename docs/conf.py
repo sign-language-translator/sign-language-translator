@@ -92,5 +92,10 @@ html_theme = "sphinx_rtd_theme"
 
 html_theme_options = {
     # 'logo_only': True,
+    # "logo": {
+    #     "text": "Sign Language Translator",
+    # },
+    # "show_nav_level": 2,
 }
-html_logo = "https://avatars.githubusercontent.com/u/130464523"
+# html_logo = "https://avatars.githubusercontent.com/u/130464523"
+html_logo = "https://github.com/sign-language-translator/sign-language-translator/assets/118578823/d4723333-3d25-413d-83a1-a4bbdc8da15a"

@@ -44,8 +44,8 @@ def iter_frames_with_opencv(path: str) -> Generator[NDArray[uint8], None, None]:
     Args:
         path (str): The path to the video or image file.
 
-    Returns:
-        Generator[NDArray, None, None]: yields numpy arrays representing frames from the video (W, H, C).
+    Yields:
+        NDArray[np.uint8]: numpy arrays representing frames from the video with shape: (height, width, color_channels).
 
     Raises:
         FileNotFoundError: If the video file is not found or cannot be opened.
@@ -79,9 +79,7 @@ def _normalize_args_index_and_timestamp(
 ) -> Tuple[float, int]:
     if (timestamp is not None) and index is None:
         if not 0 <= timestamp <= max_duration:
-            raise ValueError(
-                f"timestamp must be between 0 and {max_duration}, but got {timestamp}"
-            )
+            raise ValueError(f"'{timestamp=}' is not between 0 and {max_duration}")
 
         return timestamp, round(
             (timestamp / max_duration if max_duration else 1) * max_index
@@ -89,9 +87,7 @@ def _normalize_args_index_and_timestamp(
 
     elif (index is not None) and timestamp is None:
         if not 0 <= index <= max_index:
-            raise ValueError(
-                f"index must be between 0 and {max_index}, but got {index}."
-            )
+            raise ValueError(f"'{index=}' is not between 0 and {max_index}")
 
         return index / (max_index or 1) * max_duration, index
 
@@ -110,11 +106,11 @@ def _validate_and_normalize_slices(
         if key is Ellipsis:
             slices += [slice(None)] * (max_n_dims - len(keys) + 1)
         elif isinstance(key, int):
-            slices.append(slice(key, key + 1))
+            slices.append(slice(key, (key + 1) or None))
         elif isinstance(key, slice):
             slices.append(key)
         else:
-            raise ValueError(
+            raise TypeError(
                 f"Invalid argument: {key} at index {i}. Provide either an integer, slice or ellipsis."
             )
 

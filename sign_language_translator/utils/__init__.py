@@ -1,6 +1,12 @@
-"""This module provides utility functions for the sign language translator package.
+"""
+Utils
+=====
 
-Functions:
+This module provides utility functions for the sign language translator package.
+
+Functions
+---------
+
 - download: A function for downloading files from urls.
 - tree: A function for printing a directory tree.
 - sample_one_index: Select an index based on the given probability distribution.
@@ -11,7 +17,9 @@ Functions:
 - threaded_map: Multi-threaded mapping of a function to an iterable.
 - extract_recursive: Recursively extracts values associated with a specified key from a nested dictionary.
 
-Classes:
+Classes
+-------
+
 - ArrayOps: A class for array operations agnostic to numpy.ndarray and torch.Tensor.
 - Archive: A utility class for making, viewing and extracting archive files such as .zip files.
 - PrintableEnumMeta: A metaclass for making enum classes printable with the class members.
@@ -36,6 +44,7 @@ from sign_language_translator.utils.utils import (
     is_regex,
     sample_one_index,
     search_in_values_to_retrieve_key,
+    validate_path_exists,
 )
 
 __all__ = [
@@ -51,6 +60,7 @@ __all__ = [
     "extract_recursive",
     "adjust_vector_angle",
     "align_vectors",
+    "validate_path_exists",
     # classes
     "Archive",
     "ArrayOps",

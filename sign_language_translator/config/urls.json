@@ -4,7 +4,7 @@
       "description": "word-mapping-dataset",
       "file_to_url": {
         "mapping-schema.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/schemas/mapping-schema.json",
-        "pk-dictionary-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-dictionary-mapping.json",
+        "pk-dictionary-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/a339f5bc5203ad88307f518f38886282cfb34c4a/parallel_texts/pk-dictionary-mapping.json",
         "pk-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-sentence-mapping.json",
         "pk-synthetic-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-synthetic-sentence-mapping.json",
         "text-preprocessing.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/a62449e395140c0e3bb0f87ed586b28f0a8f193b/text-preprocessing.json"
@@ -22,10 +22,18 @@
       "archives": {
         "landmarks": [
           {
-            "description": "mediapipe_pose_v2_hand_v1",
+            "description": "pakistan_mediapipe-pose-2-hand-1",
             "file_to_url": {
-              "datasets/pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-csv.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-csv.zip",
-              "datasets/pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-json.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-json.zip"
+              "datasets/pk-hfad-1.landmarks-mediapipe-image-csv.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/pk-hfad-1.landmarks-mediapipe-image-csv.zip",
+              "datasets/pk-hfad-1.landmarks-mediapipe-world-csv.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/pk-hfad-1.landmarks-mediapipe-world-csv.zip",
+              "datasets/pk-hfad-2.landmarks-mediapipe-image-csv.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/pk-hfad-2.landmarks-mediapipe-image-csv.zip",
+              "datasets/pk-hfad-2.landmarks-mediapipe-world-csv.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/pk-hfad-2.landmarks-mediapipe-world-csv.zip"
+            }
+          },
+          {
+            "description": "demo",
+            "file_to_url": {
+              "datasets/xx-shapes-1.landmarks-testmodel-csv.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/xx-shapes-1.landmarks-testmodel-csv.zip"
             }
           }
         ],
@@ -33,13 +41,13 @@
           {
             "description": "pakistan",
             "file_to_url": {
-              "datasets/pk-hfad-1_videos-mp4.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.3/pk-hfad-1_videos-mp4.zip"
+              "datasets/pk-hfad-1.videos-mp4.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.3/pk-hfad-1.videos-mp4.zip"
             }
           },
           {
             "description": "demo",
             "file_to_url": {
-              "datasets/xx-wordless-1_videos-mp4.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.3/xx-wordless-1_videos-mp4.zip"
+              "datasets/xx-wordless-1.videos-mp4.zip": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.3/xx-wordless-1.videos-mp4.zip"
             }
           }
         ]
@@ -98,6 +106,9 @@
     {
       "description": "testing-assets",
       "file_to_url": {
+        "landmarks/test-landmarks.mediapipe-all.csv": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/test-landmarks.mediapipe-all.csv",
+        "landmarks/test-landmarks.mediapipe-image.csv": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/test-landmarks.mediapipe-image.csv",
+        "landmarks/test-landmarks.mediapipe-world.csv": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.4/test-landmarks.mediapipe-world.csv",
         "models/lookup-test-model.pt": "https://github.com/sign-language-translator/sign-language-datasets/releases/download/v0.0.1/lookup-test-model.pt"
       }
     }

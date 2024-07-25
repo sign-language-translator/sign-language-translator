@@ -55,11 +55,13 @@ class BeamSampling:
         self,
         initial_context: Optional[Iterable] = None,
         append_func: Callable[[Any, Any], Any] = lambda context, token: (
-            context + [token]
+            (context + [token])
             if isinstance(context, list)
-            else context + (token,)
-            if isinstance(context, tuple)
-            else context + token
+            else (
+                (context + (token,))
+                if isinstance(context, tuple)
+                else (context + token)
+            )
         ),
     ) -> Tuple[Iterable, float]:
         """Generate completions based on the given initial context.
