@@ -7,7 +7,9 @@ Classes:
     MediaPipeLandmarksModel: A video embedding model that utilizes MediaPipe for pose and hand landmark extraction.
 
 Example:
-    ```
+
+.. code-block:: python
+
     from sign_language_translator.models import MediaPipeLandmarksModel
     from sign_language_translator.vision.utils import iter_frames_with_opencv
 
@@ -16,7 +18,6 @@ Example:
     frame_sequence = iter_frames_with_opencv("video.mp4")
     embedding = mediapipe_model.embed(frame_sequence, landmark_type="world")
     print(embedding.shape)
-    ```
 """
 
 from os.path import join
@@ -63,7 +64,8 @@ class MediaPipeLandmarksModel(VideoEmbeddingModel):
         if mediapipe is None:
             raise ImportError(
                 "The 'mediapipe' package is required to use the 'MediaPipeLandmarksModel'. "
-                "Install it using `pip install sign-language-translator[mediapipe]`."
+                "Install it using `pip install sign-language-translator[mediapipe]`. "
+                "(also make sure if your python version is compatible with mediapipe)."
             )
 
         self._pose_class = mediapipe.tasks.vision.PoseLandmarker

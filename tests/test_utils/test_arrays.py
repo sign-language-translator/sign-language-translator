@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import torch
 
 from sign_language_translator.utils.arrays import (
@@ -10,24 +11,22 @@ from sign_language_translator.utils.arrays import (
 
 
 def test_linear_interpolation():
-    array = np.array(
+    array = [
         [
-            [
-                [0, 1, 2, 3],
-                [4, 5, 6, 7],
-                [8, 9, 10, 11],
-            ],
-            [
-                [12, 13, 14, 15],
-                [16, 17, 18, 19],
-                [20, 21, 22, 23],
-            ],
-        ]
-    )
+            [0, 1, 2, 3],
+            [4, 5, 6, 7],
+            [8, 9, 10, 11],
+        ],
+        [
+            [12, 13, 14, 15],
+            [16, 17, 18, 19],
+            [20, 21, 22, 23],
+        ],
+    ]
 
     # test intermediate frames
     indices = [0, 0.2, 0.5]
-    new_array = linear_interpolation(array, new_indexes=indices, dim=0)
+    new_array = linear_interpolation(array, indices, dim=0)
     expected_array = np.array(
         [
             [
@@ -52,32 +51,82 @@ def test_linear_interpolation():
     # test intermediate rows
     old_x = np.array([3, 5, 9])
     new_x = [4, 7.7, 9]
-    new_array = linear_interpolation(torch.Tensor(array), old_x=old_x, new_x=new_x, dim=1)  # type: ignore
-    assert new_array.isclose(  # type: ignore
-        torch.Tensor(
+    new_array = linear_interpolation(torch.Tensor(array), new_x, old_x=old_x, dim=1)  # type: ignore
+    expected_array = torch.Tensor(
+        [
             [
-                [
-                    [2.0, 3.0, 4.0, 5.0],
-                    [6.7, 7.7, 8.7, 9.7],
-                    [8.0, 9.0, 10.0, 11.0],
-                ],
-                [
-                    [14.0, 15.0, 16.0, 17.0],
-                    [18.7, 19.7, 20.7, 21.7],
-                    [20.0, 21.0, 22.0, 23.0],
-                ],
-            ]
-        )
-    ).all()
+                [2.0, 3.0, 4.0, 5.0],
+                [6.7, 7.7, 8.7, 9.7],
+                [8.0, 9.0, 10.0, 11.0],
+            ],
+            [
+                [14.0, 15.0, 16.0, 17.0],
+                [18.7, 19.7, 20.7, 21.7],
+                [20.0, 21.0, 22.0, 23.0],
+            ],
+        ]
+    )
+    assert (ArrayOps.abs(new_array - expected_array) < 1e-4).all()
 
-    try:
-        linear_interpolation(array, new_indexes=indices, old_x=old_x, dim=2)  # type: ignore
-    except ValueError:
-        pass
-    try:
-        linear_interpolation(array, new_indexes=indices, dim=6)  # type: ignore
-    except ValueError:
-        pass
+    # test negative dimension
+    new_array = linear_interpolation(torch.Tensor(array), new_x, old_x=old_x, dim=-2)  # type: ignore
+    assert (ArrayOps.abs(new_array - expected_array) < 1e-4).all()
+
+    # test negative indexes
+    indexes = torch.Tensor([0, -1, 1, -2, 0, -1.5])
+    new_array = linear_interpolation(np.array(array), indexes, dim=-3)
+    assert (new_array[:-1] == np.array(array)[indexes[:-1].long()]).all()
+    assert (new_array[-1] == (np.array(array)[-2] + np.array(array)[-1]) / 2).all()
+
+    # test negative x
+    old_x = np.array([-4, 4])
+    new_x = np.array([0, -2, 2])
+    new_array = linear_interpolation(array, new_x, old_x=old_x, dim=0)
+    expected_array = np.array(
+        [
+            [[6, 7, 8, 9], [10, 11, 12, 13], [14, 15, 16, 17]],
+            [[3, 4, 5, 6], [7, 8, 9, 10], [11, 12, 13, 14]],
+            [[9, 10, 11, 12], [13, 14, 15, 16], [17, 18, 19, 20]],
+        ]
+    )
+    assert (new_array == expected_array).all()
+
+    # test descending x
+    old_x = np.array([3, 2, 1, 0])
+    new_x = np.array([0.5, 2.5, 1.5])
+    new_array = linear_interpolation(array, new_x, old_x=old_x, dim=2)
+    expected_array = np.array(
+        [
+            [[2.5, 0.5, 1.5], [6.5, 4.5, 5.5], [10.5, 8.5, 9.5]],
+            [[14.5, 12.5, 13.5], [18.5, 16.5, 17.5], [22.5, 20.5, 21.5]],
+        ]
+    )
+    assert (new_array == expected_array).all()
+
+    # test unordered old_x
+    old_x = np.array([3, 1, 2])
+    new_x = np.array([2.5, 1.5])
+    with pytest.raises(ValueError) as exc_info:
+        linear_interpolation(array, new_x, old_x=old_x, dim=1)
+    assert "sorted" in str(exc_info.value).lower()
+
+    # test out of range index
+    indices = [0, 1, 2, -2, -3]
+    with pytest.raises(ValueError) as exc_info:
+        linear_interpolation(array, indices, dim=0)
+    assert "range" in str(exc_info.value).lower()
+
+    # test out of range x
+    old_x = np.array([0, 1, 2])
+    new_x = np.array([2.5, 1.5, -1])
+    with pytest.raises(ValueError) as exc_info:
+        linear_interpolation(array, new_x, old_x=old_x, dim=1)
+    assert "range" in str(exc_info.value).lower()
+
+    # test out of range dim
+    with pytest.raises(ValueError) as exc_info:
+        linear_interpolation(array, indices, dim=6)
+    assert "invalid dim" in str(exc_info.value).lower()
 
 
 def test_array_ops():
@@ -98,10 +147,29 @@ def test_array_ops():
     _, indices = ArrayOps.top_k(array, 3)
     assert set(indices.tolist()) == {1, 4, 0}
 
+    # test abs
+    assert (ArrayOps.abs(torch.Tensor([-1, 0, 1])) == torch.Tensor([1, 0, 1])).all()
+    assert (ArrayOps.abs(np.array([-1, 0, 1.1])) == np.array([1, 0, 1.1])).all()
+
+    # test concatenate
+    tensor_1 = torch.Tensor([1, 2])
+    tensor_2 = torch.Tensor([3, 4])
+    assert (ArrayOps.concatenate([tensor_1, tensor_2]) == torch.arange(1, 5)).all()
+
+    # test svd
+    original = [[1, 2], [3, 4]]
+    U, S, V = ArrayOps.svd(original)
+    reconstructed = U @ np.diag(S) @ V
+    assert (np.abs(reconstructed - np.array(original)) < 1e-4).all()
+
+    # test take
+    assert (ArrayOps.take([1, 2, 3], [0, 2]) == [1, 3]).all()
+    assert (ArrayOps.take(torch.Tensor([1, 2, 3]), 0) == torch.Tensor([1])).all()
+
 
 def test_adjust_vector_angle():
-    v1 = np.array([1, 1])
-    v2 = np.array([1, -1])
+    v1 = [1, 1]
+    v2 = [1, -1]
 
     #   |  ,· (1, 1)           [v1]
     #   | /,· (1, 1/sqrt(3))   [new_v1]
@@ -143,11 +211,13 @@ def test_adjust_vector_angle():
 
 def test_align_vectors():
     # Define source and target matrices
-    source_matrix = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
-    target_matrix = np.array([[2.0, 1.0], [4.0, 3.0], [6.0, 5.0]])
+    source_vectors = [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]
+    target_vectors = [[2.0, 1.0], [4.0, 3.0], [6.0, 5.0]]
+    source_matrix = np.array(source_vectors)
+    target_matrix = np.array(target_vectors)
 
     # Call the function
-    alignment = align_vectors(source_matrix, target_matrix, pre_normalize=True)
+    alignment = align_vectors(source_vectors, target_vectors, pre_normalize=True)  # type: ignore
 
     # Check if the result matrix has the correct shape
     assert tuple(alignment.shape) == (source_matrix.shape[1], target_matrix.shape[1])
@@ -167,3 +237,33 @@ def test_align_vectors():
     alignment = align_vectors(source_matrix, target_matrix, pre_normalize=True)
     assert tuple(alignment.shape) == (2, 2)
     assert alignment.allclose(torch.tensor([[0.0, 1.0], [1.0, 0.0]]), atol=1e-6)  # type: ignore
+
+
+def test_array_ops_validation():
+
+    with pytest.raises(TypeError):
+        ArrayOps.floor("4.5")  # type: ignore
+
+    with pytest.raises(TypeError):
+        ArrayOps.ceil("4.5")  # type: ignore
+
+    with pytest.raises(TypeError):
+        ArrayOps.take("[1, 2]", 1)  # type: ignore
+
+    with pytest.raises(ValueError):
+        ArrayOps.cast([1, 2, 3], str)  # type: ignore
+
+    with pytest.raises(TypeError):
+        ArrayOps.norm("str")  # type: ignore
+
+    with pytest.raises(TypeError):
+        ArrayOps.svd("[[1,2],[3,4]]")  # type: ignore
+
+    with pytest.raises(TypeError):
+        ArrayOps.top_k("str", 2)  # type: ignore
+
+    with pytest.raises(TypeError):
+        ArrayOps.concatenate([1, 2])  # type: ignore
+
+    with pytest.raises(TypeError):
+        ArrayOps.abs(1)  # type: ignore

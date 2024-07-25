@@ -1,3 +1,5 @@
+import sys
+
 from sign_language_translator import ModelCodes
 from sign_language_translator.models import (
     ConcatenativeSynthesis,
@@ -32,7 +34,8 @@ def test_get_model():
     )
 
     # video embedding models
-    assert isinstance(get_model("mediapipe"), MediaPipeLandmarksModel)
+    if (3, 8) <= sys.version_info <= (3, 11):
+        assert isinstance(get_model("mediapipe"), MediaPipeLandmarksModel)
 
     # non-existent model
     assert get_model("non-existent-model-code-should-return-None") is None

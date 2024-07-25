@@ -1,5 +1,7 @@
 import os
+import sys
 
+import pytest
 import torch
 from click.testing import CliRunner
 
@@ -17,43 +19,44 @@ def test_slt():
     assert "Usage: slt [OPTIONS] COMMAND [ARGS]" in result.output
 
 
-# def test_slt_translate():
-#     # BUG: ffmpeg error while writing video (only via CliRunner on ubuntu workflow).
-#     # global cap_ffmpeg_impl.hpp:3018 open Could not find encoder for codec_id=27, error: Encoder not found
-#     # [ERROR:0@6.347] global cap_ffmpeg_impl.hpp:3093 open VIDEOIO/FFMPEG: Failed to initialize VideoWriter
+def test_slt_translate():
+    runner = CliRunner()
 
-#     runner = CliRunner()
-
-#     # concatenative synthesis model
-#     text = "سیب اچھا ہے۔"
-#     result = runner.invoke(
-#         slt,
-#         [
-#             "translate",
-#             text,
-#             "--text-lang",
-#             "urdu",
-#             "--sign-lang",
-#             "psl",
-#             "--model-code",
-#             "concatenative-synthesis",
-#             "--sign-format",
-#             "video",
-#             "--overwrite",
-#             "true",
-#             "--output-dir",
-#             "temp",
-#             "--display",
-#             "false",
-#             "--save-format",
-#             "mkv",
-#         ],
-#     )
-#     assert result.exit_code == 0
-#     assert os.path.exists(f"temp/{text}.mkv")
+    # concatenative synthesis model
+    text = "سیب اچھا ہے۔"
+    result = runner.invoke(
+        slt,
+        [
+            "translate",
+            text,
+            "--text-lang",
+            "urdu",
+            "--sign-lang",
+            "psl",
+            "--model-code",
+            "concatenative-synthesis",
+            "--sign-format",
+            "video",
+            "--overwrite",
+            "true",
+            "--output-dir",
+            "temp",
+            "--display",
+            "false",
+            "--save-format",
+            "mp4",
+            "--codec",
+            "mp4v",  # ubuntu container does not have h264 codec
+        ],
+    )
+    assert result.exit_code == 0
+    assert os.path.exists(f"temp/{text}.mp4")
 
 
 def test_slt_embed_video():
+    if sys.version_info > (3, 11):
+        pytest.skip("MediaPipe is not supported in Python >3.11")
+
     runner = CliRunner()
 
     video_id = "videos/wordless_wordless.mp4"

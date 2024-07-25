@@ -41,12 +41,12 @@ jobs:
       - name: Install dependencies and the Package
         run: |
           python3 -m pip install --upgrade pip
-          pip3 install "twine==4.0.2" "pytest==7.4.0"
+          pip3 install "twine==5.1.1" "pytest==7.4.0" "importlib-metadata<8.0.0"
           poetry install --all-extras
 
       - name: Run tests
         run: |
-          poetry run pytest -vvv
+          poetry run pytest -vv
 
       - name: Append Build Number to version
         id: version
@@ -70,7 +70,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - name: Set up Python ${{ matrix.python-version }}

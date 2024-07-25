@@ -132,7 +132,10 @@ class VideoCaptureFrames(VideoFrames):
         - The seek method employs efficient seeking techniques based on time and frame index.
         - When finished, remember to call the close method to release video resources.
 
-    Example usage:
+    Example:
+
+    .. code-block:: python
+
         video = VideoCaptureFrames("video.mp4", use_cache=True)
         frame = video.get_frame(timestamp=10.0)
         video.seek(index=100)

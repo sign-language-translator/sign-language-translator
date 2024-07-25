@@ -35,7 +35,9 @@ class SynonymFinder:
         translate: Translates text to the specified target language.
 
     Example:
+
         .. code-block:: python
+
             # Instantiate SynonymFinder with the target language
             synonym_finder = SynonymFinder("en")
 
@@ -224,7 +226,9 @@ class SynonymFinder:
             List[str]: A list of synonyms for the input text.
 
         Example:
+
             .. code-block:: python
+
                 # Instantiate SynonymFinder with the target language
                 synonym_finder = SynonymFinder("ur")
 

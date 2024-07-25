@@ -2,6 +2,8 @@ import os
 import warnings
 from copy import deepcopy
 
+import pytest
+
 from sign_language_translator.config.assets import Assets
 from sign_language_translator.languages.sign.pakistan_sign_language import (
     PakistanSignLanguage,
@@ -93,14 +95,11 @@ def test_pakistan_token_to_sign():
         {"signs": [["pk-hfad-1_10"]], "weights": [1.0]}
     ] == psl.tokens_to_sign_dicts("10")
 
-    try:
+    with pytest.raises(ValueError):
         psl.tokens_to_sign_dicts("2u14ujvdfhrfhvbh12")
-    except ValueError:
-        pass
-    try:
+
+    with pytest.raises(ValueError):
         psl.tokens_to_sign_dicts(["i"], [Tags.AMBIGUOUS])
-    except ValueError:
-        pass
 
 
 def test_psl():

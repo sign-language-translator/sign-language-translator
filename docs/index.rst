@@ -159,7 +159,7 @@ Label the videos with all the text language words that have the same meaning as 
       ],
    }
 
-Place the actual video files in the ``assets/videos`` or ``assets/datasets/xx-yyy-#_videos-dictionary-mp4.zip`` (or preprocessed files in similar directory structure e.g. ``assets/landmarks``). Otherwise update the asset manager with the urls as follows:
+Place the actual video files in the ``assets/videos`` or ``assets/datasets/xx-yyy-#.videos-mp4.zip`` (or preprocessed files in similar directory structure e.g. ``assets/landmarks``). Otherwise update the asset manager with the urls as follows:
 
 .. code-block:: python
    :caption: Fetching signs for tokens
@@ -172,7 +172,7 @@ Place the actual video files in the ``assets/videos`` or ``assets/datasets/xx-yy
 
       slt.Assets.FILE_TO_URL.update({
          "videos/xx-yyy-#_word.mp4": "https://...",
-         "datasets/xx-yyy-#_videos-dictionary-mp4.zip": "https://...",
+         "datasets/xx-yyy-#.videos-mp4.zip": "https://...",
       })
 
       # paths = slt.Assets.download("videos/xx-yyy-#_word.mp4")
@@ -534,8 +534,8 @@ View the directory structure of the present state of the assets folder.
    ├── pk-dictionary-mapping.json
    ├── text_preprocessing.json
    ├── datasets
-   │   ├── pk-hfad-1_landmarks-mediapipe-pose-2-hand-1-csv.zip
-   │   └── pk-hfad-1_videos-mp4.zip
+   │   ├── pk-hfad-1.landmarks-mediapipe-world-csv.zip
+   │   └── pk-hfad-1.videos-mp4.zip
    │
    ├── landmarks
    │   ├── pk-hfad-1_1.landmarks-mediapipe-pose-2-hand-1.csv

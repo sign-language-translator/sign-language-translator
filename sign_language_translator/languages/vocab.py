@@ -97,6 +97,9 @@ class Vocab:
             str: The word without the word sense or disambiguation information.
 
         Example:
+
+        .. code-block:: python
+
             word = "this is a spring(metal-coil). those are glasses(water-containers)."
             without_word_sense = remove_word_sense(word)
             print(without_word_sense)  # Output: "this is a spring. those are glasses."

@@ -18,7 +18,7 @@ def threaded_map(
     args_list: Iterable,
     time_delay=0.02,
     timeout: Optional[float] = None,
-    max_n_threads=None,
+    max_n_threads: Optional[int] = None,
     progress_bar=True,
     leave=True,
 ):
@@ -38,7 +38,9 @@ def threaded_map(
         leave (bool, optional): Whether to leave the progress bar after completion. Default is True.
 
     Example:
+
         .. code-block:: python
+
             import requests
             from sign_language_translator.utils import threaded_map
 

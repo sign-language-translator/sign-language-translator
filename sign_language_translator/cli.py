@@ -175,7 +175,12 @@ def download(filenames, overwrite, progress_bar, timeout, chunk_size, directory)
 @click.option("--sign-lang", help="Name of the sign language.")
 @click.option(
     "--sign-format",
-    help="the sign features to be used e.g. video, mediapipe-landmarks etc.",
+    help="the sign features to be used e.g. 'video', 'landmarks' etc.",
+)
+@click.option(
+    "--sign-embedding-model",
+    default=None,
+    help="the sign embedding model to be used or which was used (as video preprocessing step) e.g. 'mediapipe-world', 'mediapipe-image'.",
 )
 @click.option(
     "--output-dir", default=".", help="Output directory for generated translations."
@@ -195,7 +200,12 @@ def download(filenames, overwrite, progress_bar, timeout, chunk_size, directory)
 @click.option(
     "--save-format",
     default="mp4",
-    help="The output file extension. Defaults to 'mp4'.",
+    help="The output file extension. e.g: ('mp4', 'csv', ) Defaults to 'mp4'.",
+)
+@click.option(
+    "--codec",
+    default=None,
+    help="The output video codec (must be installed on system and configured in OpenCV). e.g: ('h264', 'avc1', 'xvid', 'mp4v', ...). Defaults to None.",
 )
 def translate(
     inputs,
@@ -203,10 +213,12 @@ def translate(
     text_lang,
     sign_lang,
     sign_format,
+    sign_embedding_model,
     output_dir,
     overwrite,
     display,
     save_format,
+    codec,
 ):
     """
     Translate text into sign language or vice versa.
@@ -226,14 +238,15 @@ def translate(
         sign_language=sign_lang,
         text_language=text_lang,
         sign_format=sign_format,
+        sign_embedding_model=sign_embedding_model,
     )
     if model and isinstance(model, TextToSignModel):  # TODO: , SignToTextModel):
         for text in inputs:
             sign = model.translate(text)
-            path = os.path.join(output_dir, f"{text}.{save_format}")
-            sign.save(path, overwrite=overwrite, leave=True)
+            path_ = os.path.join(output_dir, f"{text}.{save_format}")
+            sign.save(path_, overwrite=overwrite, leave=True, codec=codec)
             if display:
-                get_sign_wrapper_class(sign.name())(path).show()
+                get_sign_wrapper_class(sign.name())(path_).show()
 
     else:
         click.echo("This type of translation is not yet supported!")
