@@ -121,7 +121,7 @@ class CausalMultiHeadSelfAttention(torch.nn.Module):
 
         Example:
 
-        .. code-block
+        .. code-block:: python
 
             model = CausalMultiHeadSelfAttention(n_heads=8, embed_size=256, dropout=0.2)
             input_tensor = torch.randn(16, 32, 256)

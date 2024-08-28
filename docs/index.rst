@@ -72,55 +72,48 @@ Translation
 .. code-block:: python
    :linenos:
    :caption: Text to Sign Language Translation
-   :emphasize-lines: 4,5,11
+   :emphasize-lines: 4,7,9
 
    import sign_language_translator as slt
 
-   # print(slt.ModelCodes)
-   # model = slt.get_model("transformer-text-to-sign")
+   # The core model of the project (rule-based text-to-sign translator)
+   # which enables us to generate synthetic training datasets
    model = slt.models.ConcatenativeSynthesis(
-      text_language = "urdu", # or object of any child of slt.languages.text.text_language.TextLanguage class
-      sign_language = "pakistan-sign-language", # or object of any child of slt.languages.sign.sign_language.SignLanguage class
-      sign_format = "video" # or object of any child of slt.vision.sign.Sign class
-   )
+      text_language="urdu", sign_language="pk-sl", sign_format="video" )
 
-   sign_language_sentence = model.translate("یہ اچھا ہے۔")
-   sign_language_sentence.show()
-   # sign_language_sentence.save("output.mp4")
+   text = "یہ اچھا ہے۔" # "this-good-is"
+   sign = model.translate(text) # tokenize, map, download & concatenate
+   sign.show()
+
+   model.text_language = slt.TextLanguageCodes.HINDI  # or object of any child of `slt.languages.TextLanguage`` class
+   model.sign_format = slt.SignFormatCodes.LANDMARKS  # or object of any child of `slt.vision.sign.Sign` class
+   model.sign_embedding_model = "mediapipe-world"
+
+   sign_2 = model.translate("कैसे हैं आप?") # "how-are-you"
+   sign_2.save("how-are-you.csv", overwrite=True)
+   sign_2.save_animation("how-are-you.gif", overwrite=True)
 
 .. code-block:: python
-   :linenos:
-   :caption: Sign Language to Text Translation (dummy code until v0.8)
+   :linenos: 2,6,7,11,12
+   :caption: Sign Language to Text Translation
 
    import sign_language_translator as slt
 
-   # load sign
-   video = slt.Video("video.mp4")
-   # features = slt.LandmarksSign("landmarks.csv", landmark_type="world")
+   # sign = slt.Video("path/to/video.mp4")
+   sign = slt.Video.load_asset("pk-hfad-1_آپ-کا-نام-کیا(what)-ہے")  # your name what is? (auto-downloaded)
+   sign.show_frames_grid()
 
-   # embed
-   embedding_model = slt.get_model("mediapipe_pose_v2_hand_v1")
-   features = embedding_model.embed(video.iter_frames())
+   # Extract Pose Vector for feature reduction
+   embedding_model = slt.models.MediaPipeLandmarksModel()      # pip install "sign_language_translator[mediapipe]"  # (or [all])
+   embedding = embedding_model.embed(sign.iter_frames())
 
-   # Load sign-to-text model
-   deep_s2t_model = slt.get_model(slt.ModelCodes.TRANSFORMER_MP_S2T) # pytorch
+   slt.Landmarks(embedding.reshape((-1, 75, 5)),
+               connections="mediapipe-world").show()
 
-   # translate via single call to pipeline
-   # text = deep_s2t_model.translate(video)
-
-   # translate via individual steps
-   encoding = deep_s2t_model.encoder(features)
-   token_ids = [0] # start_token
-   for _ in range(5):
-      logits = deep_s2t_model.decoder(encoding, token_ids=token_ids)
-      token_ids.append(logits.argmax(dim=-1).item())
-
-   tokens = deep_s2t_model.decode(token_ids)
-   text = "".join(tokens) # deep_s2t_model.detokenize(tokens)
-
-   print(features.shape)
-   print(logits.shape)
-   print(text)
+   # # Load sign-to-text model (pytorch) (COMING SOON!)
+   # translation_model = slt.get_model(slt.ModelCodes.Gesture)
+   # text = translation_model.translate(embedding)
+   # print(text)
 
 Building Custom Translators
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -159,7 +152,7 @@ Label the videos with all the text language words that have the same meaning as 
       ],
    }
 
-Place the actual video files in the ``assets/videos`` or ``assets/datasets/xx-yyy-#.videos-mp4.zip`` (or preprocessed files in similar directory structure e.g. ``assets/landmarks``). Otherwise update the asset manager with the urls as follows:
+Place the actual video files in the ``assets/videos`` or ``assets/datasets/xx-yyy-#.videos-mp4.zip`` (or preprocessed files in similar directory structure e.g. ``assets/landmarks``). Otherwise update the asset manager with the URLs as follows:
 
 .. code-block:: python
    :caption: Fetching signs for tokens
@@ -173,6 +166,7 @@ Place the actual video files in the ``assets/videos`` or ``assets/datasets/xx-yy
       slt.Assets.FILE_TO_URL.update({
          "videos/xx-yyy-#_word.mp4": "https://...",
          "datasets/xx-yyy-#.videos-mp4.zip": "https://...",
+         "datasets/xx-yyy-#.landmarks-[estimation-model-name]-csv.zip": "https://...",
       })
 
       # paths = slt.Assets.download("videos/xx-yyy-#_word.mp4")
@@ -223,21 +217,23 @@ Deep Learning based
 
 You can use 3 types of Parallel corpus as training data (`more details <https://github.com/sign-language-translator/sign-language-datasets#problem-overview>`_):
 #. Sentences (bunch of signs performed consecutively in a single video to form a meaningful message.)
-#. Synthetic sentences (made by the rule-based translator)
+#. Synthetic sentences (made by the rule-based translator from the text of spoken languages & dictionary videos.)
 #. Replications (recordings of people performing the signs in dictionary videos and sentences.)
 
-`Here <https://github.com/sign-language-translator/sign-language-datasets/blob/main/parallel_texts/pk-sentence-mapping.json>`_ is a format that you can use for data labeling.
+`Here <https://github.com/sign-language-translator/sign-language-datasets/blob/main/parallel_texts/pk-sentence-mapping.json>`_ is a format that you can use for data labeling.  You can use the following `JSON schema <https://github.com/sign-language-translator/sign-language-datasets/blob/main/schemas/mapping-schema.json>`_ to validate your labeled data.
+
 You can use `language models <Complete>`_ to write sentences for synthetic data. The language models can be masked to use only specified words in the output so that the rule-based translator can translate them.
 
 Get the best out of your model by training it for multiple languages and multiple tasks. For example, provide task as start-of-sequence-token and target-text-language as the second token to the decoder of the seq2seq model.
 
 .. code-block:: python
    :linenos:
-   :caption: Custom rule-based Translator (text to sign)
+   :caption: Fine-tuning Deep learning Translators
 
    import sign_language_translator as slt
 
-   pretrained_model = slt.get_model(slt.ModelCodes.Gesture)  # sign landmarks to text
+   # pretrained_model = slt.get_model(slt.ModelCodes.Gesture)  # sign landmarks to text (COMING SOON!)
+   # original training code: 
 
    # pytorch training loop to finetune our model on your dataset
    for epoch in range(10):
@@ -281,7 +277,9 @@ Sign Language Processing
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 This processes a representation of sign language which mainly consists of the file names of videos.
-There are two main parts: 1) word to video mapping and 2) word rearrangement according to grammar.
+There are two main parts:
+   1. word to video mapping
+   2. word rearrangement according to grammar.
 
 For video processing, see :ref:`vision` section.
 
@@ -311,7 +309,7 @@ Those objects have built-in functions for data augmentation and visualization et
 
 .. code-block:: python
    :linenos:
-   :caption: Sign Processing (dummy code until v0.7)
+   :caption: Sign Processing
 
    import sign_language_translator as slt
 
@@ -329,20 +327,18 @@ Those objects have built-in functions for data augmentation and visualization et
    #     ["dataset/*.mp4"], n_processes=12, save_format="csv", ...
    # )
 
+   # Show the landmarks
+   landmarks = slt.Landmarks(embedding.reshape((-1, 75, 5)),
+                             connections="mediapipe-world")
+   landmarks.show()
+   landmarks.show_frames_grid(3, 5)
+
    # transform / augment data
-   sign = slt.MediaPipeSign(embedding, landmark_type="world")
-   sign = sign.rotate(60, 10, 90, degrees=True)
-   sign = sign.transform(slt.vision.transformations.ZoomLandmarks(1.1, 0.9, 1.0))
-
-   # plot
-   video_visualization = sign.video()
-   image_visualization = sign.frames_grid(steps=5)
-   # overlay_visualization = sign.overlay(video) # needs landmark_type="image"
-
-   # display
-   video_visualization.show()
-   image_visualization.show()
-   # overlay_visualization.show()
+   # tform = slt.vision.landmarks.transformations.RotateLandmarks(60, 10, 90, degrees=True)
+   # landmarks = tform(landmarks)
+   # landmarks.show()
+   # landmarks.transform(tform, inplace=True)
+   # landmarks.show()
 
 Language models
 ^^^^^^^^^^^^^^^
@@ -538,8 +534,8 @@ View the directory structure of the present state of the assets folder.
    │   └── pk-hfad-1.videos-mp4.zip
    │
    ├── landmarks
-   │   ├── pk-hfad-1_1.landmarks-mediapipe-pose-2-hand-1.csv
-   │   └── pk-hfad-1_10.landmarks-mediapipe-pose-2-hand-1.csv
+   │   ├── pk-hfad-1_airplane.landmarks-mediapipe-world.csv
+   │   └── pk-hfad-1_icecream.landmarks-mediapipe-image.csv
    │
    ├── models
    │   ├── ur-supported-token-unambiguous-mixed-ngram-w1-w6-lm.pkl
@@ -548,7 +544,7 @@ View the directory structure of the present state of the assets folder.
    │
    └── videos
       ├── pk-hfad-1_1.mp4
-      ├── pk-hfad-1_10.mp4
+      ├── pk-hfad-1_cow.mp4
       └── pk-hfad-1_مجھے.mp4
 
 .. code-block:: bash

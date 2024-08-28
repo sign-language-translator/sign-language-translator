@@ -54,7 +54,7 @@ def test_slt_translate():
 
 
 def test_slt_embed_video():
-    if sys.version_info > (3, 11):
+    if sys.version_info >= (3, 12):
         pytest.skip("MediaPipe is not supported in Python >3.11")
 
     runner = CliRunner()
