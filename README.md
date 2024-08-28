@@ -19,7 +19,7 @@
 [![Downloads](https://img.shields.io/pepy/dt/sign_language_translator?color=purple&logoColor=white&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iODAwIiBmaWxsPSJub25lIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiMwMDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTkuMiAyLjhjLS4yLjMtLjIuOC0uMiAxLjZWMTFINy44Yy0uOSAwLTEuMyAwLTEuNS4yYS44LjggMCAwIDAtLjMuNmMwIC4zLjMuNiAxIDEuMmw0LjEgNC40LjcuNmEuNy43IDAgMCAwIC40IDBsLjctLjZMMTcgMTNjLjYtLjYuOS0xIC45LTEuMmEuOC44IDAgMCAwLS4zLS42Yy0uMi0uMi0uNi0uMi0xLjUtLjJIMTVWNC40YzAtLjggMC0xLjMtLjItMS42YTEuNSAxLjUgMCAwIDAtLjYtLjZjLS4zLS4yLS44LS4yLTEuNi0uMmgtMS4yYy0uOCAwLTEuMyAwLTEuNi4yYTEuNSAxLjUgMCAwIDAtLjYuNnpNNSAyMWExIDEgMCAwIDAgMSAxaDEyYTEgMSAwIDEgMCAwLTJINmExIDEgMCAwIDAtMSAxeiIgY2xpcC1ydWxlPSJldmVub2RkIi8+PC9zdmc+)](https://pepy.tech/projects/sign-language-translator/)<br>
 [![HuggingFace Spaces](https://img.shields.io/badge/%F0%9F%8C%90%20Web%20Demo-%F0%9F%A4%97%20hf.co%2FsltAI-mediumpurple)](https://huggingface.co/sltAI)
 
-| **Support Us** ❤️ | <!-- [![Stripe](https://img.shields.io/badge/Stripe-626CD9?logo=Stripe&logoColor=white)]() --> [![PayPal](https://img.shields.io/badge/PayPal-00457C?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=7SNGNSKUQXQW2) |
+| **Support Us** ❤️ | [![PayPal](https://img.shields.io/badge/PayPal-00457C?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=7SNGNSKUQXQW2) |
 | - | - |
 
 </div>
@@ -38,7 +38,7 @@
 4. [Languages](#languages)
 5. [Models](#models)
 6. [How to Build a Translator for your Sign Language](#how-to-build-a-translator-for-sign-language)
-7. [Directory Tree](#directory-tree)
+7. [Module Hierarchy](#module-hierarchy)
 8. [How to Contribute](#how-to-contribute)
 9. [Citation, License & Research Papers](#citation-licence--research-papers)
 10. [Credits and Gratitude](#credits-and-gratitude)
@@ -226,7 +226,7 @@ import sign_language_translator as slt
 model = slt.models.ConcatenativeSynthesis(
    text_language="urdu", sign_language="pk-sl", sign_format="video" )
 
-text = "یہ بہت اچھا ہے۔" # "This very good is."
+text = "یہ بہت اچھا ہے۔" # "this-very-good-is"
 sign = model.translate(text) # tokenize, map, download & concatenate
 sign.show()
 
@@ -235,7 +235,7 @@ model.text_language = slt.TextLanguageCodes.HINDI     # slt.languages.text.Engli
 model.sign_format = slt.SignFormatCodes.LANDMARKS
 model.sign_embedding_model = "mediapipe-world"
 
-sign_2 = model.translate("कैसे हैं आप?") # "How are you?"
+sign_2 = model.translate("कैसे हैं आप?") # "how-are-you"
 sign_2.save("how-are-you.csv", overwrite=True)
 sign_2.save_animation("how-are-you.gif", overwrite=True)
 ```
@@ -244,7 +244,7 @@ sign = model.translate("Hello World!") -->
 
 | ![this very good is](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/7f4ff312-df03-4b11-837b-5fb895c9f08e) | <picture><source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/4d54a197-d723-4cc4-a3ba-cae98e681003" /><source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/45e71098-7a94-4a9e-ad24-1773369b65d5" /><img alt="how are you (landmark 3d plot)" src="https://github.com/user-attachments/assets/45e71098-7a94-4a9e-ad24-1773369b65d5" /></picture> |
 | :-: | :-: |
-| "یہ بہت اچھا ہے۔" (this very good is) | "कैसे हैं आप?" (how are you) |
+| "یہ بہت اچھا ہے۔" (this-very-good-is) | "कैसे हैं आप?" (how-are-you) |
 
 </br>
 
@@ -457,7 +457,7 @@ To create your own sign language translator, you'll need these essential compone
 
 <li>
 <details>
-<summary>Model Fine-Tuning</summary>
+<summary>Deep Learning Model Fine-Tuning</summary>
 
    1. Utilize the (synthetic & real) sign language videos and corresponding text sentences from the previous step.
    2. Apply our training pipeline to fine-tune a chosen model for improved accuracy and translation quality.
@@ -473,10 +473,12 @@ Remember to contribute back to the community:
 
 See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-language-translator.readthedocs.io/en/latest/#building-custom-translators) or in this [notebook](https://github.com/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb). [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sign-language-translator/notebooks/blob/main/translation/concatenative_synthesis.ipynb)
 
-## Directory Tree
+## Module Hierarchy
+
+<details>
+<summary><b style="font-size:large;"><code>sign-language-translator</code></b> (Click to see file descriptions)</summary>
 
 <pre>
-<b style="font-size:large;">sign-language-translator</b>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/README.md">README.md</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/pyproject.toml">pyproject.toml</a>
 ├── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/requirements.txt">requirements.txt</a>
@@ -573,6 +575,8 @@ See the `code` at [Build Custom Translator section in ReadTheDocs](https://sign-
             └── <a href="https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/vision/video/video.py">video.py</a>
 </pre>
 
+</details>
+
 ## How to Contribute
 
 <details>
@@ -611,7 +615,7 @@ See our datasets & conventions [here](https://github.com/sign-language-translato
 <summary><b>Product Development</b>:
 </summary>
 
-- Engage in the development efforts across [MLOps](https://huggingface.co/sltAI), [backend](), [web](), and [mobile]() domains, depending on your expertise and interests.
+- Engage in the development efforts across [MLOps](https://huggingface.co/sltAI) & [web-frontend](https://github.com/sign-language-translator/slt-frontend) <!-- [backend](https://github.com/sign-language-translator/slt-backend), and [mobile](https://github.com/sign-language-translator/slt-mobile) --> domains, depending on your expertise and interests.
 
 </details>
 
@@ -625,7 +629,7 @@ See our datasets & conventions [here](https://github.com/sign-language-translato
 # 0.8.2: trim signs before concatenation, insert transition frames
 
 # 0.8.3: subtitles/captions
-# 0.8.4: stabilize video batch using landmarks
+# 0.8.4: stabilize video batch using landmarks, draw/overlay 2D landmarks on video/image
 ```
 
 </details>
@@ -737,24 +741,11 @@ Stay Tuned for research Papers!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for Mudassar who has continued it till at least 2024-07-25.
-
-<details>
-<summary> Immense gratitude towards: (click to expand)</summary>
-
-- [Mudassar Iqbal](https://github.com/mdsrqbl) for coding the project so far.
-- [Rabbia Arshad](https://github.com/Rabbia-Arshad) for help in initial R&D.
-- [Waqas Bin Abbas](https://github.com/Waqas-Bin-Abbas) for assistance in initial video data collection.
-- Kamran Malik for connecting us with Hamza Foundation.
-- [Hamza Foundation](https://www.youtube.com/@pslhamzafoundationacademyf7624/videos) (especially Ms Benish, Ms Rashda & Mr Zeeshan) for agreeing to collaborate and providing their sign dictionary, hearing-impaired performers for data creation, and creating a text2gloss dataset.
-- [UrduHack](https://github.com/urduhack/urduhack) for their work on Urdu character normalization.
-- [Telha Bilal](https://github.com/TelhaBilal) for help in designing the architecture of some modules.
-
-</details>
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for [Mudassar](https://github.com/mdsrqbl) who has continued it till at least 2024-08-28.
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **13,015** + Tests: **2,475**):
+Count total number of **lines of code** (Package: **13,371** + Tests: **2,589**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
