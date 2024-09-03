@@ -1,3 +1,7 @@
+__all__ = [
+    "Hindi",
+]
+
 import re
 from string import ascii_uppercase, digits
 from typing import Any, Dict, Iterable, List, Set, Tuple, Union
@@ -99,14 +103,16 @@ class Hindi(TextLanguage):
     #     Characters     #
     # ================== #
 
-    UNICODE_RANGE: Tuple[int, int] = (2304, 2431)
+    UNICODE_RANGE: Tuple[int, int] = (2304, 2431)  # 0x0900 - 0x097F
 
     FULL_STOPS: List[str] = [".", "।", "॥"]
     QUESTION_MARKS: List[str] = ["?"]
     ACRONYM_PERIODS: List[str] = ["॰"]
     END_OF_SENTENCE_MARKS: List[str] = FULL_STOPS + QUESTION_MARKS + ["!"]
+    PUNCTUATION: List[str] = END_OF_SENTENCE_MARKS + ACRONYM_PERIODS + list(",;:")
 
-    PUNCTUATION: List[str] = END_OF_SENTENCE_MARKS + list("॰-_,!()[]/{}")
+    BRACKETS: List[str] = ["(", ")", "[", "]", "{", "}"]
+    SYMBOLS: List[str] = PUNCTUATION + BRACKETS + list("-_/")
 
     CHARACTERS: List[str] = str(
         """
@@ -125,7 +131,7 @@ class Hindi(TextLanguage):
     ALLOWED_CHARACTERS: Set[str] = (
         set(CHARACTERS)
         | set(DIACRITICS)
-        | set(PUNCTUATION)
+        | set(SYMBOLS)
         | set(ascii_uppercase)
         | set(digits)
         | set("()!.,?/[]{} \n")
@@ -147,8 +153,8 @@ class Hindi(TextLanguage):
     #    Regex   #
     # ========== #
 
-    NUMBER_REGEX = r"(\d+(?:[\.:]\d+)*)"
-    WORD_REGEX = r"([^\W_\d]([^\W_\d]|[" + "".join(DIACRITICS) + r"])*)"
+    NUMBER_REGEX = r"\d+(?:[\.:]\d+)*"
+    WORD_REGEX = r"[^\W_\d]([^\W_\d]|[" + "".join(DIACRITICS) + r"])*"
     UNALLOWED_CHARACTERS_REGEX = (
         "[^" + "".join(map(re.escape, ALLOWED_CHARACTERS)) + "]"
     )
@@ -192,11 +198,20 @@ class Hindi(TextLanguage):
             ),  # TODO: | one-hundred twenty-three (\d[ \d]*): ["100", "23"] --> ["123"]
             end_of_sentence_tokens=self.END_OF_SENTENCE_MARKS,
             full_stops=self.FULL_STOPS,
+            # spelled out english letters (acronyms)
             non_sentence_end_words=[
-                "बी",
-                "सी",
-                "एस",
-            ],  # spelled out english letters (acronyms)
+                "बी",  # B
+                "सी",  # C
+                "एफ",  # F
+                "एच",  # H
+                "जे",  # J
+                "एल",  # L
+                "एम",  # M
+                "एन",  # N
+                "एस",  # S
+                "डब्ल्यू",  # W
+                "एक्स",  # X
+            ],
             tokenized_word_sense_pattern=[self.WORD_REGEX, r"\(", [r"नाम"], r"\)"],
         )
         return tokenizer

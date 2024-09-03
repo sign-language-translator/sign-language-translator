@@ -93,11 +93,11 @@ class TextLanguages(Enum, metaclass=PrintableEnumMeta):
     Attributes:
         - URDU (str): Short code for the Urdu language.
         - HINDI (str): Short code for the Hindi language.
-        ...
+        - ENGLISH (str): Short code for the English language.
     """
 
     URDU = "ur"
-    # ENGLISH = "en"
+    ENGLISH = "en"
     HINDI = "hi"
 
 
@@ -283,6 +283,11 @@ def normalize_short_code(short_code: Union[str, Enum]) -> str:
             "urdu",
             "urd",
             "ur",
+        },
+        TextLanguages.ENGLISH.value: {
+            "english",
+            "eng",
+            "en",
         },
         TextLanguages.HINDI.value: {
             "hindi",

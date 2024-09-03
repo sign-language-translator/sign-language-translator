@@ -1,6 +1,10 @@
+import pytest
+
 from sign_language_translator.text import SynonymFinder
+from sign_language_translator.utils.utils import is_internet_available
 
 
+@pytest.mark.skipif(not is_internet_available(), reason="No internet available")
 def test_translation_synonyms():
     synonymizer = SynonymFinder(language="en")
 

@@ -175,7 +175,7 @@ Try to capture variations in signs in a scalable and diversity accommodating way
 ### Goals
 
 1. Enable **integration** of sign language into existing applications.
-2. Support construction of **custom** solutions for resource poor sign langauges.
+2. Assist construction of **custom** solutions for resource poor sign langauges.
 3. Improve **education** quality for the deaf and elevate literacy rates.
 4. Promote communication **inclusivity** of the hearing impaired.
 5. Establish a framework for sign language **standardization**.
@@ -230,17 +230,17 @@ text = "یہ بہت اچھا ہے۔" # "this-very-good-is"
 sign = model.translate(text) # tokenize, map, download & concatenate
 sign.show()
 
-
-model.text_language = slt.TextLanguageCodes.HINDI     # slt.languages.text.English()
 model.sign_format = slt.SignFormatCodes.LANDMARKS
 model.sign_embedding_model = "mediapipe-world"
 
-sign_2 = model.translate("कैसे हैं आप?") # "how-are-you"
-sign_2.save("how-are-you.csv", overwrite=True)
-sign_2.save_animation("how-are-you.gif", overwrite=True)
+model.text_language = slt.languages.text.English()
+sign_2 = model.translate("This is an apple.")
+sign_2.save("this-is-an-apple.csv", overwrite=True)
+
+model.text_language = slt.TextLanguageCodes.HINDI
+sign_3 = model.translate("कैसे हैं आप?") # "how-are-you"
+sign_3.save_animation("how-are-you.gif", overwrite=True)
 ```
-<!-- model.text_language = slt.languages.text.English()
-sign = model.translate("Hello World!") -->
 
 | ![this very good is](https://github.com/sign-language-translator/sign-language-translator/assets/118578823/7f4ff312-df03-4b11-837b-5fb895c9f08e) | <picture><source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/4d54a197-d723-4cc4-a3ba-cae98e681003" /><source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/45e71098-7a94-4a9e-ad24-1773369b65d5" /><img alt="how are you (landmark 3d plot)" src="https://github.com/user-attachments/assets/45e71098-7a94-4a9e-ad24-1773369b65d5" /></picture> |
 | :-: | :-: |
@@ -625,28 +625,31 @@ See our datasets & conventions [here](https://github.com/sign-language-translato
 <summary>LANDMARKS_WRAPPER: v0.8</summary>
 
 ```python
-# 0.8.1: landmark augmentation (zoom, rotate, move, noise, duration, rectify, stabilize, __repr__)
-# 0.8.2: trim signs before concatenation, insert transition frames
+# 0.8.2: landmark augmentation (zoom, rotate, move, noise, duration, rectify, stabilize, __repr__)
+# 0.8.3: trim signs before concatenation, insert transition frames
+# 0.8.4: plotly & three.js/mixamo display
 
-# 0.8.3: subtitles/captions
-# 0.8.4: stabilize video batch using landmarks, draw/overlay 2D landmarks on video/image
+# 0.8.5: subtitles/captions
+# 0.8.6: stabilize video batch using landmarks, draw/overlay 2D landmarks on video/image
 ```
 
 </details>
 
 <details>
-<summary>LANGUAGES: v0.9</summary>
+<summary>CLEAN_UP: v0.9</summary>
 
 ```python
-# clean-up slt.languages.text.Urdu code
-# implement NLP class for English
-# rename `enums.py` to `constants.py` and use frozen dataclasses
+# skip test cases which require internet when internet isn't available / test for  dummy languages
+# improve langauge classes architecture (for easy customization via inheritance)
+# clean-up slt.languages.text.* code
+# ? add a generic SignedTextLanguage class which just maps text lang to signs based on mappinng.json ?
+# ADD model/language registry decorator, improve slt.config.enums.normalize_short_code method. maybe rename `enums.py` to `constants.py` and use frozen dataclasses
 # add progress bar to slt.models.MediaPipeLandmarksModel
 
 # rename 'country' to 'region' & rename wordless_wordless to wordless.mp4
 # decide mediapipe-all = world & image concactenated in landmark dim or feature dim?
 # expand dictionary video data by scraping everything
-# upload 12 person dictionary replication landmark dataset
+# upload the 12 person dictionary replication landmark dataset
 ```
 
 </details>
@@ -741,11 +744,11 @@ Stay Tuned for research Papers!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for [Mudassar](https://github.com/mdsrqbl) who has continued it till at least 2024-08-28.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for [Mudassar](https://github.com/mdsrqbl) who has continued it till at least 2024-09-03.
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **13,371** + Tests: **2,589**):
+Count total number of **lines of code** (Package: **13,593** + Tests: **2,845**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l

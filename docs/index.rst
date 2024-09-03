@@ -72,7 +72,7 @@ Translation
 .. code-block:: python
    :linenos:
    :caption: Text to Sign Language Translation
-   :emphasize-lines: 4,7,9
+   :emphasize-lines: 4,7,9,11
 
    import sign_language_translator as slt
 
@@ -85,13 +85,16 @@ Translation
    sign = model.translate(text) # tokenize, map, download & concatenate
    sign.show()
 
-   model.text_language = slt.TextLanguageCodes.HINDI  # or object of any child of `slt.languages.TextLanguage`` class
-   model.sign_format = slt.SignFormatCodes.LANDMARKS  # or object of any child of `slt.vision.sign.Sign` class
+   model.sign_format = slt.SignFormatCodes.LANDMARKS
    model.sign_embedding_model = "mediapipe-world"
 
-   sign_2 = model.translate("कैसे हैं आप?") # "how-are-you"
-   sign_2.save("how-are-you.csv", overwrite=True)
-   sign_2.save_animation("how-are-you.gif", overwrite=True)
+   model.text_language = slt.languages.text.English()
+   sign_2 = model.translate("This is an apple.")
+   sign_2.save("this-is-an-apple.csv", overwrite=True)
+
+   model.text_language = slt.TextLanguageCodes.HINDI
+   sign_3 = model.translate("कैसे हैं आप?") # "how-are-you"
+   sign_3.save_animation("how-are-you.gif", overwrite=True)
 
 .. code-block:: python
    :linenos: 2,6,7,11,12

@@ -193,7 +193,7 @@ class Urdu(TextLanguage):
     #    Character Groups    #
     # ====================== #
 
-    UNICODE_RANGE: Tuple[int, int] = (1536, 1791)
+    UNICODE_RANGE: Tuple[int, int] = (1536, 1791)  # 0x0600 - 0x06FF
 
     FULL_STOPS: List[str] = [".", "۔"]
     QUESTION_MARKS: List[str] = ["?", "؟"]
