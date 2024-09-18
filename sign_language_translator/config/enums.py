@@ -62,8 +62,11 @@ class Organizations(Enum, metaclass=PrintableEnumMeta):
     """
 
     HFAD = "hfad"
+    """Hamza Foundation Academy for the Deaf (Lahore, Pakistan)"""
     # NISE = "nise"
+    # """National Institute of Special Education (Islamabad, Pakistan)"""
     # FESF = "fesf"
+    # """Family Educational Services Foundation (Karachi, Pakistan)"""
 
 
 class SignCollections(Enum, metaclass=PrintableEnumMeta):

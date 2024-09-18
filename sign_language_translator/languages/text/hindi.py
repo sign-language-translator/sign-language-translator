@@ -94,7 +94,8 @@ class Hindi(TextLanguage):
             tokens = [tokens]
 
         word_senses = [
-            self.vocab.ambiguous_to_unambiguous.get(token, []) for token in tokens
+            self.vocab.ambiguous_to_unambiguous.get(token.lower(), [])
+            for token in tokens
         ]
 
         return word_senses
@@ -134,7 +135,7 @@ class Hindi(TextLanguage):
         | set(SYMBOLS)
         | set(ascii_uppercase)
         | set(digits)
-        | set("()!.,?/[]{} \n")
+        | set("()!.,?/[]{}<> \n")
     )
 
     CHARACTER_TO_DECOMPOSED: Dict[str, str] = {
@@ -191,8 +192,7 @@ class Hindi(TextLanguage):
         tokenizer = SignTokenizer(
             word_regex=self.token_regex(),
             compound_words=(
-                self.vocab.supported_words
-                | self.vocab.supported_words_with_word_sense
+                self.vocab.supported_tokens
                 | set(self.vocab.words_to_numbers.keys())
                 | set(self.vocab.person_names)
             ),  # TODO: | one-hundred twenty-three (\d[ \d]*): ["100", "23"] --> ["123"]
@@ -240,10 +240,7 @@ class Hindi(TextLanguage):
             ),
             # e.g. Cow, airplane, 1
             Rule(
-                lambda token: (
-                    token.lower() in self.vocab.supported_words
-                    or token.lower() in self.vocab.supported_words_with_word_sense
-                ),
+                lambda token: (token.lower() in self.vocab.supported_tokens),
                 Tags.SUPPORTED_WORD,
                 3,
             ),
@@ -258,7 +255,7 @@ class Hindi(TextLanguage):
             ),
             # e.g. "सोना" -> ["सोना(gold)", "सोना(sleep)"]
             Rule(
-                lambda token: token in self.vocab.ambiguous_to_unambiguous,
+                lambda token: token.lower() in self.vocab.ambiguous_to_unambiguous,
                 Tags.AMBIGUOUS,
                 2,
             ),

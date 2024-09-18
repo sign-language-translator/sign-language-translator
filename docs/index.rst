@@ -103,7 +103,7 @@ Translation
    import sign_language_translator as slt
 
    # sign = slt.Video("path/to/video.mp4")
-   sign = slt.Video.load_asset("pk-hfad-1_آپ-کا-نام-کیا(what)-ہے")  # your name what is? (auto-downloaded)
+   sign = slt.Video.load_asset("pk-hfad-1_aap-ka-nam-kya(what)-hy")  # your name what is? (auto-downloaded)
    sign.show_frames_grid()
 
    # Extract Pose Vector for feature reduction
@@ -299,9 +299,9 @@ For video processing, see :ref:`vision` section.
    tokens, tags, _ = psl.restructure_sentence(tokens, tags, None) # ["he", "school", "go"]
    signs  = psl.tokens_to_sign_dicts(tokens, tags)
    # signs = [
-   #   {'signs': [['pk-hfad-1_وہ']], 'weights': [1.0]},
+   #   {'signs': [['pk-hfad-1_that']], 'weights': [1.0]},
    #   {'signs': [['pk-hfad-1_school']], 'weights': [1.0]},
-   #   {'signs': [['pk-hfad-1_گیا']], 'weights': [1.0]}
+   #   {'signs': [['pk-hfad-1_gia']], 'weights': [1.0]}
    # ]
 
 Vision
@@ -548,7 +548,7 @@ View the directory structure of the present state of the assets folder.
    └── videos
       ├── pk-hfad-1_1.mp4
       ├── pk-hfad-1_cow.mp4
-      └── pk-hfad-1_مجھے.mp4
+      └── pk-hfad-1_me.mp4
 
 .. code-block:: bash
    :caption: Directories only

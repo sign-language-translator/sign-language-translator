@@ -27,8 +27,12 @@ def validate_sign_label_pattern(sign_label: str):
 
 def test_mapping_datasets():
     default_assets_dir = Assets.ROOT_DIR
-    Assets.set_root_dir("./temp")
-    paths = Assets.download(r".*-mapping.json", overwrite=True)
+    try:
+        Assets.set_root_dir("./temp")
+        paths = Assets.download(r".*-mapping.json", overwrite=True)
+    except Exception as exc:
+        Assets.set_root_dir(default_assets_dir)
+        raise exc
 
     # assumes the dataset has correct format because otherwise it would fail during iteration hence no schema validation
     # schema_path = Assets.get_path("mapping-schema.json")[0]

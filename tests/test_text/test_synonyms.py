@@ -13,8 +13,10 @@ def test_translation_synonyms():
     assert set(synonyms) & {"hi", "hey", "howdy", "hello", "greetings", "hola", "hiya"}
 
     word = "happy"
-    synonyms = synonymizer.synonyms_by_translation(word, lower_case=True)
+    cache = {}
+    synonyms = synonymizer.synonyms_by_translation(word, lower_case=True, cache=cache)
     assert set(synonyms) & {"happy", "glad", "cheerful", "joyful", "merry", "delighted"}
+    assert word in cache
 
     synonymizer.language = "ur"
     word = "اشارہ"

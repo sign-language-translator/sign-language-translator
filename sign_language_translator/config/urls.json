@@ -4,10 +4,10 @@
       "description": "word-mapping-dataset",
       "file_to_url": {
         "mapping-schema.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/schemas/mapping-schema.json",
-        "pk-dictionary-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/a339f5bc5203ad88307f518f38886282cfb34c4a/parallel_texts/pk-dictionary-mapping.json",
-        "pk-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-sentence-mapping.json",
-        "pk-synthetic-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/47c5f28f2395afa6201a39bbdd0c9bc34d9b6612/parallel_texts/pk-synthetic-sentence-mapping.json",
-        "text-preprocessing.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/a62449e395140c0e3bb0f87ed586b28f0a8f193b/text-preprocessing.json"
+        "pk-dictionary-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/c7fbcb4d53ad4b5c04c43ed62cd98c2a6fa07f63/parallel_texts/pk-dictionary-mapping.json",
+        "pk-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/c7fbcb4d53ad4b5c04c43ed62cd98c2a6fa07f63/parallel_texts/pk-sentence-mapping.json",
+        "pk-synthetic-sentence-mapping.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/fcaec746a7bd16c1b27d646409e088e7bce006e2/parallel_texts/pk-synthetic-sentence-mapping.json",
+        "text-preprocessing.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/c7fbcb4d53ad4b5c04c43ed62cd98c2a6fa07f63/text-preprocessing.json"
       }
     },
     {
@@ -93,7 +93,7 @@
     {
       "description": "sign-dictionaries-url-files",
       "file_to_url": {
-        "pk-dictionary-urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/d385b3fbdebeba19866c7392e3f5d6f625d5b03e/asset_urls/pk-dictionary-urls.json"
+        "pk-dictionary-urls.json": "https://raw.githubusercontent.com/sign-language-translator/sign-language-datasets/fcaec746a7bd16c1b27d646409e088e7bce006e2/asset_urls/pk-dictionary-urls.json"
       }
     },
     {

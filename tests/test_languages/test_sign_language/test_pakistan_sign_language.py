@@ -61,7 +61,7 @@ def test_pakistan_token_to_sign():
 
     signs = psl.tokens_to_sign_dicts(tokens, tags=tags)
     expected_signs_1 = [
-        {"signs": [["pk-hfad-1_میں(i)"]], "weights": [1.0]},
+        {"signs": [["pk-hfad-1_i(me)"]], "weights": [1.0]},
         {
             "signs": [
                 [
@@ -69,21 +69,21 @@ def test_pakistan_token_to_sign():
                     "pk-hfad-1_a(double-handed-letter)",
                     "pk-hfad-1_a(double-handed-letter)",
                 ],
-                ["pk-hfad-1_وزیراعظم"],
+                ["pk-hfad-1_prime-minister"],
             ],
             "weights": [0.5, 0.5],
         },
-        {"signs": [["pk-hfad-1_ع"]], "weights": [1.0]},
+        {"signs": [["pk-hfad-1_aein"]], "weights": [1.0]},
         {"signs": [["pk-hfad-1_m(single-handed-letter)"]], "weights": [1.0]},
         {"signs": [["pk-hfad-1_r(single-handed-letter)"]], "weights": [1.0]},
         {"signs": [["pk-hfad-1_a(single-handed-letter)"]], "weights": [1.0]},
         {"signs": [["pk-hfad-1_n(single-handed-letter)"]], "weights": [1.0]},
-        {"signs": [["pk-hfad-1_خ"]], "weights": [1.0]},
+        {"signs": [["pk-hfad-1_khhey"]], "weights": [1.0]},
         {"signs": [["pk-hfad-1_a(single-handed-letter)"]], "weights": [1.0]},
         {"signs": [["pk-hfad-1_n(single-handed-letter)"]], "weights": [1.0]},
-        {"signs": [["pk-hfad-1_کے(of)"]], "weights": [1.0]},
-        {"signs": [["pk-hfad-1_گھر"]], "weights": [1.0]},
-        {"signs": [["pk-hfad-1_گیا"]], "weights": [1.0]},
+        {"signs": [["pk-hfad-1_of(ky)"]], "weights": [1.0]},
+        {"signs": [["pk-hfad-1_house"]], "weights": [1.0]},
+        {"signs": [["pk-hfad-1_gia"]], "weights": [1.0]},
     ]
     # the other order
     expected_signs_2 = deepcopy(expected_signs_1)
