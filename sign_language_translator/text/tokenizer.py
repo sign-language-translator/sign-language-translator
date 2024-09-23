@@ -10,7 +10,7 @@ class SignTokenizer:
         word_regex: str = r"\w+",
         compound_words: Iterable[str] = (),
         end_of_sentence_tokens: Iterable[str] = (".", "?", "!"),
-        full_stops=(".",),
+        acronym_periods=(".",),
         non_sentence_end_words: Iterable[str] = ("A", "B", "C"),
         tokenized_word_sense_pattern: Optional[List] = None,
     ):
@@ -20,7 +20,7 @@ class SignTokenizer:
 
         self.end_of_sentence_tokens = list(set(end_of_sentence_tokens))
         self.non_sentence_end_words = non_sentence_end_words
-        self.full_stops = full_stops
+        self.acronym_periods = acronym_periods
         self.tokenized_word_sense_pattern = tokenized_word_sense_pattern or [
             r"\w+",
             r"\(",
@@ -62,7 +62,7 @@ class SignTokenizer:
         return broken
 
     def sentence_tokenize(self, text: str) -> List[str]:
-        tokens = self.tokenize(text)
+        tokens = self.tokenize(text)  # todo: split on end_of_sentence_tokens directly
         sentences = []
         sentence = []
         previous_token = None
@@ -71,7 +71,7 @@ class SignTokenizer:
             if token in self.end_of_sentence_tokens:
                 ended = True
                 if (
-                    token in self.full_stops
+                    token in self.acronym_periods
                     and previous_token in self.non_sentence_end_words  # type: ignore
                 ):
                     ended = False

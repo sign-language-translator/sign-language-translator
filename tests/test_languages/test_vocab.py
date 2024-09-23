@@ -21,12 +21,6 @@ def test_vocab_single_sign_collection():
         "word-2": [["xy-abc-1_sign-2"]],
         "word-3(context)": [["xy-abc-1_sign-2"]],
     }
-    assert vocab.supported_words == {
-        "word-0",
-        "word-1",
-        "word-2",
-        "word-3",
-    }
     assert vocab.ambiguous_to_unambiguous == {"word-3": ["word-3(context)"]}
 
     assert vocab.person_names == ["alice", "bob"]
@@ -60,7 +54,7 @@ def test_vocab_all_sign_collections():
         "word-7": {("xy-abc-2_sign-1", "xy-abc-1_sign-2")},
         "word-8": {("xy-abc-2_sign-1", "xy-abc-1_sign-2")},
     }
-    assert vocab.supported_words_with_word_sense == {
+    assert vocab.supported_tokens == {
         "word-0",
         "word-1",
         "word-2",

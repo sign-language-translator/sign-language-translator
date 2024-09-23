@@ -49,9 +49,9 @@ class Urdu(TextLanguage):
         )
 
         self.non_sentence_end_tokens = {
-            # letters (A.B.C.) & spelled out letters (Ay, Bee, See)
+            # letters (A.B.C.) & spelled out letters (Ay, Bee, See etc but in Urdu)
             w.upper()
-            for wc in self.vocab.supported_words_with_word_sense
+            for wc in self.vocab.supported_tokens
             for w in [self.vocab.remove_word_sense(wc)]
             if (("double-handed-letter)" in wc) and (not w.isascii()))
             or (len(w) == 1 and w.isalpha())
@@ -60,13 +60,12 @@ class Urdu(TextLanguage):
         self.tokenizer = SignTokenizer(
             word_regex=self.token_regex(),
             compound_words=(
-                self.vocab.supported_words
-                | self.vocab.supported_words_with_word_sense
+                self.vocab.supported_tokens
                 | set(self.vocab.words_to_numbers.keys())
                 | set(self.vocab.person_names)
             ),  # TODO: | one-hundred twenty-three (\d[ \d]*): ["100", "23"] --> ["123"]
             end_of_sentence_tokens=self.END_OF_SENTENCE_MARKS,
-            full_stops=self.FULL_STOPS,
+            acronym_periods=self.FULL_STOPS,
             non_sentence_end_words=self.non_sentence_end_tokens,
             tokenized_word_sense_pattern=[self.WORD_REGEX, r"\(", [r"نام"], r"\)"],
         )
@@ -99,10 +98,7 @@ class Urdu(TextLanguage):
             ),
             # e.g. Cow, airplane, 1
             Rule(
-                lambda token: (
-                    token.lower() in self.vocab.supported_words
-                    or token.lower() in self.vocab.supported_words_with_word_sense
-                ),
+                lambda token: (token.lower() in self.vocab.supported_tokens),
                 Tags.SUPPORTED_WORD,
                 3,
             ),
@@ -117,7 +113,7 @@ class Urdu(TextLanguage):
             ),
             # e.g. "میں" -> ["میں(i)", "میں(in)"]
             Rule(
-                lambda token: token in self.vocab.ambiguous_to_unambiguous,
+                lambda token: token.lower() in self.vocab.ambiguous_to_unambiguous,
                 Tags.AMBIGUOUS,
                 2,
             ),
@@ -184,22 +180,68 @@ class Urdu(TextLanguage):
             tokens = [tokens]
 
         word_senses = [
-            self.vocab.ambiguous_to_unambiguous.get(token, []) for token in tokens
+            self.vocab.ambiguous_to_unambiguous.get(token.lower(), [])
+            for token in tokens
         ]
 
         return word_senses
+
+    def romanize(self, text: str, *args, add_diacritics=True, **kwargs) -> str:
+        """Map Urdu characters to phonetically similar characters of the English language.
+        Transliteration is useful for readability.
+
+        ALA-LC Romanization Table: https://www.loc.gov/catdir/cpso/romanization/urdu.pdf
+
+        Args:
+            text (str): Urdu text to be mapped to Latin script.
+            add_diacritics (bool, optional): Whether to use diacritics over English characters to ease pronunciation. (Rules: 1. The under-dot ' ̣' indicates alternate soft/hard pronunciation of the letter. 2. The over-bar/macron ' ̄' means long pronunciation. 3. The consecutive underline ' ̲ ̲' means the characters come from a single source letter). Defaults to True.
+
+        Examples:
+
+        .. code-block:: python
+
+            import sign_language_translator as slt
+
+            nlp = slt.languages.text.Urdu()
+
+            text = "میں نے ۴۷ کتابیں خریدی ہیں۔"
+            romanized_text = nlp.romanize(text)
+            print(romanized_text)
+            # 'mein̲ ny 47 ktabein̲ k̲h̲ridi hen̲.'
+
+            text = "مکّهی کا زکریّاؒ کی قابلِ تعریف قوّت سے منہ کهٹّا ہو گیا ہے۔۔۔"
+            text = nlp.preprocess(text)
+            romanized_text = nlp.romanize(text, add_diacritics=False)
+            print(romanized_text)
+            # "mkkhi ka zkryya(RH) ki qabl-e ta'rif qoot sy mnh khtta ho gya hy..."
+        """
+        # duplicate the letter behind shaddah
+        text = re.sub(r"\w" + " ّ".strip(), lambda x: x.group(0)[:-1] * 2, text)
+        text = text.replace(" ّ".strip(), "")
+
+        # replace n-grams
+        text = super().romanize(
+            text,
+            *args,
+            add_diacritics=add_diacritics,
+            character_translation_table=self.ROMANIZATION_CHARACTER_TRANSLATOR,
+            n_gram_map=self.NGRAM_ROMANIZATION_MAP,
+            **kwargs
+        )
+
+        return text
 
     # ====================== #
     #    Character Groups    #
     # ====================== #
 
-    UNICODE_RANGE: Tuple[int, int] = (1536, 1791)
+    UNICODE_RANGE: Tuple[int, int] = (1536, 1791)  # 0x0600 - 0x06FF
 
     FULL_STOPS: List[str] = [".", "۔"]
     QUESTION_MARKS: List[str] = ["?", "؟"]
     END_OF_SENTENCE_MARKS: List[str] = FULL_STOPS + QUESTION_MARKS + ["!"]
 
-    PUNCTUATION: List[str] = END_OF_SENTENCE_MARKS + [",", "٫", "،", "؛"]
+    PUNCTUATION: List[str] = END_OF_SENTENCE_MARKS + [",", "،", "؛"]
 
     QUOTATION_MARKS = """ ' " ” “ ’ ‘ """.split()
     BRACKETS: List[str] = ["(", ")"]
@@ -207,11 +249,11 @@ class Urdu(TextLanguage):
 
     PUNCTUATION_REGEX = r"[" + "".join([re.escape(punc) for punc in PUNCTUATION]) + r"]"
     DIACRITICS = str(" ٍ ً ٰ َ ُ ِ ّ ").split()
-    EXTRA_DIACRITICS = str(" ؐ  ؑ ؒ ؓ").split()
+    HONORIFICS = str(" ؐ  ؑ ؒ ؓ ").split()
     WORD_REGEX = r"[\w" + "".join(DIACRITICS) + r"]+"
     # TODO: r"[[^\W\d_]"+ "".join(DIACRITICS) + r"]+"
 
-    NUMBER_REGEX = r"\d+(?:[\.:]\d+)*"
+    NUMBER_REGEX = r"\d+(?:[٫\.:]\d+)*"
 
     CHARACTER_TO_WORD = {
         "ﷲ": "اللہ",
@@ -264,127 +306,132 @@ class Urdu(TextLanguage):
         text = text.strip(". !\"'\n\t")
         return text
 
-    if True or "UrduHack":
-        # Start of the code borrowed from "UrduHack/normalization/character.py"
-        # """Following Dictionaries and code are copied from UrduHack package
-        # Source Repo URL: https://github.com/urduhack/urduhack
-        # Source Repo URL: https://github.com/urduhack/urdu-characters"""
+    # ============ #
+    #   UrduHack   #
+    # ============ #
+    # Character normalization adapted from "UrduHack/normalization/character.py"
+    # Source Repo URL: https://github.com/urduhack/urduhack
+    # Source Repo URL: https://github.com/urduhack/urdu-characters"""
 
-        # Maps correct Urdu characters to list of visually similar non-urdu characters
-        CORRECT_URDU_CHARACTERS_TO_INCORRECT: Dict[str, List[str]] = {
-            "آ": ["ﺁ", "ﺂ"],
-            "أ": ["ﺃ"],
-            "ا": ["ﺍ", "ﺎ"],
-            "ب": ["ﺏ", "ﺐ", "ﺑ", "ﺒ"],
-            "پ": ["ﭖ", "ﭘ", "ﭙ"],
-            "ت": ["ﺕ", "ﺖ", "ﺗ", "ﺘ"],
-            "ٹ": ["ﭦ", "ﭧ", "ﭨ", "ﭩ"],
-            "ث": ["ﺛ", "ﺜ", "ﺚ"],
-            "ج": ["ﺝ", "ﺞ", "ﺟ", "ﺠ"],
-            "ح": ["ﺡ", "ﺣ", "ﺤ", "ﺢ"],
-            "خ": ["ﺧ", "ﺨ", "ﺦ"],
-            "د": ["ﺩ", "ﺪ"],
-            "ذ": ["ﺬ", "ﺫ"],
-            "ر": ["ﺭ", "ﺮ"],
-            "ز": ["ﺯ", "ﺰ"],
-            "س": ["ﺱ", "ﺲ", "ﺳ", "ﺴ"],
-            "ش": ["ﺵ", "ﺶ", "ﺷ", "ﺸ"],
-            "ص": ["ﺹ", "ﺺ", "ﺻ", "ﺼ"],
-            "ض": ["ﺽ", "ﺾ", "ﺿ", "ﻀ"],
-            "ط": ["ﻃ", "ﻄ"],
-            "ظ": ["ﻅ", "ﻇ", "ﻈ"],
-            "ع": ["ﻉ", "ﻊ", "ﻋ", "ﻌ"],
-            "غ": ["ﻍ", "ﻏ", "ﻐ"],
-            "ف": ["ﻑ", "ﻒ", "ﻓ", "ﻔ"],
-            "ق": ["ﻕ", "ﻖ", "ﻗ", "ﻘ"],
-            "ل": ["ﻝ", "ﻞ", "ﻟ", "ﻠ"],
-            "م": ["ﻡ", "ﻢ", "ﻣ", "ﻤ"],
-            "ن": ["ﻥ", "ﻦ", "ﻧ", "ﻨ"],
-            "چ": ["ﭺ", "ﭻ", "ﭼ", "ﭽ"],
-            "ڈ": ["ﮈ", "ﮉ"],
-            "ڑ": ["ﮍ", "ﮌ"],
-            "ژ": ["ﮋ"],
-            "ک": ["ﮎ", "ﮏ", "ﮐ", "ﮑ", "ﻛ", "ك"],
-            "گ": ["ﮒ", "ﮓ", "ﮔ", "ﮕ"],
-            "ں": ["ﮞ", "ﮟ"],
-            "و": ["ﻮ", "ﻭ", "ﻮ"],
-            "ؤ": ["ﺅ"],
-            "ھ": ["ﮪ", "ﮬ", "ﮭ", "ﻬ", "ﻫ", "ﮫ"],
-            "ہ": ["ﻩ", "ﮦ", "ﻪ", "ﮧ", "ﮩ", "ﮨ", "ه"],
-            "ۂ": [],
-            "ۃ": ["ة"],
-            "ء": ["ﺀ"],
-            "ی": ["ﯼ", "ى", "ﯽ", "ﻰ", "ﻱ", "ﻲ", "ﯾ", "ﯿ", "ي"],
-            "ئ": ["ﺋ", "ﺌ"],
-            "ے": ["ﮮ", "ﮯ", "ﻳ", "ﻴ"],
-            "ۓ": [],
-            "۰": ["٠"],
-            "۱": ["١"],
-            "۲": ["٢"],
-            "۳": ["٣"],
-            "۴": ["٤"],
-            "۵": ["٥"],
-            "۶": ["٦"],
-            "۷": ["٧"],
-            "۸": ["٨"],
-            "۹": ["٩"],
-            "۔": [],
-            "؟": [],
-            "٫": [],
-            "،": [],
-            "لا": ["ﻻ", "ﻼ"],
-            # "": ["ـ"],
-        }
+    # Maps correct Urdu characters to list of visually similar non-urdu characters
+    CORRECT_URDU_CHARACTERS_TO_INCORRECT: Dict[str, List[str]] = {
+        "آ": ["ﺁ", "ﺂ"],
+        "أ": ["ﺃ"],
+        "ا": ["ﺍ", "ﺎ"],
+        "ب": ["ﺏ", "ﺐ", "ﺑ", "ﺒ"],
+        "پ": ["ﭖ", "ﭘ", "ﭙ"],
+        "ت": ["ﺕ", "ﺖ", "ﺗ", "ﺘ"],
+        "ٹ": ["ﭦ", "ﭧ", "ﭨ", "ﭩ"],
+        "ث": ["ﺛ", "ﺜ", "ﺚ"],
+        "ج": ["ﺝ", "ﺞ", "ﺟ", "ﺠ"],
+        "چ": ["ﭺ", "ﭻ", "ﭼ", "ﭽ"],
+        "ح": ["ﺡ", "ﺣ", "ﺤ", "ﺢ"],
+        "خ": ["ﺧ", "ﺨ", "ﺦ"],
+        "د": ["ﺩ", "ﺪ"],
+        "ڈ": ["ﮈ", "ﮉ"],
+        "ذ": ["ﺬ", "ﺫ"],
+        "ر": ["ﺭ", "ﺮ"],
+        "ڑ": ["ﮍ", "ﮌ"],
+        "ز": ["ﺯ", "ﺰ"],
+        "ژ": ["ﮋ"],
+        "س": ["ﺱ", "ﺲ", "ﺳ", "ﺴ"],
+        "ش": ["ﺵ", "ﺶ", "ﺷ", "ﺸ"],
+        "ص": ["ﺹ", "ﺺ", "ﺻ", "ﺼ"],
+        "ض": ["ﺽ", "ﺾ", "ﺿ", "ﻀ"],
+        "ط": ["ﻃ", "ﻄ"],
+        "ظ": ["ﻅ", "ﻇ", "ﻈ"],
+        "ع": ["ﻉ", "ﻊ", "ﻋ", "ﻌ"],
+        "غ": ["ﻍ", "ﻏ", "ﻐ"],
+        "ف": ["ﻑ", "ﻒ", "ﻓ", "ﻔ"],
+        "ق": ["ﻕ", "ﻖ", "ﻗ", "ﻘ"],
+        "ک": ["ﮎ", "ﮏ", "ﮐ", "ﮑ", "ﻛ", "ك"],
+        "گ": ["ﮒ", "ﮓ", "ﮔ", "ﮕ"],
+        "ل": ["ﻝ", "ﻞ", "ﻟ", "ﻠ"],
+        "م": ["ﻡ", "ﻢ", "ﻣ", "ﻤ"],
+        "ن": ["ﻥ", "ﻦ", "ﻧ", "ﻨ"],
+        "ں": ["ﮞ", "ﮟ"],
+        "و": ["ﻮ", "ﻭ", "ﻮ"],
+        "ؤ": ["ﺅ"],
+        "ہ": ["ﻩ", "ﮦ", "ﻪ", "ﮧ", "ﮩ", "ﮨ", "ه"],
+        "ۂ": [],
+        "ۃ": ["ة"],
+        "ھ": ["ﮪ", "ﮬ", "ﮭ", "ﻬ", "ﻫ", "ﮫ"],
+        "ء": ["ﺀ"],
+        "ی": ["ﯼ", "ى", "ﯽ", "ﻰ", "ﻱ", "ﻲ", "ﯾ", "ﯿ", "ي"],
+        "ئ": ["ﺋ", "ﺌ"],
+        "ے": ["ﮮ", "ﮯ", "ﻳ", "ﻴ"],
+        "ۓ": [],
+        "۰": ["٠"],
+        "۱": ["١"],
+        "۲": ["٢"],
+        "۳": ["٣"],
+        "۴": ["٤"],
+        "۵": ["٥"],
+        "۶": ["٦"],
+        "۷": ["٧"],
+        "۸": ["٨"],
+        "۹": ["٩"],
+        "۔": [],
+        "؟": [],
+        "٫": [],
+        "،": [],
+        "لا": ["ﻻ", "ﻼ"],
+        # "": ["ـ"],
+    }
 
-        # Maps (character + diacritic) to single characters (beware RTL text rendering)
-        SPLIT_TO_COMBINED_CHARACTERS: Dict[str, str] = {
-            "آ": "آ",
-            "أ": "أ",
-            "ؤ": "ؤ",
-            "ۂ": "ۂ",
-            "یٔ": "ئ",
-            "ۓ": "ۓ",
-        }
+    # Maps (character + diacritic) to single characters (beware RTL text rendering)
+    SPLIT_TO_COMBINED_CHARACTERS: Dict[str, str] = {
+        "آ": "آ",
+        "أ": "أ",
+        "ؤ": "ؤ",
+        "ۂ": "ۂ",
+        "یٔ": "ئ",
+        "ۓ": "ۓ",
+        " ََ".strip(): " ً".strip(),
+        " ِِ".strip(): " ٍ".strip(),
+    }
 
-        # Convert the dictionaries to a useable format
-        CHARACTER_TRANSLATOR = {
-            **{ord(c): w for c, w in CHARACTER_TO_WORD.items()},
-            **{
-                ord(non_urdu): urdu
-                for urdu, others in CORRECT_URDU_CHARACTERS_TO_INCORRECT.items()
-                for non_urdu in others
-            },
-        }
-        COMBINE_CHARACTERS_REGEX = r"|".join(SPLIT_TO_COMBINED_CHARACTERS.keys())
-        DIACRITICS_REGEX = r"|".join(DIACRITICS)
+    # Convert the dictionaries to a useable format
+    CHARACTER_TRANSLATOR = {
+        **{ord(c): w for c, w in CHARACTER_TO_WORD.items()},
+        **{
+            ord(non_urdu): urdu
+            for urdu, others in CORRECT_URDU_CHARACTERS_TO_INCORRECT.items()
+            for non_urdu in others
+        },
+    }
+    COMBINE_CHARACTERS_REGEX = r"|".join(SPLIT_TO_COMBINED_CHARACTERS.keys())
+    DIACRITICS_REGEX = r"|".join(DIACRITICS)
 
-        @staticmethod
-        def character_normalize(text: str) -> str:
-            """Replace characters that are rendered the same as Urdu characters in common fonts but actually belong to foreign unicode character ranges by Urdu characters.
+    @staticmethod
+    def character_normalize(text: str) -> str:
+        """Replace characters that are rendered the same as Urdu characters in common fonts but actually belong to foreign unicode character ranges by Urdu characters.
 
-            Args:
-                text (str): a piece of urdu text that may contain foreign symbols
+        Args:
+            text (str): a piece of urdu text that may contain foreign symbols
 
-            Returns:
-                str: normalized urdu text
-            """
+        Returns:
+            str: normalized urdu text
+        """
 
-            text = text.translate(Urdu.CHARACTER_TRANSLATOR)
-            text = re.sub(
-                Urdu.COMBINE_CHARACTERS_REGEX,
-                lambda match: Urdu.SPLIT_TO_COMBINED_CHARACTERS[match.group()],
-                text,
-            )
+        text = text.translate(Urdu.CHARACTER_TRANSLATOR)
+        text = re.sub(
+            Urdu.COMBINE_CHARACTERS_REGEX,
+            lambda match: Urdu.SPLIT_TO_COMBINED_CHARACTERS[match.group()],
+            text,
+        )
 
-            return text
+        return text
 
-        @staticmethod
-        def remove_diacritics(text: str) -> str:
-            text = re.sub(Urdu.DIACRITICS_REGEX, "", text)
+    @staticmethod
+    def remove_diacritics(text: str) -> str:
+        text = re.sub(Urdu.DIACRITICS_REGEX, "", text)
 
-            return text
+        return text
 
-        # End of the code borrowed from UrduHack
+    # ============ #
+    # End UrduHack #
+    # ============ #
 
     ALLOWED_CHARACTERS = (
         set("".join(CORRECT_URDU_CHARACTERS_TO_INCORRECT.keys()))
@@ -392,9 +439,139 @@ class Urdu(TextLanguage):
         | set(SYMBOLS)
         | set(ascii_uppercase)  # acronyms
         | set(digits)
-        | set(EXTRA_DIACRITICS)
-        | set("()!.,?/[]{} \n")
+        | set(HONORIFICS)
+        | set("٫()!.,?/[]{}<> \n")
     )
     UNALLOWED_CHARACTERS_REGEX = (
         "[^" + "".join(map(re.escape, ALLOWED_CHARACTERS)) + "]"
     )
+
+    # ================== #
+    #    Romanization    #
+    # ================== #
+    # https://www.loc.gov/catdir/cpso/romanization/urdu.pdf
+    ROMANIZATION_MAP = {
+        # === Consonants === #
+        "ب": "b",
+        "پ": "p",
+        "ت": "t",
+        "ٹ": "ṭ",
+        "ث": "s",  # ? different from PDF
+        "ج": "j",
+        "چ": "ch",  # ?      Examples: ["کراچی", "کچھ", "چیئرمین", "میچ"]
+        "ح": "h",  # ? different from PDF
+        "خ": "k̲h̲",
+        "د": "d",
+        "ڈ": "ḍ",
+        "ذ": "z",  # ? different from PDF
+        "ر": "r",
+        "ڑ": "ṛ",
+        "ز": "z",
+        "ژ": "zh",  #        Examples: ["ڈویژن", "ژالہ"]
+        "س": "s",
+        "ش": "sh",
+        "ص": "s",  # ? different from PDF
+        "ض": "z",  # ? different from PDF
+        "ط": "t",  # ? different from PDF
+        "ظ": "z",  # ? different from PDF
+        "غ": "g̲h̲",
+        "ف": "f",
+        "ق": "q",
+        "ک": "k",
+        "گ": "g",
+        "ل": "l",
+        "م": "m",
+        "ن": "n",
+        "ۃ": "t",  # ?       Examples: ["زکوٰۃ", "سورۃ", "رحمۃ"]
+        #
+        # === Vowels === #
+        "آ": "aa",  # ?      Examples: ["آباد", "آپ", "برآمد"]
+        "أ": "a",  # ?       Examples: ["جرأت", "قرأت"]
+        "ا": "a",
+        "ع": "a'",  # ?      Examples: ["علی", "متعلق", "جمع"]
+        "ں": "n̲",
+        "و": "o",  # ?       Examples: v: ["وقت", "حوالے", "وجہ"] , o: ["موقع", "دو", "روپے"]
+        "ؤ": "ow",  # ?      Examples: ["ٹاؤن", "گاؤں", "باؤلنگ", "جنگجوؤں", "ڈاکوؤں", "جاؤ"]
+        "ھ": "h",
+        "ہ": "h",
+        "ۂ": "h-e",  # ?     Examples: ["غزوۂ", "تبادلۂ", "شعبۂ", "کرۂ"]
+        "ء": "'",  # ?       Examples: ["فروری2020ء"], ["طلباء", "اشیاء"]
+        "ی": "i",  # ? different from PDF
+        "ئ": "e",  # ?       Examples: ["صوبائی", "لائن", "برائے",  "وائرس", ] ,   ["لئے", "گئی", "کئی"]
+        "ے": "y",
+        "ۓ": "ey",  # ? different from PDF
+        #
+        # === Diacritics === #
+        # https://en.wiktionary.org/wiki/%D9%8D
+        " َ".strip(): "a",
+        " ُ".strip(): "u",
+        " ِ".strip(): "i",
+        " ً".strip(): "an",
+        " ٍ".strip(): "in",
+        " ٰ".strip(): "a",
+        # " ّ".strip(): "",  # shaddah handled separately in .romanize()
+        #
+        # === Honorifics === #
+        # https://en.wikipedia.org/wiki/Islamic_honorifics
+        " ؑ".strip(): "(AS)",  #   " alayhe-assallam",
+        " ؐ".strip(): "(PBUH)",  # " sallallahou-alayhe-wassallam",
+        " ؓ".strip(): "(RA)",  #   " radi-allahou-anhu",
+        " ؒ".strip(): "(RH)",  #   " rahmatullah-alayhe"
+        #
+        # === Numbers === #
+        "۰": "0",
+        "۱": "1",
+        "۲": "2",
+        "۳": "3",
+        "۴": "4",
+        "۵": "5",
+        "۶": "6",
+        "۷": "7",
+        "۸": "8",
+        "۹": "9",
+        #
+        # === Symbols === #
+        "٫": ".",  # decimal point
+        "۔": ".",  # full stop
+        "،": ",",
+        "؟": "?",
+        "؛": ";",
+    }
+
+    ROMANIZATION_CHARACTER_TRANSLATOR = {
+        ord(u): r for u, r in ROMANIZATION_MAP.items() if len(u) == 1
+    }
+    NGRAM_ROMANIZATION_MAP = {
+        **{ng: r for ng, r in ROMANIZATION_MAP.items() if len(ng) > 1},
+        r"(?<=\d)\s*ء": "CE",  # (Common Era),
+        #
+        # === AEIN === #
+        r"\bع(?=ی)": "ei",
+        #
+        # === WAO === #
+        r"و(?=[اَےی])": "v",
+        r"(?<=[ُ])و(?![ا])": "",
+        r"و(?=[ؤ])": "u",
+        r"\bو": "v",
+        r"(?<=[ا])و(?![ں])": "v",
+        #
+        # === YEH === #
+        r"\bی": "y",
+        r"(?<=ہ)ی(?!\b)": "e",
+        r"ی(?=[وای])": "y",
+        r"(?<=ا)ی": "y",
+        r"ی(?=ں)": "ei",
+        #
+        # === SUPERSCRIPT_HAMZA === #
+        r"(?<=ل)ئ(?=ے)": "ie",
+        #
+        # === ZER, ZABAR, PESH etc === #
+        r"(?<=\w)آ": "'ā",
+        r"ِ(?!\w)": "-e",
+        r"یٰ": "a",
+        r"اً": "an",
+        r"اُ": "u",
+        r"اِ": "i",
+        r"ًا": "an",
+        r"اَ": "a",
+    }

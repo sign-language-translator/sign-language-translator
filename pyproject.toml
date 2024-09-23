@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "sign_language_translator"
-version =  "0.8.0"
-description = "Build Translators and Translate between text & sign language videos with AI."
+version = "0.8.1"
+description = "Build custom Translators and Translate between text and sign language videos with AI."
 authors = ["Mudassar Iqbal <mdsriqb@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
@@ -64,4 +64,4 @@ exclude_also = [
 precision = 2
 
 [tool.coverage.run]
-omit = ["temp/*", "temp_*.py", "temp_*/*"]
+omit = ["temp/*", "temp_*.py", "temp_*/*", "temp.py"]

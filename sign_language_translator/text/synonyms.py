@@ -10,9 +10,21 @@ Classes:
 """
 
 from collections import Counter
-from typing import List, Optional
+from typing import Dict, List, Optional
+from warnings import warn
 
-from urllib3.exceptions import MaxRetryError, SSLError
+from urllib3.exceptions import HTTPError
+
+try:
+    from deep_translator import GoogleTranslator
+    from deep_translator.exceptions import (
+        BaseError as DeepTranslatorError,
+        TooManyRequests,
+    )
+except ImportError:
+    GoogleTranslator = None
+    DeepTranslatorError = None
+    TooManyRequests = None
 
 from sign_language_translator.utils.parallel import threaded_map
 
@@ -82,13 +94,11 @@ class SynonymFinder:
         target language as the __init__ argument or according to the current state.
         """
         if self._translator is None:
-            try:
-                from deep_translator import GoogleTranslator
-            except ImportError as exc:
+            if GoogleTranslator is None:
                 raise ImportError(
                     "The 'deep_translator' package is required for translation-based synonym finding. "
                     "Install it using `pip install sign-language-translator[synonyms]`."
-                ) from exc
+                )
 
             self._translator = GoogleTranslator(source="auto", target=self.language)
         return self._translator
@@ -109,12 +119,14 @@ class SynonymFinder:
         self,
         text: str,
         intermediate_languages: Optional[List[str]] = None,
+        min_frequency: int = 1,
         time_delay: float = 1e-2,
         timeout: Optional[float] = 10,
         max_n_threads: int = 132,
         lower_case: bool = True,
         progress_bar: bool = True,
         leave: bool = False,
+        cache: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> List[str]:
         """
         Translates the given text into intermediate languages and performs back-translation to obtain synonyms.
@@ -123,12 +135,14 @@ class SynonymFinder:
         Args:
             text (str): The text to be translated.
             intermediate_languages (Optional[List[str]]): List of intermediate languages to translate the text into. Use 2-letter codes (ISO 639-1). If None, all supported languages of the translator will be used. Defaults to None.
+            min_frequency (int): Minimum occurrence count for synonyms to get considered. Value is inclusive. Defaults to 1.
             time_delay (float): Time delay between translation requests (in seconds). Defaults to 1e-2.
             timeout (float | None): The maximum amount of time (in seconds) to wait for a thread to finish. None means wait indefinitely. Defaults to 10.
             max_n_threads (int): Maximum number of threads to use for parallel translation. Defaults to 128.
             lower_case (bool): Whether to convert the synonyms to lowercase. Defaults to True.
             progress_bar (bool): Whether to display a progress bar during translation. Defaults to True.
             leave (bool): Whether to leave the progress bar after translation. Defaults to True.
+            cache (Optional[Dict[str, Dict[str, str]]]): A dictionary to save or retrieve the intermediate translations of the `text`. Structure is `{"text": {"language": "translation", ...}, ...}` where each input maps to a dict mapping language code to the text's translation. Defaults to None.
 
         Returns:
             List[str]: A list of synonyms obtained through back-translation from other languages.
@@ -139,11 +153,17 @@ class SynonymFinder:
             intermediate_languages = self.intermediate_languages
 
         def translation_function(text: str, target_lang: str, translations: List[str]):
-            try:
-                translations.append(self.translate(text, target_lang))
-            # catch  and pass
-            except Exception:
-                pass
+            if (
+                isinstance(cache, dict)
+                and (text in cache)
+                and (target_lang in cache[text])
+            ):
+                translations.append(cache[text][target_lang])
+            else:
+                if translation := self.translate(text, target_lang):
+                    translations.append(translation)
+                    if isinstance(cache, dict):
+                        cache.setdefault(text, {})[target_lang] = translation
 
         # translation into intermediate languages
         translations = []
@@ -176,13 +196,14 @@ class SynonymFinder:
 
         # preprocess
         if lower_case:
-            synonyms = [syn.lower() for syn in synonyms]
+            synonyms = [str(syn).lower() for syn in synonyms]
+        synonyms = [stripped for syn in synonyms if (stripped := str(syn).strip())]
 
         # sort by frequency
         synonyms = [
-            txt_
-            for txt, _ in Counter(synonyms).most_common()
-            if (txt_ := txt.strip()) not in ("",)
+            txt
+            for txt, freq in Counter(synonyms).most_common()
+            if freq >= min_frequency
         ]
 
         return synonyms
@@ -200,8 +221,13 @@ class SynonymFinder:
         """
         try:
             self.translator.target = target_language
-            return self.translator.translate(text)
-        except (MaxRetryError, SSLError):
+            return str(self.translator.translate(text)).strip()
+        except (
+            HTTPError,
+            DeepTranslatorError or HTTPError,
+            TooManyRequests or HTTPError,
+        ) as exc:
+            warn(f"Translation failed for '{text}' to '{target_language}'.Error: {exc}")
             return ""
 
     @property

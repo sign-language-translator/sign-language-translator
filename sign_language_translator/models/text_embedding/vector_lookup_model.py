@@ -38,7 +38,7 @@ class VectorLookupModel(TextEmbeddingModel):
         - save(self, path: str): Saves the model state (tokens & vectors) to a file.
         - load(cls, path: str): Loads a saved model state (tokens & vectors) from a file.
 
-    Usage:
+    Example:
 
     ..code-block:: python
 

@@ -46,13 +46,28 @@ def test_hindi_tokenization():
     # detokenization
     assert nlp.detokenize(tokens) == nlp.preprocess(text)
 
-    # sentence tokenization
-    text = "बी.एस. विज्ञान और एम॰एस॰ की डिग्री लेने के बाद वह अपने घर लौटी। जो भारत में है"  # after getting a B.S. and M.S. in science, she returned home. which is in India.
-    sentences = nlp.sentence_tokenize(text)
-    assert sentences == [
-        "बी.एस. विज्ञान और एम॰एस॰ की डिग्री लेने के बाद वह अपने घर लौटी।",
-        "जो भारत में है",
+
+def test_hindi_sentence_tokenization():
+    nlp = Hindi()
+
+    texts = [
+        # Basic . ? !
+        "आप कैसे हैं? मैं ठीक हूँ। शानदार!",  # how are you? I'm fine. Amazing!
+        # Acronyms
+        "बी.एस. विज्ञान और एम॰एस॰ की डिग्री लेने के बाद वह अपने घर लौटी। जो भारत में है",  # after getting a B.S. and M.S. in science, she returned home. which is in India.
+        "आई।सी।सी। विश्व कप लीग चीन में होगा॥जो एशिया में है.",  # ICC World Cup League will be in China.which is in Asia.
+        # Numbers
+        "ये पिछले वालों से २.५ गुना बेहतर हैं. जो बहुत शानदार है.",  # these are 2.5 times better than the previous ones. which is amazing.
     ]
+    expected_sentences = [
+        ["आप कैसे हैं?", "मैं ठीक हूँ।", "शानदार!"],
+        ["बी.एस. विज्ञान और एम॰एस॰ की डिग्री लेने के बाद वह अपने घर लौटी।", "जो भारत में है"],
+        ["आई।", "सी।", "सी।", "विश्व कप लीग चीन में होगा॥", "जो एशिया में है."],
+        ["ये पिछले वालों से २.५ गुना बेहतर हैं.", "जो बहुत शानदार है."],
+    ]
+
+    sentences = [nlp.sentence_tokenize(t) for t in texts]
+    assert sentences == expected_sentences
 
 
 def test_hindi_tagging():
@@ -93,3 +108,21 @@ def test_hindi_static_attributes():
     assert all(len(c) == 1 for c in Hindi.allowed_characters())
     assert all(len(c) == 1 for c in Hindi.CHARACTERS)
     assert all(len(c) == 1 for c in Hindi.DIACRITICS)
+
+
+def test_hindi_romanization():
+    nlp = Hindi()
+
+    texts = [
+        "अपनी ऊंचाई के कारण उछाल पाने में भी कामयाब होते हैं.",
+        "मैंने किताब खरीदी है।",
+        "ईशांत को शानदार गेंदबाजी के लिए १ अवॉर्ड दिया गया।",
+    ]
+    expected_romanized = [
+        ("apnī ūnchaī ke karṇ uchhal pane men bhī kamyab hote hain.", True),
+        ("mainne kitab khrīdī hai.", True),
+        ("ishant ko shandar gendbaji ke lie 1 avord diya gya.", False),
+    ]
+
+    for txt, (exp_rom, diacritics) in zip(texts, expected_romanized):
+        assert exp_rom == nlp.romanize(txt, add_diacritics=diacritics)

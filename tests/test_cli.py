@@ -8,6 +8,7 @@ from click.testing import CliRunner
 from sign_language_translator.cli import slt
 from sign_language_translator.config.assets import Assets
 from sign_language_translator.config.enums import ModelCodeGroups
+from sign_language_translator.utils.utils import is_internet_available
 
 
 def test_slt():
@@ -54,7 +55,7 @@ def test_slt_translate():
 
 
 def test_slt_embed_video():
-    if sys.version_info > (3, 11):
+    if sys.version_info >= (3, 12):
         pytest.skip("MediaPipe is not supported in Python >3.11")
 
     runner = CliRunner()
@@ -126,6 +127,7 @@ def test_slt_complete():
     assert result.output.split()[-1].startswith("[m")  # ignore progress bar
 
 
+@pytest.mark.skipif(not is_internet_available(), reason="No internet available")
 def test_slt_assets_download():
     runner = CliRunner()
 

@@ -1,5 +1,6 @@
 import os
 import re
+import socket
 from enum import EnumMeta
 from random import choices
 from typing import Any, Dict, List, Set, Union
@@ -15,6 +16,7 @@ __all__ = [
     "sample_one_index",
     "search_in_values_to_retrieve_key",
     "validate_path_exists",
+    "is_internet_available",
 ]
 
 
@@ -252,3 +254,16 @@ def validate_path_exists(path: str, overwrite: bool = False) -> str:
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
     return path
+
+
+def is_internet_available() -> bool:
+    """Hit a well-known server (Google DNS) to check for internet availability.
+
+    Returns:
+        bool: True if internet is available, False otherwise.
+    """
+    try:
+        socket.create_connection(("8.8.8.8", 53), timeout=5)
+        return True
+    except OSError:
+        return False

@@ -51,7 +51,7 @@ Usage
     # -------------------------- TRANSLATE: sign to text --------------------------
 
     # sign = slt.Video("path/to/video.mp4")
-    sign = slt.Video.load_asset("pk-hfad-1_آپ-کا-نام-کیا(what)-ہے")  # your name what is? (auto-downloaded)
+    sign = slt.Video.load_asset("pk-hfad-1_aap-ka-nam-kya(what)-hy")  # your name what is? (auto-downloaded)
     sign.show_frames_grid()
 
     # Extract Pose Vector for feature reduction

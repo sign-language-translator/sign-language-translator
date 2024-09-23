@@ -147,9 +147,26 @@ def test_array_ops():
     _, indices = ArrayOps.top_k(array, 3)
     assert set(indices.tolist()) == {1, 4, 0}
 
+    multidimensional = torch.Tensor([[1, 2, 6], [3, 5, 4], [7, 3, 0]]).type(torch.long)
+    values, _ = ArrayOps.top_k(multidimensional, 1, dim=0, largest=False)
+    assert set(values.ravel().tolist()) == {1, 2, 0}
+    values, _ = ArrayOps.top_k(multidimensional.tolist(), 1, dim=1)
+    assert set(values.ravel().tolist()) == {6, 5, 7}
+
     # test abs
     assert (ArrayOps.abs(torch.Tensor([-1, 0, 1])) == torch.Tensor([1, 0, 1])).all()
     assert (ArrayOps.abs(np.array([-1, 0, 1.1])) == np.array([1, 0, 1.1])).all()
+
+    # test copy
+    array = np.array([1, 2, 3])
+    copy = ArrayOps.copy(array)
+    assert (copy == array).all()
+    assert copy is not array
+    array[0] = -1
+    assert (copy == np.array([1, 2, 3])).all()
+    copy[-1] = -1
+    assert (array == np.array([-1, 2, 3])).all()
+    assert (copy != array).any()
 
     # test concatenate
     tensor_1 = torch.Tensor([1, 2])
@@ -165,6 +182,91 @@ def test_array_ops():
     # test take
     assert (ArrayOps.take([1, 2, 3], [0, 2]) == [1, 3]).all()
     assert (ArrayOps.take(torch.Tensor([1, 2, 3]), 0) == torch.Tensor([1])).all()
+
+    # test linspace
+    linspace = ArrayOps.linspace(0, 1, 5)
+    assert isinstance(linspace, np.ndarray)
+    assert linspace.round(2).tolist() == [0.0, 0.25, 0.5, 0.75, 1.0]
+    linspace = ArrayOps.linspace(1, 3, 4, data_type=torch.Tensor, endpoint=False)
+    assert isinstance(linspace, torch.Tensor)
+    assert ((linspace - torch.Tensor([1, 1.5, 2, 2.5])).abs() < 1e-4).all()
+
+    # test random uniform
+    uniform = ArrayOps.random_uniform((10, 30), 1, 2)
+    assert uniform.shape == (10, 30)
+    assert (uniform >= 1).all()
+    assert isinstance(uniform, np.ndarray)
+    uniform = ArrayOps.random_uniform((200, 3000), 0, 1, data_type=torch.Tensor)
+    assert (uniform < 1).all()
+    assert isinstance(uniform, torch.Tensor)
+    assert (uniform.mean() - 0.5).abs() < 0.01
+
+    # test random normal
+    normal = ArrayOps.random_normal((1000, 3000), 0, 1)
+    assert normal.shape == (1000, 3000)
+    assert isinstance(normal, np.ndarray)
+    assert np.isclose(normal.mean(), 0, atol=0.1)
+    assert np.isclose(normal.std(), 1, atol=0.1)
+
+    # test truncated normal
+    normal = ArrayOps.random_normal((200,), 1, 1.4, -1, 2, data_type=torch.Tensor)
+    assert isinstance(normal, torch.Tensor)
+    assert (normal >= -1).all()
+    assert (normal <= 2).all()
+
+
+def test_array_ops_steps():
+    anchors = [0, 1, 5, -2]
+
+    # equal spacing between anchors
+    steps = ArrayOps.steps(7, anchors, 0, 0, 0, None, 1)
+    assert steps.round(1).tolist() == [0.0, 0.5, 1.0, 3.0, 5.0, 1.5, -2.0]
+
+    # distance based anchor spacing
+    steps = ArrayOps.steps(7, np.array(anchors), 0, 0, 0, None, 0)
+    # 0 1 2 3 4 5 6 7 8 9 10 11 12
+    # 0 1 . . . 5 . . . .  .  . -2
+    # x . x . x . x . x .  x  .  x
+    assert steps.round().tolist() == [0, 2, 4, 4, 2, 0, -2]
+    assert isinstance(steps, np.ndarray)
+
+    # random uniform + linear steps
+    anchors = [0, 1]
+    steps = ArrayOps.steps(60, anchors, 0.5, 0, 0, None, 0)
+    assert steps.shape == (60,)
+    assert isinstance(steps, np.ndarray)
+    assert (steps <= 1).all()
+    assert (steps >= 0).all()
+    assert not (
+        set(np.linspace(anchors[0], anchors[1], 30).tolist()) - set(steps.tolist())
+    )
+
+    # random normal + linear steps + spacing blend
+    anchors = [-2, -1, 2]
+    steps = ArrayOps.steps(100, torch.Tensor(anchors), 0, 0.5, 3, None, 0.5)
+    assert steps.shape == (100,)
+    assert isinstance(steps, torch.Tensor)
+    assert (steps <= 2).all()
+    assert (steps >= -2).all()
+    assert -2 in steps.tolist()
+    assert 2 in steps.tolist()
+
+    # invalid fractions
+    with pytest.raises(ValueError) as exc_info:
+        ArrayOps.steps(10, [0, 1], 0.7, 0.8, 0, None, 0)
+    assert "_frac" in str(exc_info.value).lower()
+
+    with pytest.raises(ValueError) as exc_info:
+        ArrayOps.steps(10, [0, 1], 1.1, -0.2, 0, None, 0)
+    assert "_frac" in str(exc_info.value).lower()
+
+    with pytest.raises(ValueError) as exc_info:
+        ArrayOps.steps(10, [0, 1], 0, 0, 0, None, -1)
+    assert "spacing_blend" in str(exc_info.value).lower()
+
+    with pytest.raises(ValueError) as exc_info:
+        ArrayOps.steps(10, [0, 1], 0, 0, 0, None, 2)
+    assert "spacing_blend" in str(exc_info.value).lower()
 
 
 def test_adjust_vector_angle():
@@ -267,3 +369,15 @@ def test_array_ops_validation():
 
     with pytest.raises(TypeError):
         ArrayOps.abs(1)  # type: ignore
+
+    with pytest.raises(TypeError):
+        ArrayOps.copy([1, 2, 3])  # type: ignore
+
+    with pytest.raises(ValueError):
+        ArrayOps.linspace(1, 0, 3, list)  # type: ignore
+
+    with pytest.raises(ValueError):
+        ArrayOps.random_normal((10,), data_type=list)  # type: ignore
+
+    with pytest.raises(ValueError):
+        ArrayOps.random_uniform((10,), data_type=list)  # type: ignore
