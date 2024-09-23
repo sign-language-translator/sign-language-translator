@@ -28,6 +28,12 @@ def test_concatenative_synthesis_model():
     sign_language_sentence.save(path := "temp/sign.mp4", overwrite=True, codec="mp4v")
     assert os.path.exists(path), os.listdir("temp")
 
+    text = "گھنٹے گھنٹہ"
+    sign = model.translate(text)
+
+    sign_language_sentence.save(path := "temp/sign_2.mp4", overwrite=True, codec="mp4v")
+    assert os.path.exists(path), os.listdir("temp")
+
     model.sign_format = "landmarks"
     assert model.sign_format.name() == "landmarks"
     model.sign_embedding_model = "mediapipe-world"
@@ -35,8 +41,22 @@ def test_concatenative_synthesis_model():
     model.sign_language = PakistanSignLanguage()
     assert model.sign_language.name() == "pakistan-sign-language"
 
-    text = "گھنٹے گھنٹہ"
+    # ==== Hindi ==== #
+    model.text_language = "hindi"
+    assert model.text_language.name() == "hi"
+
+    text = "पाँच घंटे।"
     sign = model.translate(text)
+
+    sign.save((path := f"temp/{text}.csv"), overwrite=True)
+    with open(path, "r", encoding="utf-8") as f:
+        assert len(f.read().splitlines()) > 1
+
+    # ==== English ==== #
+    model.text_language = "english"
+    assert model.text_language.name() == "en"
+
+    sign = model.translate("The Door closed with Noise.")
 
     sign.save((path := f"temp/{text}.csv"), overwrite=True)
     with open(path, "r", encoding="utf-8") as f:

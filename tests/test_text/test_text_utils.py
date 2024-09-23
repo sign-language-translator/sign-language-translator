@@ -1,5 +1,6 @@
 from sign_language_translator.text.utils import (
     ListRegex,
+    concatenate_sentence_terminals,
     extract_supported_subsequences,
     make_ngrams,
 )
@@ -34,6 +35,29 @@ def test_extract_supported_subsequence():
     )
 
     assert subsequences == expected_subsequences
+
+
+def test_concatenate_sentence_terminals():
+    start, end = "<s>", "</s>"
+
+    sentence_terminal_pairs = [
+        (
+            ["Hello!", "How are you?", "I'm fine."],
+            ["Hello!</s>", "<s>How are you?</s>", "<s>I'm fine."],
+        ),
+        (
+            ["I can't understand my old code!"],
+            ["I can't understand my old code!"],
+        ),
+        (
+            ["How have you been?", "I've been worried."],
+            ["How have you been?</s>", "<s>I've been worried."],
+        )
+    ]
+
+    for sentence, expected in sentence_terminal_pairs:
+        concatenated = concatenate_sentence_terminals(sentence, start, end)
+        assert concatenated == expected
 
 
 def test_list_regex():

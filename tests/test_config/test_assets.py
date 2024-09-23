@@ -11,10 +11,14 @@ from sign_language_translator.utils.parallel import threaded_map
 
 def test_set_assets_dir():
     default = slt.Assets.ROOT_DIR
-
     temp_dir = tempfile.gettempdir()
-    slt.Assets.set_root_dir(temp_dir)
-    slt.Assets.download("text-preprocessing.json")
+    try:
+        slt.Assets.set_root_dir(temp_dir)
+        slt.Assets.download("text-preprocessing.json")
+    except Exception as exc:
+        slt.Assets.set_root_dir(default)
+        raise exc
+
     download_path = os.path.abspath(os.path.join(temp_dir, "text-preprocessing.json"))
     assert os.path.exists(download_path)
     assert download_path == Assets.get_path("text-preprocessing.json")[0]
@@ -23,7 +27,6 @@ def test_set_assets_dir():
         with tempfile.NamedTemporaryFile() as f:
             slt.Assets.set_root_dir(f.name)
 
-    os.makedirs(default, exist_ok=True)
     slt.Assets.set_root_dir(default)
 
 

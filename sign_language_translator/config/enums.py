@@ -62,8 +62,11 @@ class Organizations(Enum, metaclass=PrintableEnumMeta):
     """
 
     HFAD = "hfad"
+    """Hamza Foundation Academy for the Deaf (Lahore, Pakistan)"""
     # NISE = "nise"
+    # """National Institute of Special Education (Islamabad, Pakistan)"""
     # FESF = "fesf"
+    # """Family Educational Services Foundation (Karachi, Pakistan)"""
 
 
 class SignCollections(Enum, metaclass=PrintableEnumMeta):
@@ -93,11 +96,11 @@ class TextLanguages(Enum, metaclass=PrintableEnumMeta):
     Attributes:
         - URDU (str): Short code for the Urdu language.
         - HINDI (str): Short code for the Hindi language.
-        ...
+        - ENGLISH (str): Short code for the English language.
     """
 
     URDU = "ur"
-    # ENGLISH = "en"
+    ENGLISH = "en"
     HINDI = "hi"
 
 
@@ -283,6 +286,11 @@ def normalize_short_code(short_code: Union[str, Enum]) -> str:
             "urdu",
             "urd",
             "ur",
+        },
+        TextLanguages.ENGLISH.value: {
+            "english",
+            "eng",
+            "en",
         },
         TextLanguages.HINDI.value: {
             "hindi",

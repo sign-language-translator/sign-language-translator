@@ -629,7 +629,7 @@ class Landmarks(Sign):
             n_landmarks = self.connections.n_landmarks
             n_features = self.connections.n_features
 
-        data = np.loadtxt(path, delimiter=sep, skiprows=int(bool(header)))
+        data = np.loadtxt(path, delimiter=sep, skiprows=int(bool(header)), ndmin=2)
 
         return data.reshape(data.shape[0], n_landmarks, n_features)
 

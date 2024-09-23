@@ -72,7 +72,7 @@ Translation
 .. code-block:: python
    :linenos:
    :caption: Text to Sign Language Translation
-   :emphasize-lines: 4,7,9
+   :emphasize-lines: 4,7,9,11
 
    import sign_language_translator as slt
 
@@ -85,13 +85,16 @@ Translation
    sign = model.translate(text) # tokenize, map, download & concatenate
    sign.show()
 
-   model.text_language = slt.TextLanguageCodes.HINDI  # or object of any child of `slt.languages.TextLanguage`` class
-   model.sign_format = slt.SignFormatCodes.LANDMARKS  # or object of any child of `slt.vision.sign.Sign` class
+   model.sign_format = slt.SignFormatCodes.LANDMARKS
    model.sign_embedding_model = "mediapipe-world"
 
-   sign_2 = model.translate("कैसे हैं आप?") # "how-are-you"
-   sign_2.save("how-are-you.csv", overwrite=True)
-   sign_2.save_animation("how-are-you.gif", overwrite=True)
+   model.text_language = slt.languages.text.English()
+   sign_2 = model.translate("This is an apple.")
+   sign_2.save("this-is-an-apple.csv", overwrite=True)
+
+   model.text_language = slt.TextLanguageCodes.HINDI
+   sign_3 = model.translate("कैसे हैं आप?") # "how-are-you"
+   sign_3.save_animation("how-are-you.gif", overwrite=True)
 
 .. code-block:: python
    :linenos: 2,6,7,11,12
@@ -100,7 +103,7 @@ Translation
    import sign_language_translator as slt
 
    # sign = slt.Video("path/to/video.mp4")
-   sign = slt.Video.load_asset("pk-hfad-1_آپ-کا-نام-کیا(what)-ہے")  # your name what is? (auto-downloaded)
+   sign = slt.Video.load_asset("pk-hfad-1_aap-ka-nam-kya(what)-hy")  # your name what is? (auto-downloaded)
    sign.show_frames_grid()
 
    # Extract Pose Vector for feature reduction
@@ -251,27 +254,62 @@ Process text strings using language specific classes:
 
 .. code-block:: python
    :linenos:
+   :caption: English Text Processor
+
+   from sign_language_translator.languages.text import English
+   en_nlp = English()
+
+   text = "Hello , I lived in U.S.A.! What about you? 😄"
+   text = en_nlp.preprocess(text)              # 'Hello, I lived in U.S.A.! What about you?'
+
+   sentences = en_nlp.sentence_tokenize(text)  # ['Hello, I lived in U.S.A.!', 'What about you?']
+   tokens = en_nlp.tokenize(sentences[1])      # ['What', 'about', 'you', '?']
+   tagged = en_nlp.tag(tokens)                 # [('What', Tags.SUPPORTED_WORD), ('about', Tags.WORD), ('you', Tags.AMBIGUOUS), ('?', Tags.PUNCTUATION)]
+   senses = en_nlp.get_word_senses(["close", "orange"])  # [['close(shut)', 'close(near)'], ['orange(fruit)', 'orange(color)']]
+
+
+.. code-block:: python
+   :linenos:
    :caption: Urdu Text Processor
 
    from sign_language_translator.languages.text import Urdu
    ur_nlp = Urdu()
 
+   english_script = ur_nlp.romanize("کاش یہ اتنا آسان ہوتا۔")
+   # english_script: "kash yh atna aasan hota."
+
    text = "hello جاؤں COVID-19."
 
    normalized_text = ur_nlp.preprocess(text)
-   # normalized_text = 'جاؤں COVID-19.' # replace/remove unicode characters
+   # normalized_text: 'جاؤں COVID-19.' # replace/remove unicode characters
 
    tokens = ur_nlp.tokenize(normalized_text)
-   # tokens = ['جاؤں', ' ', 'COVID', '-', '19', '.']
+   # tokens: ['جاؤں', ' ', 'COVID', '-', '19', '.']
 
    # tagged = ur_nlp.tag(tokens)
-   # tagged = [('جاؤں', Tags.SUPPORTED_WORD), (' ', Tags.SPACE), ...]
+   # tagged: [('جاؤں', Tags.SUPPORTED_WORD), (' ', Tags.SPACE), ...]
 
    tags = ur_nlp.get_tags(tokens)
-   # tags = [Tags.SUPPORTED_WORD, Tags.SPACE, Tags.ACRONYM, ...]
+   # tags: [Tags.SUPPORTED_WORD, Tags.SPACE, Tags.ACRONYM, ...]
 
-   # word_senses = ur_nlp.get_word_senses("میں")
-   # word_senses = [["میں(i)", "میں(in)"]]
+   word_senses = ur_nlp.get_word_senses("میں")
+   # word_senses: [["میں(i)", "میں(in)"]]  # multiple meanings
+
+
+.. code-block:: python
+   :linenos:
+   :caption: Hindi Text Processor
+
+   from sign_language_translator.languages.text import Hindi
+   hi_nlp = Hindi()
+
+   text = "नमस्ते आप कैसे हैं? "
+   text = hi_nlp.preprocess(text)  # 'नमस्ते आप कैसे हैं?'
+
+   hi_nlp.romanize(text)           # 'nmste āp kaise hain?'
+   tokens = hi_nlp.tokenize(text)  # ['नमस्ते', 'आप', 'कैसे', 'हैं', '?']
+   tags = hi_nlp.get_tags(tokens)  # [Tags.WORD, Tags.SUPPORTED_WORD, Tags.SUPPORTED_WORD, Tags.SUPPORTED_WORD, Tags.PUNCTUATION]
+   senses = hi_nlp.get_word_senses(["सोने"])  # [['सोने(स्वर्ण)']]
 
 Sign Language Processing
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -296,9 +334,9 @@ For video processing, see :ref:`vision` section.
    tokens, tags, _ = psl.restructure_sentence(tokens, tags, None) # ["he", "school", "go"]
    signs  = psl.tokens_to_sign_dicts(tokens, tags)
    # signs = [
-   #   {'signs': [['pk-hfad-1_وہ']], 'weights': [1.0]},
+   #   {'signs': [['pk-hfad-1_that']], 'weights': [1.0]},
    #   {'signs': [['pk-hfad-1_school']], 'weights': [1.0]},
-   #   {'signs': [['pk-hfad-1_گیا']], 'weights': [1.0]}
+   #   {'signs': [['pk-hfad-1_gia']], 'weights': [1.0]}
    # ]
 
 Vision
@@ -545,7 +583,7 @@ View the directory structure of the present state of the assets folder.
    └── videos
       ├── pk-hfad-1_1.mp4
       ├── pk-hfad-1_cow.mp4
-      └── pk-hfad-1_مجھے.mp4
+      └── pk-hfad-1_me.mp4
 
 .. code-block:: bash
    :caption: Directories only

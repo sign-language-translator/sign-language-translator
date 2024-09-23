@@ -41,6 +41,7 @@ from sign_language_translator.utils.utils import (
     ProgressStatusCallback,
     extract_recursive,
     in_jupyter_notebook,
+    is_internet_available,
     is_regex,
     sample_one_index,
     search_in_values_to_retrieve_key,
@@ -61,6 +62,7 @@ __all__ = [
     "adjust_vector_angle",
     "align_vectors",
     "validate_path_exists",
+    "is_internet_available",
     # classes
     "Archive",
     "ArrayOps",

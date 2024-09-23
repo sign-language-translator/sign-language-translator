@@ -73,8 +73,7 @@ class Vocab:
 
         # initialize properties with defaults
         self.word_to_labels: Dict[str, List[List[str]]] = {}
-        self.supported_words_with_word_sense: Set[str] = set()
-        self.supported_words: Set[str] = set()  # TODO: why does this variable exist?
+        self.supported_tokens: Set[str] = set()
         self.ambiguous_to_unambiguous: Dict[str, List[str]] = {}
         self.person_names: List[str] = []
         self.words_to_numbers: Dict[str, int] = {}
@@ -160,12 +159,9 @@ class Vocab:
                     )
                 )
 
-        self.supported_words_with_word_sense = set(self.word_to_labels)
-        self.supported_words = {
-            self.remove_word_sense(w) for w in self.supported_words_with_word_sense
-        }
+        self.supported_tokens = set(self.word_to_labels)
         self.ambiguous_to_unambiguous = self._make_disambiguation_map(
-            self.supported_words_with_word_sense
+            self.supported_tokens
         )
         self.labels: Set[str] = {
             label

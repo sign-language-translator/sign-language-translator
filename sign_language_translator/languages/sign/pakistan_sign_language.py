@@ -26,7 +26,7 @@ class PakistanSignLanguage(SignLanguage):
         STOPWORDS (set): A set of stopwords in Pakistan Sign Language.
     """
 
-    STOPWORDS = {"is", "am", "are"}
+    STOPWORDS = {"the", "so"}
 
     @staticmethod
     def name() -> str:
@@ -109,11 +109,11 @@ class PakistanSignLanguage(SignLanguage):
         priority = float("inf")
 
         for rule in self.mapping_rules:
-            if rule.is_applicable(token, tag, context):
+            if rule.is_applicable(token.lower(), tag, context):
                 if rule.priority < priority or (
                     rule.priority == priority and random.random() < 0.5
                 ):
-                    sign = rule.apply(token)
+                    sign = rule.apply(token.lower())
                     priority = rule.priority
 
         if sign is None and tag == Tags.AMBIGUOUS:
@@ -144,7 +144,7 @@ class PakistanSignLanguage(SignLanguage):
         # drop stuff
         for token, tag, context in zip(sentence, tags, contexts):
             # drop stop-words
-            if token in self.STOPWORDS:
+            if token.lower() in self.STOPWORDS:
                 continue
 
             # drop space and punctuation
