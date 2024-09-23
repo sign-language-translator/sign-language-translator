@@ -17,10 +17,14 @@ from urllib3.exceptions import HTTPError
 
 try:
     from deep_translator import GoogleTranslator
-    from deep_translator.exceptions import BaseError as DeepTranslatorError
+    from deep_translator.exceptions import (
+        BaseError as DeepTranslatorError,
+        TooManyRequests,
+    )
 except ImportError:
     GoogleTranslator = None
     DeepTranslatorError = None
+    TooManyRequests = None
 
 from sign_language_translator.utils.parallel import threaded_map
 
@@ -218,7 +222,11 @@ class SynonymFinder:
         try:
             self.translator.target = target_language
             return str(self.translator.translate(text)).strip()
-        except (HTTPError, DeepTranslatorError or HTTPError) as exc:
+        except (
+            HTTPError,
+            DeepTranslatorError or HTTPError,
+            TooManyRequests or HTTPError,
+        ) as exc:
             warn(f"Translation failed for '{text}' to '{target_language}'.Error: {exc}")
             return ""
 

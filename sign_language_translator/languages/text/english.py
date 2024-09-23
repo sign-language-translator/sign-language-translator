@@ -101,6 +101,9 @@ class English(TextLanguage):
 
         return word_senses
 
+    def romanize(self, text: str, *args, add_diacritics=True, **kwargs) -> str:
+        return text
+
     # ================== #
     #     Characters     #
     # ================== #
@@ -182,7 +185,7 @@ class English(TextLanguage):
                 | set(self.vocab.person_names)
             ),  # TODO: | one-hundred twenty-three (\d[ \d]*): ["100", "23"] --> ["123"]
             end_of_sentence_tokens=self.END_OF_SENTENCE_MARKS,
-            full_stops=self.FULL_STOPS,
+            acronym_periods=self.FULL_STOPS,
             non_sentence_end_words=list(ascii_uppercase),  # (acronyms)
             tokenized_word_sense_pattern=[self.WORD_REGEX, r"\(", [r"name"], r"\)"],
             # todo: generalize the tokenized_word_sense_pattern arg for more ListRegex patterns  e.g. numbers & contractions

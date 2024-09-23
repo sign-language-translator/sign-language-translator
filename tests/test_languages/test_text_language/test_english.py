@@ -203,3 +203,15 @@ def test_english_word_sense_disambiguation():
         predicted_senses = nlp.get_word_senses(tokens)
         for predicted, expected in zip(predicted_senses, senses):
             assert expected <= set(predicted)
+
+
+def test_english_romanization():
+    nlp = English()
+
+    texts = [
+        "Hello, how are you?",
+    ]
+    expected_romanized = texts
+
+    for txt, exp_rom in zip(texts, expected_romanized):
+        assert exp_rom == nlp.romanize(txt)

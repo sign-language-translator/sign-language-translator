@@ -153,3 +153,21 @@ def test_word_senses():
     word_senses = list(map(lambda x: set(ur_nlp.get_word_senses(x)[0]), raw_words))
 
     assert word_senses == expected_word_senses
+
+
+def test_urdu_romanization():
+    nlp = Urdu()
+
+    texts = [
+        "ایک انار سو بیمار کی مثال تو ہم سب نے ہی سنی ہے۔",
+        "میں نے ۴۷ کتابیں خریدی ہیں۔ ۱۹۸۷ء",
+        "مکّهی کا زکریّاؒ کی قابلِ تعریف قوّت سے منہ کهٹّا ہو گیا ہے۔۔۔",
+    ]
+    expected_romanized = [
+        ("ayk anar so bimar ki msal to hm sb ny hi sni hy.", True),
+        ("mein̲ ny 47 ktabein̲ k̲h̲ridi hen̲. 1987CE", True),
+        ("mkkhi ka zkryya(RH) ki qabl-e ta'rif qoot sy mnh khtta ho gya hy...", False),
+    ]
+
+    for txt, (exp_rom, diacritics) in zip(texts, expected_romanized):
+        assert exp_rom == nlp.romanize(nlp.preprocess(txt), add_diacritics=diacritics)

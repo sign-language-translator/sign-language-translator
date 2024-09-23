@@ -7,7 +7,7 @@ def get_tokenizer():
     tokenizer = SignTokenizer(
         word_regex=r"[a-zA-Z]+",
         compound_words=["ice-cream", "book shop"],
-        full_stops=["."],
+        acronym_periods=["."],
         end_of_sentence_tokens=[".", "?", "!"],
         non_sentence_end_words=list(string.ascii_uppercase),
         tokenized_word_sense_pattern=[

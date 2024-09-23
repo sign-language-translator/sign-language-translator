@@ -254,27 +254,62 @@ Process text strings using language specific classes:
 
 .. code-block:: python
    :linenos:
+   :caption: English Text Processor
+
+   from sign_language_translator.languages.text import English
+   en_nlp = English()
+
+   text = "Hello , I lived in U.S.A.! What about you? 😄"
+   text = en_nlp.preprocess(text)              # 'Hello, I lived in U.S.A.! What about you?'
+
+   sentences = en_nlp.sentence_tokenize(text)  # ['Hello, I lived in U.S.A.!', 'What about you?']
+   tokens = en_nlp.tokenize(sentences[1])      # ['What', 'about', 'you', '?']
+   tagged = en_nlp.tag(tokens)                 # [('What', Tags.SUPPORTED_WORD), ('about', Tags.WORD), ('you', Tags.AMBIGUOUS), ('?', Tags.PUNCTUATION)]
+   senses = en_nlp.get_word_senses(["close", "orange"])  # [['close(shut)', 'close(near)'], ['orange(fruit)', 'orange(color)']]
+
+
+.. code-block:: python
+   :linenos:
    :caption: Urdu Text Processor
 
    from sign_language_translator.languages.text import Urdu
    ur_nlp = Urdu()
 
+   english_script = ur_nlp.romanize("کاش یہ اتنا آسان ہوتا۔")
+   # english_script: "kash yh atna aasan hota."
+
    text = "hello جاؤں COVID-19."
 
    normalized_text = ur_nlp.preprocess(text)
-   # normalized_text = 'جاؤں COVID-19.' # replace/remove unicode characters
+   # normalized_text: 'جاؤں COVID-19.' # replace/remove unicode characters
 
    tokens = ur_nlp.tokenize(normalized_text)
-   # tokens = ['جاؤں', ' ', 'COVID', '-', '19', '.']
+   # tokens: ['جاؤں', ' ', 'COVID', '-', '19', '.']
 
    # tagged = ur_nlp.tag(tokens)
-   # tagged = [('جاؤں', Tags.SUPPORTED_WORD), (' ', Tags.SPACE), ...]
+   # tagged: [('جاؤں', Tags.SUPPORTED_WORD), (' ', Tags.SPACE), ...]
 
    tags = ur_nlp.get_tags(tokens)
-   # tags = [Tags.SUPPORTED_WORD, Tags.SPACE, Tags.ACRONYM, ...]
+   # tags: [Tags.SUPPORTED_WORD, Tags.SPACE, Tags.ACRONYM, ...]
 
-   # word_senses = ur_nlp.get_word_senses("میں")
-   # word_senses = [["میں(i)", "میں(in)"]]
+   word_senses = ur_nlp.get_word_senses("میں")
+   # word_senses: [["میں(i)", "میں(in)"]]  # multiple meanings
+
+
+.. code-block:: python
+   :linenos:
+   :caption: Hindi Text Processor
+
+   from sign_language_translator.languages.text import Hindi
+   hi_nlp = Hindi()
+
+   text = "नमस्ते आप कैसे हैं? "
+   text = hi_nlp.preprocess(text)  # 'नमस्ते आप कैसे हैं?'
+
+   hi_nlp.romanize(text)           # 'nmste āp kaise hain?'
+   tokens = hi_nlp.tokenize(text)  # ['नमस्ते', 'आप', 'कैसे', 'हैं', '?']
+   tags = hi_nlp.get_tags(tokens)  # [Tags.WORD, Tags.SUPPORTED_WORD, Tags.SUPPORTED_WORD, Tags.SUPPORTED_WORD, Tags.PUNCTUATION]
+   senses = hi_nlp.get_word_senses(["सोने"])  # [['सोने(स्वर्ण)']]
 
 Sign Language Processing
 ^^^^^^^^^^^^^^^^^^^^^^^^

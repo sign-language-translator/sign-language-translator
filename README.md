@@ -314,10 +314,11 @@ Available Functions:
 - Token Classification (Tagging)
 - Word Sense Disambiguation
 
-| Name                                                                                                                                     | Vocabulary         | Ambiguous tokens | Signs |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | ---------------- | ----- |
-| [Urdu](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/urdu.py)   | 2090 words+phrases | 227              | 790   |
-| [Hindi](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/hindi.py) | 92 words+phrases   | 5                | 61    |
+| Name | Vocabulary | Ambiguous tokens | Signs |
+| - | - | - | - |
+| [English](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/english.py) | 1591 words+phrases | 167 | 776 |
+| [Urdu](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/urdu.py)    | 2080 words+phrases | 227 | 776 |
+| [Hindi](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/text/hindi.py)   |  137 words+phrases |   5 |  84 |
 
 </details>
 
@@ -330,9 +331,9 @@ Available Functions:
 - Sentence restructuring according to grammar
 - Sentence simplification (drop stopwords)
 
-| Name                                                                                                                                                                       | Vocabulary | Dataset  | Parallel Corpus                                         |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------- | ------------------------------------------------------- |
-| [Pakistan Sign Language](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py) | 789        | 23 hours | n gloss sentences with translations in m text languages |
+| Name | Vocabulary | Dataset | Parallel Corpus |
+| - | - | - | :-: |
+| [Pakistan Sign Language](https://github.com/sign-language-translator/sign-language-translator/blob/main/sign_language_translator/languages/sign/pakistan_sign_language.py) | 776 | 23 hours | [details](https://github.com/sign-language-translator/sign-language-datasets#datasets) |
 
 </details>
 
@@ -737,11 +738,11 @@ Stay Tuned for research Papers!
 
 ## Credits and Gratitude
 
-This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for [Mudassar](https://github.com/mdsrqbl) who has continued it till at least 2024-09-18.
+This project started in October 2021 as a BS Computer Science final year project with 3 students and 1 supervisor. After 9 months at university, it became a hobby project for [Mudassar](https://github.com/mdsrqbl) who has continued it till at least 2024-09-23.
 
 ## Bonus
 
-Count total number of **lines of code** (Package: **13,605** + Tests: **2,848**):
+Count total number of **lines of code** (Package: **14,034** + Tests: **2,928**):
 
 ```bash
 git ls-files | grep '\.py' | xargs wc -l
