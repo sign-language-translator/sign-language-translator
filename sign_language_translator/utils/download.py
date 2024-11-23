@@ -88,7 +88,11 @@ def download(
                     fp.write(chunk)
 
                 # Calculate download speed (exponential moving average)
-                speed += len(chunk) / (1024**2) / (time() - start_time)
+                elapsed_time = time() - start_time
+                if elapsed_time==0:
+                    speed += 0
+                else:
+                    speed += len(chunk) / (1024**2) / (time() - start_time)
                 speed /= 2
                 start_time = time()
 
