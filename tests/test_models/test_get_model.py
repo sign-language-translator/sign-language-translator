@@ -3,6 +3,7 @@ import sys
 from sign_language_translator import ModelCodes
 from sign_language_translator.models import (
     ConcatenativeSynthesis,
+    MediaPipeHolisticModel,
     MediaPipeLandmarksModel,
     MixerLM,
     NgramLanguageModel,
@@ -36,6 +37,12 @@ def test_get_model():
     # video embedding models
     if (3, 8) <= sys.version_info <= (3, 11):
         assert isinstance(get_model("mediapipe"), MediaPipeLandmarksModel)
+    if (3, 8) <= sys.version_info < (3, 12):
+        model = get_model(ModelCodes.MEDIAPIPE_HOLISTIC_V2.value)
+        assert isinstance(model, MediaPipeHolisticModel)
+        assert model.model_complexity == 2
+        assert get_model("mediapipe-holistic-0").model_complexity == 0
+        assert isinstance(get_model("holistic"), MediaPipeHolisticModel)
 
     # non-existent model
     assert get_model("non-existent-model-code-should-return-None") is None

@@ -16,6 +16,9 @@ Available Models:
 - **`MediaPipeLandmarksModel`**: A model that utilizes MediaPipe's pose & hand solution to generate video embeddings.
     It detects keypoints representing body joints and estimates their position in 3D world coordinates and in the frame pixels.
 
+- **`MediaPipeHolisticModel`**: A model that utilizes MediaPipe's Holistic solution to generate video embeddings.
+    Hands are tracked from the body pose (the landmark setup of OpenHands), with the same output layout as `MediaPipeLandmarksModel`.
+
 Usage:
 ------
 
@@ -33,6 +36,9 @@ Usage:
     print(embeddings.shape) # (n_frames, n_landmarks * 5)
 """
 
+from sign_language_translator.models.video_embedding.mediapipe_holistic_model import (
+    MediaPipeHolisticModel,
+)
 from sign_language_translator.models.video_embedding.mediapipe_landmarks_model import (
     MediaPipeLandmarksModel,
 )
@@ -43,6 +49,7 @@ from sign_language_translator.models.video_embedding.video_embedding_model impor
 __all__ = [
     "VideoEmbeddingModel",
     "MediaPipeLandmarksModel",
+    "MediaPipeHolisticModel",
 ]
 
 # TODO: more models

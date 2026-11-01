@@ -643,6 +643,9 @@ Embed **videos** into a sequence of vectors using a selected embedding model:
    slt embed videos/*.mp4 --model-code mediapipe-pose-2-hand-1 --embedding-type world \
       --processes 4 --save-format csv --output-dir ./embeddings
 
+To extract landmarks with the MediaPipe Holistic solution (hands tracked from the body pose, as in OpenHands),
+use ``--model-code mediapipe-holistic-2`` with ``--embedding-type image``.
+
 Embed texts
 ^^^^^^^^^^^^
 

@@ -73,6 +73,11 @@ def get_model(model_code: Union[str, Enum], *args, **kwargs):
         )
         return TransformerLanguageModel.load(Assets.get_path(f"models/{model_code}")[0])
 
+    if model_code in ModelCodeGroups.ALL_MEDIAPIPE_HOLISTIC_MODELS.value:
+        from sign_language_translator.models import MediaPipeHolisticModel
+
+        return MediaPipeHolisticModel(model_complexity=int(model_code.split("-")[-1]))
+
     if model_code in ModelCodeGroups.ALL_MEDIAPIPE_EMBEDDING_MODELS.value:
         from sign_language_translator.models import MediaPipeLandmarksModel
 
