@@ -423,6 +423,7 @@ def embed(
     1. mediapipe-pose-2-hand-1\n
     2. mediapipe-pose-1-hand-1\n
     3. mediapipe-pose-0-hand-1\n
+    4. mediapipe-holistic-2 (also -1, -0)\n
     Example:\n
         $ slt embed dataset/*.mp4 --model-code mediapipe-pose-2-hand-1 --embedding-type all --processes 4 --save-format csv\n
 

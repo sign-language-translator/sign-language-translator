@@ -22,6 +22,7 @@ Video Embedding:
 ----------------
 - VideoEmbeddingModel: An abstract model that embeds video frames into a vector space.
 - MediaPipeLandmarksModel: A video embedding model that utilizes MediaPipe for pose and hand landmark extraction.
+- MediaPipeHolisticModel: A video embedding model that utilizes MediaPipe Holistic for pose and hand landmark extraction.
 
 Text Embedding:
 ---------------
@@ -57,6 +58,7 @@ from sign_language_translator.models.text_embedding import (
 from sign_language_translator.models.text_to_sign import ConcatenativeSynthesis
 from sign_language_translator.models.text_to_sign.t2s_model import TextToSignModel
 from sign_language_translator.models.video_embedding import (
+    MediaPipeHolisticModel,
     MediaPipeLandmarksModel,
     VideoEmbeddingModel,
 )
@@ -77,6 +79,7 @@ __all__ = [
     "LanguageModel",
     "TextToSignModel",
     "MediaPipeLandmarksModel",
+    "MediaPipeHolisticModel",
     "VideoEmbeddingModel",
     "TextEmbeddingModel",
     "VectorLookupModel",

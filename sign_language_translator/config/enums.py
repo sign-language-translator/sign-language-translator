@@ -161,6 +161,9 @@ class ModelCodes(Enum, metaclass=PrintableEnumMeta):
         - MEDIAPIPE_POSE_V2_HAND_V1 (str): Short code for a video embedding model which uses MediaPipe pose_landmarker_heavy & hand_landmarker.
         - MEDIAPIPE_POSE_V1_HAND_V1 (str): Short code for a video embedding model which uses MediaPipe pose_landmarker_full & hand_landmarker.
         - MEDIAPIPE_POSE_V0_HAND_V1 (str): Short code for a video embedding model which uses MediaPipe pose_landmarker_lite & hand_landmarker.
+        - MEDIAPIPE_HOLISTIC_V2 (str): Short code for a video embedding model which uses the MediaPipe Holistic solution with model_complexity=2.
+        - MEDIAPIPE_HOLISTIC_V1 (str): Short code for a video embedding model which uses the MediaPipe Holistic solution with model_complexity=1.
+        - MEDIAPIPE_HOLISTIC_V0 (str): Short code for a video embedding model which uses the MediaPipe Holistic solution with model_complexity=0.
 
         - LOOKUP_UR_FASTTEXT_CC (str): Short code for a text embedding model which uses a lookup table to embed Urdu tokens using fastText embeddings trained on Common Crawl.
     """
@@ -188,6 +191,12 @@ class ModelCodes(Enum, metaclass=PrintableEnumMeta):
     """Short code for the video embedding model which uses MediaPipe pose_landmarker_full  & hand_landmarker to generate (33 pose + 2 * 21 hand) world & 75 image landmarks (x, y, z, visibility, presence) for each frame of the video."""
     MEDIAPIPE_POSE_V0_HAND_V1 = "mediapipe-pose-0-hand-1"
     """Short code for the video embedding model which uses MediaPipe pose_landmarker_lite  & hand_landmarker to generate (33 pose + 2 * 21 hand) world & 75 image landmarks (x, y, z, visibility, presence) for each frame of the video."""
+    MEDIAPIPE_HOLISTIC_V2 = "mediapipe-holistic-2"
+    """Short code for the video embedding model which uses the MediaPipe Holistic solution (model_complexity=2) to generate (33 pose + 2 * 21 hand) image landmarks & 33 pose world landmarks (x, y, z, visibility, presence) for each frame of the video. Same landmark setup as OpenHands."""
+    MEDIAPIPE_HOLISTIC_V1 = "mediapipe-holistic-1"
+    """Short code for the video embedding model which uses the MediaPipe Holistic solution (model_complexity=1) to generate (33 pose + 2 * 21 hand) image landmarks & 33 pose world landmarks (x, y, z, visibility, presence) for each frame of the video."""
+    MEDIAPIPE_HOLISTIC_V0 = "mediapipe-holistic-0"
+    """Short code for the video embedding model which uses the MediaPipe Holistic solution (model_complexity=0) to generate (33 pose + 2 * 21 hand) image landmarks & 33 pose world landmarks (x, y, z, visibility, presence) for each frame of the video."""
 
     # text-embedding-models
     LOOKUP_UR_FASTTEXT_CC = "lookup-ur-fasttext-cc.pt"
@@ -220,6 +229,7 @@ class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
 
         ALL_VIDEO_EMBEDDING_MODELS (set): Set of model codes for all video embedding models.
         ALL_MEDIAPIPE_EMBEDDING_MODELS (set): Set of model codes for all MediaPipe-based video embedding models.
+        ALL_MEDIAPIPE_HOLISTIC_MODELS (set): Set of model codes for MediaPipe Holistic based video embedding models.
 
         ALL_TEXT_EMBEDDING_MODELS (set): Set of model codes for all text embedding models.
         ALL_VECTOR_LOOKUP_MODELS (set): Set of model codes for all vector lookup-based text embedding models.
@@ -244,11 +254,16 @@ class ModelCodeGroups(Enum, metaclass=PrintableEnumMeta):
     )
 
     # video embedding models
+    ALL_MEDIAPIPE_HOLISTIC_MODELS = {
+        ModelCodes.MEDIAPIPE_HOLISTIC_V2.value,
+        ModelCodes.MEDIAPIPE_HOLISTIC_V1.value,
+        ModelCodes.MEDIAPIPE_HOLISTIC_V0.value,
+    }
     ALL_MEDIAPIPE_EMBEDDING_MODELS = {
         ModelCodes.MEDIAPIPE_POSE_V2_HAND_V1.value,
         ModelCodes.MEDIAPIPE_POSE_V1_HAND_V1.value,
         ModelCodes.MEDIAPIPE_POSE_V0_HAND_V1.value,
-    }
+    } | ALL_MEDIAPIPE_HOLISTIC_MODELS
     ALL_VIDEO_EMBEDDING_MODELS = ALL_MEDIAPIPE_EMBEDDING_MODELS
 
     # text embedding models
@@ -336,6 +351,10 @@ def normalize_short_code(short_code: Union[str, Enum]) -> str:
         },
         ModelCodes.MEDIAPIPE_POSE_V2_HAND_V1.value: {
             "mediapipe",
+        },
+        ModelCodes.MEDIAPIPE_HOLISTIC_V2.value: {
+            "mediapipe-holistic",
+            "holistic",
         },
         SignEmbeddingModels.MEDIAPIPE_IMAGE.value: {
             "landmark-mediapipe-image",
